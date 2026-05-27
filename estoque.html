@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scanner Estoque PWA</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-color: #0b0e14;
+            --surface-color: rgba(20, 25, 34, 0.7);
+            --text-main: #ffffff;
+            --text-muted: #8b9bb4;
+            
+            /* Cores Neon */
+            --glow-cyan: #00f3ff;
+            --glow-green: #00ff66;
+            --glow-orange: #ff9900;
+            --glow-red: #ff3366;
+            --glow-grey: #4a5568;
+            
+            /* Cores de Toners CMYK */
+            --toner-yellow: #ffea00;
+            --toner-magenta: #ff007f;
+            --toner-cyan: #00bfff;
+            --toner-black: #333333;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: radial-gradient(circle at 50% 0%, #1a2332 0%, #0b0e14 70%);
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 400px;
+            height: 100vh;
+            max-height: 850px;
+            padding: 2rem 1.5rem;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(0, 243, 255, 0.1);
+            background: rgba(11, 14, 20, 0.95);
+        }
+
+        /* Controle de Telas (SPA) */
+        .screen {
+            display: none;
+            flex-direction: column;
+            height: 100%;
+            overflow-y: auto;
+            padding-bottom: 80px;
+            animation: fadeIn 0.25s ease-in-out;
+        }
+
+        .screen.active { display: flex; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.98); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        /* Cabeçalhos */
+        header {
+            text-align: center;
+            position: relative;
+            padding-bottom: 1rem;
+            margin-bottom: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        h1 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            text-shadow: 0 0 10px rgba(0, 243, 255, 0.3);
+        }
+
+        header::after {
+            content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+            width: 60%; height: 2px; background: var(--glow-cyan); box-shadow: 0 0 15px var(--glow-cyan); border-radius: 50%;
+        }
+
+        /* Grids de Navegação */
+        .grid-main, .grid-items {
+            display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem;
+        }
+
+        /* Botões Base */
+        .btn {
+            background: var(--surface-color); border-radius: 12px; padding: 1.2rem 0.5rem;
+            display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.8rem;
+            color: var(--text-main); cursor: pointer; transition: all 0.2s ease; backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.05); text-align: center;
+        }
+        .btn span { font-size: 0.8rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
+
+        .btn-cyan i { color: var(--glow-cyan); font-size: 2rem; }
+        .btn-cyan:hover { border-color: var(--glow-cyan); box-shadow: 0 0 10px rgba(0, 243, 255, 0.2); }
+        .btn-green { border-bottom: 2px solid var(--glow-green); }
+        .btn-green:hover { border-color: var(--glow-green); box-shadow: 0 0 10px rgba(0,255,102,0.1); }
+        .btn-grey { border-bottom: 2px solid var(--glow-grey); opacity: 0.6; }
+        .btn-orange { border-bottom: 2px solid var(--glow-orange); }
+
+        /* --- CONTROLES DOS SUB-PAINEIS DINÂMICOS --- */
+        .sub-panel {
+            background: rgba(20, 25, 34, 0.6); border: 1px solid rgba(0, 243, 255, 0.1);
+            border-radius: 16px; padding: 1.2rem; margin-bottom: 1rem;
+        }
+        .sub-panel h3 { font-size: 0.9rem; color: var(--glow-cyan); letter-spacing: 1px; margin-bottom: 0.8rem; text-transform: uppercase; }
+
+        .display-stock { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; }
+        
+        /* Input Master de Estoque */
+        .stock-input-master {
+            font-size: 2rem; font-weight: bold; color: var(--glow-green); text-shadow: 0 0 10px rgba(0,255,102,0.2);
+            background: transparent; border: none; border-bottom: 1px dashed rgba(0, 255, 102, 0.3);
+            width: 100px; text-align: left; padding: 0;
+        }
+        .stock-input-master:focus { outline: none; border-bottom-style: solid; border-color: var(--glow-green); }
+        
+        .date-text { font-size: 0.75rem; color: var(--text-muted); }
+
+        .input-group { display: flex; gap: 0.5rem; margin-top: 0.5rem; }
+        .input-futuristic {
+            flex-grow: 1; background: #141922; border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px; padding: 0.6rem; color: #fff; font-weight: bold; text-align: center;
+        }
+        .input-futuristic:focus { outline: none; border-color: var(--glow-cyan); box-shadow: 0 0 8px rgba(0,243,255,0.3); }
+        
+        .btn-action {
+            background: var(--glow-cyan); color: #000; border: none; border-radius: 8px;
+            padding: 0.6rem 1rem; font-weight: bold; cursor: pointer; transition: 0.2s;
+        }
+        .btn-action:hover { background: #00d2dd; box-shadow: 0 0 10px rgba(0,243,255,0.4); }
+
+        /* Estruturação das Listas */
+        .printer-list { display: flex; flex-direction: column; gap: 0.6rem; }
+        .printer-row {
+            display: flex; justify-content: space-between; align-items: center;
+            background: rgba(255,255,255,0.03); padding: 0.6rem 1rem; border-radius: 8px;
+            border-left: 3px solid var(--glow-cyan);
+        }
+        .printer-name { font-weight: bold; letter-spacing: 1px; font-size: 0.9rem; }
+        .printer-model-tag { font-size: 0.7rem; color: var(--text-muted); display: block; font-weight: normal; }
+        
+        .printer-controls { display: flex; align-items: center; gap: 0.5rem; }
+        
+        /* Contador Individual das Maquinas */
+        .printer-counter-input {
+            color: var(--glow-orange); font-weight: bold; background: rgba(20, 25, 34, 0.8);
+            border: 1px solid rgba(255, 153, 0, 0.2); border-radius: 6px; width: 45px; 
+            text-align: center; padding: 0.3rem 0; font-size: 0.9rem;
+        }
+        .printer-counter-input:focus { outline: none; border-color: var(--glow-orange); box-shadow: 0 0 8px rgba(255,153,0,0.3); }
+
+        .btn-output {
+            background: transparent; border: 1px solid var(--glow-orange); color: var(--glow-orange);
+            border-radius: 6px; padding: 0.3rem 0.8rem; font-size: 0.75rem; font-weight: bold; cursor: pointer; transition: 0.2s;
+        }
+        .btn-output:hover { background: var(--glow-orange); color: #000; box-shadow: 0 0 8px rgba(255,153,0,0.3); }
+
+        /* Remove setas de inputs do tipo number */
+        input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        input[type=number] { -moz-appearance: textfield; }
+
+        /* Abas internas para gerenciamento multimoldes */
+        .tab-bar { display: flex; gap: 0.4rem; margin-bottom: 0.8rem; background: rgba(0,0,0,0.2); padding: 0.3rem; border-radius: 8px; }
+        .tab-btn {
+            flex: 1; background: transparent; border: none; color: var(--text-muted); padding: 0.4rem;
+            font-size: 0.7rem; font-weight: bold; cursor: pointer; border-radius: 6px; text-transform: uppercase; transition: 0.2s;
+        }
+        .tab-btn.active { background: rgba(0, 243, 255, 0.1); color: var(--glow-cyan); border: 1px solid rgba(0,243,255,0.2); }
+
+        /* Rodapé de Navegação */
+        .bottom-nav {
+            position: absolute; bottom: 15px; left: 50%; transform: translateX(-50%);
+            display: flex; gap: 2rem; background: rgba(10, 14, 20, 0.95); padding: 0.6rem 2rem;
+            border-radius: 30px; border: 1px solid rgba(0, 243, 255, 0.2); backdrop-filter: blur(10px); z-index: 10;
+        }
+        .nav-btn { background: none; border: none; color: var(--text-main); font-size: 1.3rem; cursor: pointer; transition: 0.2s; }
+        .nav-btn:hover { color: var(--glow-cyan); transform: scale(1.1); }
+
+        /* --- ESTILOS EXCLUSIVOS TELA CARTAZ --- */
+        .cartaz-row {
+            border-left-color: var(--glow-cyan);
+            margin-bottom: 0.4rem;
+        }
+        .cartaz-label {
+            font-weight: bold;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+            width: 85px;
+        }
+        .color-y { color: var(--toner-yellow); text-shadow: 0 0 5px rgba(255,234,0,0.3); }
+        .color-m { color: var(--toner-magenta); text-shadow: 0 0 5px rgba(255,0,127,0.3); }
+        .color-c { color: var(--toner-cyan); text-shadow: 0 0 5px rgba(0,191,255,0.3); }
+        .color-k { color: #bcbcbc; }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        
+        <!-- TELA 1: HOME -->
+        <div id="screen-home" class="screen active">
+            <header><h1>Status Estoque</h1></header>
+            <main class="grid-main">
+                <button class="btn btn-cyan" onclick="openScreen('screen-impressora')">
+                    <i class="fa-solid fa-print"></i><span>IMPRESSORA</span>
+                </button>
+                <button class="btn btn-cyan" onclick="openScreen('screen-balanca')"><i class="fa-solid fa-scale-balanced"></i><span>BALANÇA</span></button>
+                <button class="btn btn-cyan" onclick="openScreen('screen-relogio')"><i class="fa-solid fa-clock"></i><span>RELÓGIO PONTO</span></button>
+            </main>
+        </div>
+
+        <!-- TELA 2: SELEÇÃO IMPRESSORA -->
+        <div id="screen-impressora" class="screen">
+            <header><h1>Impressora</h1></header>
+            <main class="grid-items">
+                <button class="btn btn-green" onclick="openScreen('screen-oficio')"><span>Papel Ofício</span></button>
+                <button class="btn btn-green" onclick="abrirTelaGondola()"><span>ETQ Gondola</span></button>
+                <button class="btn btn-green" onclick="abrirTelaInsumo('fcd')"><span>Foto Condutor</span></button>
+                <button class="btn btn-green" onclick="abrirTelaRibbon()"><span>Ribbon</span></button>
+                <button class="btn btn-green" onclick="abrirTelaInsumo('toner')"><span>Toner</span></button>
+                <button class="btn btn-green" onclick="abrirTelaAmarela()"><span>ETQ Amarela</span></button>
+                <button class="btn btn-orange" onclick="abrirTelaCartaz()"><span>Toner Cartaz</span></button>
+                <button class="btn btn-green" onclick="abrirTelaLaranja()"><span>ETQ Laranja</span></button>
+                <button class="btn btn-green" onclick="abrirTelaTimbrado()"><span>Papel Timbrado</span></button>
+                <button class="btn btn-green" onclick="abrirTelaPonto()"><span>ETQ Ponto</span></button>
+            </main>
+            <nav class="bottom-nav">
+                <button class="nav-btn" onclick="openScreen('screen-home')"><i class="fa-solid fa-house"></i></button>
+                <button class="nav-btn" onclick="openScreen('screen-home')"><i class="fa-solid fa-rotate-left"></i></button>
+            </nav>
+        </div>
+
+        <!-- TELA EXTRA: BALANÇA -->
+        <div id="screen-balanca" class="screen">
+            <header><h1>Balança</h1></header>
+            <main class="grid-items">
+                <button class="btn btn-cyan" style="border-bottom: 2px solid #0056b3;"><span>ETQ Frios</span></button>
+                <button class="btn btn-grey"><span>ETQ HF</span></button>
+                <button class="btn btn-grey"><span>Lamb Lamb</span></button>
+                <button class="btn btn-orange"><span>Lamb Lamb Laranja</span></button>
+            </main>
+            <nav class="bottom-nav">
+                <button class="nav-btn" onclick="openScreen('screen-home')"><i class="fa-solid fa-house"></i></button>
+                <button class="nav-btn" onclick="openScreen('screen-home')"><i class="fa-solid fa-rotate-left"></i></button>
+            </nav>
+        </div>
+
+        <!-- TELA EXTRA: RELÓGIO -->
+        <div id="screen-relogio" class="screen">
+            <header><h1>Relógio</h1></header>
+            <main class="grid-items">
+                <button class="btn btn-orange" onclick="abrirTelaPonto()"><span>ETQ Ponto</span></button>
+            </main>
+            <nav class="bottom-nav">
+                <button class="nav-btn" onclick="openScreen('screen-home')"><i class="fa-solid fa-house"></i></button>
+                <button class="nav-btn" onclick="openScreen('screen-home')"><i class="fa-solid fa-rotate-left"></i></button>
+            </nav>
+        </div>
+
+        <!-- TELA 3: PAPEL OFÍCIO -->
+        <div id="screen-oficio" class="screen">
+            <header><h1>Papel Ofício</h1></header>
+            <div class="sub-panel">
+                <h3>Estoque Central</h3>
+                <div class="display-stock">
+                    <div>
+                        <input type="number" id="lbl-total-estoque-oficio" class="stock-input-master" value="0" onchange="atualizarOficioManual(this.value)">
+                        <span style="display:block; font-size: 0.75rem; color: var(--text-muted); margin-top: 2px;">Unidades Disponíveis</span>
+                    </div>
+                    <div style="text-align: right;">
+                        <span class="date-text" style="display:block; font-weight: bold;">Última Entrada:</span>
+                        <span id="lbl-data-entrada-oficio" class="date-text">-</span>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <input type="number" id="input-qtd-oficio" class="input-futuristic" placeholder="Qtd Resmas">
+                    <button class="btn-action" onclick="adicionarOficio()">ADICIONAR</button>
+                </div>
+            </div>
+            <div class="sub-panel" style="flex-grow: 1;">
+                <h3>Saída para Setores</h3>
+                <div class="printer-list">
+                    <div class="printer-row"><span class="printer-name">NFE</span><div class="printer-controls"><input type="number" id="oficio-NFE" class="printer-counter-input" value="0" onchange="atualizarOficioSetor('NFE', this.value)"><button class="btn-output" onclick="direcionarOficio('NFE')">DIRECIONAR</button></div></div>
+                    <div class="printer-row"><span class="printer-name">RME</span><div class="printer-controls"><input type="number" id="oficio-RME" class="printer-counter-input" value="0" onchange="atualizarOficioSetor('RME', this.value)"><button class="btn-output" onclick="direcionarOficio('RME')">DIRECIONAR</button></div></div>
+                    <div class="printer-row"><span class="printer-name">GER</span><div class="printer-controls"><input type="number" id="oficio-GER" class="printer-counter-input" value="0" onchange="atualizarOficioSetor('GER', this.value)"><button class="btn-output" onclick="direcionarOficio('GER')">DIRECIONAR</button></div></div>
+                    <div class="printer-row"><span class="printer-name">CPD</span><div class="printer-controls"><input type="number" id="oficio-CPD" class="printer-counter-input" value="0" onchange="atualizarOficioSetor('CPD', this.value)"><button class="btn-output" onclick="direcionarOficio('CPD')">DIRECIONAR</button></div></div>
+                    <div class="printer-row"><span class="printer-name">RH</span><div class="printer-controls"><input type="number" id="oficio-RH" class="printer-counter-input" value="0" onchange="atualizarOficioSetor('RH', this.value)"><button class="btn-output" onclick="direcionarOficio('RH')">DIRECIONAR</button></div></div>
+                </div>
+            </div>
+            <nav class="bottom-nav">
+                <button class="nav-btn" onclick="openScreen('screen-home')"><i class="fa-solid fa-house"></i></button>
+                <button class="nav-btn" onclick="openScreen('screen-impressora')"><i class="fa-solid fa-rotate-left"></i></button>
+            </nav>
+        </div>
+
+        <!-- TELA: ETQ GÔNDOLA -->
+        <div id="screen-gondola" class="screen">
+            <header><h1>ETQ Gondola</h1></header>
+            <div class="sub-panel">
+                <h3>Estoque Central</h3>
+                <div class="display-stock">
+                    <div>
+                        <input type="number" id="lbl-total-estoque-gondola" class="stock-input-master" value="0" onchange="atualizarGondolaManual(this.value)">
+                        <span style="display:block; font-size: 0.75rem; color: var(--text-muted); margin-top: 2px;">Unidades Disponíveis</span>
+                    </div>
+                    <div style="text-align: right;">
+                        <span class="date-text" style="display:block; font-weight: bold;">Última Entrada:</span>
+                        <span id="lbl-data-entrada-gondola" class="date-text">-</span>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <input type="number" id="input-qtd-gondola" class="input-futuristic" placeholder="Qtd Unidades">
+                    <button class="btn-action" onclick="adicionarGondola()">ADICIONAR</button>
+                </div>
+            </div>
+            <div class="sub-panel" style="flex-grow: 1;">
+                <h3>Saída</h3>
+                <div class="printer-list">
+                    <div class="printer-row"><span class="printer-name">IMPRESSORA PREÇO</span><div class="printer-controls"><input type="number" id="gondola-PRECO" class="printer-counter-input" value="0" onchange="atualizarGondolaSetor('PRECO', this.value)"><button class="btn-output" onclick="direcionarGondola('PRECO')">DIRECIONAR</button></div></div>
+                    <div class="printer-row"><span class="printer-name">LAMB LAMB</span><div class="printer-controls"><input type="number" id="gondola-LAMB" class="printer-counter-input" value="0" onchange="atualizarGondolaSetor('LAMB', this.value)"><button class="btn-output" onclick="direcionarGondola('LAMB')">DIRECIONAR</button></div></div>
+                </div>
+            </div>
+            <nav class="bottom-nav">
+                <button class="nav-btn" onclick="openScreen('screen-home')"><i class="fa-solid fa-house"></i></button>
+                <button class="nav-btn" onclick="openScreen('screen-impressora')"><i class="fa-solid fa-rotate-left"></i></button>
+            </nav>
+        </div>
+
+        <!-- TELA: RIBBON -->
+        <div id="screen-ribbon" class="screen">
+            <header><h1>Ribbon</h1></header>
+            <div class="sub-panel">
+                <h3>Estoque Central</h3>
+                <div class="display-stock">
+                    <div>
+                        <input type="number" id="lbl-total-estoque-ribbon" class="stock-input-master" value="0" onchange="atualizarRibbonManual(this.value)">
+                        <span style="display:block; font-size: 0.75rem; color: var(--text-muted); margin-top: 2px;">Unidades Disponíveis</span>
+                    </div>
+                    <div style="text-align: right;">
+                        <span class="date-text" style="display:block; font-weight: bold;">Última Entrada:</span>
+                        <span id="lbl-data-entrada-ribbon" class="date-text">-</span>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <input type="number" id="input-qtd-ribbon" class="input-futuristic" placeholder="Qtd Unidades">
+                    <button class="btn-action" onclick="adicionarRibbon()">ADICIONAR</button>
+                </div>
+            </div>
+            <div class="sub-panel" style="flex-grow: 1;">
+                <h3>Saída</h3>
+                <div class="printer-list">
+                    <div class="printer-row"><span class="printer-name">IMPRESSORA PREÇO</span><div class="printer-controls"><input type="number" id="ribbon-PRECO" class="printer-counter-input" value="0" onchange="atualizarRibbonSetor('PRECO', this.value)"><button class="btn-output" onclick="direcionarRibbon('PRECO')">DIRECIONAR</button></div></div>
+                    <div class="printer-row"><span class="printer-name">LAMB LAMB</span><div class="printer-controls"><input type="number" id="ribbon-LAMB" class="printer-counter-input" value="0" onchange="atualizarRibbonSetor('LAMB', this.value)"><button class="btn-output" onclick="direcionarRibbon('LAMB')">DIRECIONAR</button></div></div>
+                </div>
+            </div>
+            <nav class="bottom-nav">
+                <button class="nav-btn" onclick="openScreen('screen-home')"><i class="fa-solid fa-house"></i></button>
+                <button class="nav-btn" onclick="openScreen('screen-impressora')"><i class="fa-solid fa-rotate-left"></i></button>
+            </nav>
+        </div>
+
+        <!-- TELA: ETQ AMARELA -->
+        <div id="screen-amarela" class="screen">
+            <header><h1>ETQ Amarela</h1></header>
+            <div class="sub-panel">
+                <h3>Estoque Central</h3>
+                <div class="display-stock">
+                    <div>
+                        <input type="number" id="lbl-total-estoque-amarela" class="stock-input-master" value="0" onchange="atualizarAmarelaManual(this.value)">
+                        <span style="display:block; font-size: 0.75rem; color: var(--text-muted); margin-top: 2px;">Unidades Disponíveis</span>
+                    </div>
+                    <div style="text-align: right;">
+                        <span class="date-text" style="display:block; font-weight: bold;">Última Entrada:</span>
+                        <span id="lbl-data-entrada-amarela" class="date-text">-</span>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <input type="number" id="input-qtd-amarela" class="input-futuristic" placeholder="Qtd Unidades">
+                    <button class="btn-action" onclick="adicionarAmarela()">ADICIONAR</button>
+                </div>
+            </div>
+            <div class="sub-panel" style="flex-grow: 1;">
+                <h3>Saída</h3>
+                <div class="printer-list">
+                    <div class="printer-row">
+                        <span class="printer-name">IMPRESSORA PREÇO</span>
+                        <div class="printer-controls">
+                            <input type="number" id="amarela-PRECO" class="printer-counter-input" value="0" onchange="atualizarAmarelaSetor('PRECO', this.value)">
+                            <button class="btn-output" onclick="direcionarAmarela('PRECO')">DIRECIONAR</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <nav class="bottom-nav">
+                <button class="nav-btn" onclick="openScreen('screen-home')"><i class="fa-solid fa-house"></i></button>
+                <button class="nav-btn" onclick="openScreen('screen-impressora')"><i class="fa-solid fa-rotate-left"></i></button>
+            </nav>
+        </div>
+
+        <!-- TELA: ETQ LARANJA -->
+        <div id="screen-laranja" class="screen">
+            <header><h1>ETQ Laranja</h1></header>
+            <div class="sub-panel">
+                <h3>Estoque Central</h3>
+                <div class="display-stock">
+                    <div>
+                        <input type="number" id="lbl-total-estoque-laranja" class="stock-input-master" value="0" onchange="atualizarLaranjaManual(this.value)">
+                        <span style="display:block; font-size: 0.75rem; color: var(--text-muted); margin-top: 2px;">Unidades Disponíveis</span>
+                    </div>
+                    <div style="text-align: right;">
+                        <span class="date-text" style="display:block; font-weight: bold;">Última Entrada:</span>
+                        <span id="lbl-data-entrada-laranja" class="date-text">-</span>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <input type="number" id="input-qtd-laranja" class="input-futuristic" placeholder="Qtd Unidades">
+                    <button class="btn-action" onclick="adicionarLaranja()">ADICIONAR</button>
+                </div>
+            </div>
+            <div class="sub-panel" style="flex-grow: 1;">
+                <h3>Saída</h3>
+                <div class="printer-list">
+                    <div class="printer-row">
+                        <span class="printer-name">LAMB LAMB</span>
+                        <div class="printer-controls">
+                            <input type="number" id="laranja-LAMB" class="printer-counter-input" value="0" onchange="atualizarLaranjaSetor('LAMB', this.value)">
+                            <button class="btn-output" onclick="direcionarLaranja('LAMB')">DIRECIONAR</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <nav class="bottom-nav">
+                <button class="nav-btn" onclick="openScreen('screen-home')"><i class="fa-solid fa-house"></i></button>
+                <button class="nav-btn" onclick="openScreen('screen-impressora')"><i class="fa-solid fa-rotate-left"></i></button>
+            </nav>
+        </div>
+
+        <!-- **TELA: PAPEL TIMBRADO (Exclusivo NFE)** -->
+        <div id="screen-timbrado" class="screen">
+            <header><h1>Papel Timbrado</h1></header>
+            <div class="sub-panel">
+                <h3>Estoque Central</h3>
+                <div class="display-stock">
+                    <div>
+                        <input type="number" id="lbl-total-estoque-timbrado" class="stock-input-master" value="0" onchange="atualizarTimbradoManual(this.value)">
+                        <span style="display:block; font-size: 0.75rem; color: var(--text-muted); margin-top: 2px;">Unidades Disponíveis</span>
+                    </div>
+                    <div style="text-align: right;">
+                        <span class="date-text" style="display:block; font-weight: bold;">Última Entrada:</span>
+                        <span id="lbl-data-entrada-timbrado" class="date-text">-</span>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <input type="number" id="input-qtd-timbrado" class="input-futuristic" placeholder="Qtd Unidades">
+                    <button class="btn-action" onclick="adicionarTimbrado()">ADICIONAR</button>
+                </div>
+            </div>
+            <div class="sub-panel" style="flex-grow: 1;">
+                <h3>Saída</h3>
+                <div class="printer-list">
+                    <div class="printer-row">
+                        <span class="printer-name">NFE</span>
+                        <div class="printer-controls">
+                            <input type="number" id="timbrado-NFE" class="printer-counter-input" value="0" onchange="atualizarTimbradoSetor('NFE', this.value)">
+                            <button class="btn-output" onclick="direcionarTimbrado('NFE')">DIRECIONAR</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <nav class="bottom-nav">
+                <button class="nav-btn" onclick="openScreen('screen-home')"><i class="fa-solid fa-house"></i></button>
+                <button class="nav-btn" onclick="openScreen('screen-impressora')"><i class="fa-solid fa-rotate-left"></i></button>
+            </nav>
+        </div>
+
+        <!-- TELA: ETQ PONTO (4 Relógios de Ponto) -->
+        <div id="screen-ponto" class="screen">
+            <header><h1>ETQ Ponto</h1></header>
+            <div class="sub-panel">
+                <h3>Estoque Central</h3>
+                <div class="display-stock">
+                    <div>
+                        <input type="number" id="lbl-total-estoque-ponto" class="stock-input-master" value="0" onchange="atualizarPontoManual(this.value)">
+                        <span style="display:block; font-size: 0.75rem; color: var(--text-muted); margin-top: 2px;">Unidades Disponíveis</span>
+                    </div>
+                    <div style="text-align: right;">
+                        <span class="date-text" style="display:block; font-weight: bold;">Última Entrada:</span>
+                        <span id="lbl-data-entrada-ponto" class="date-text">-</span>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <input type="number" id="input-qtd-ponto" class="input-futuristic" placeholder="Qtd Unidades">
+                    <button class="btn-action" onclick="adicionarPonto()">ADICIONAR</button>
+                </div>
+            </div>
+            <div class="sub-panel" style="flex-grow: 1;">
+                <h3>Saída para Relógios</h3>
+                <div class="printer-list">
+                    <div class="printer-row"><span class="printer-name">#1 Ent Func (DIGICON)</span><div class="printer-controls"><input type="number" id="ponto-R1" class="printer-counter-input" value="0" onchange="atualizarPontoSetor('R1', this.value)"><button class="btn-output" onclick="direcionarPonto('R1')">DIRECIONAR</button></div></div>
+                    <div class="printer-row"><span class="printer-name">#2 FCX (TELEMATICA)</span><div class="printer-controls"><input type="number" id="ponto-R2" class="printer-counter-input" value="0" onchange="atualizarPontoSetor('R2', this.value)"><button class="btn-output" onclick="direcionarPonto('R2')">DIRECIONAR</button></div></div>
+                    <div class="printer-row"><span class="printer-name">#3 DEP (DIGINON)</span><div class="printer-controls"><input type="number" id="ponto-R3" class="printer-counter-input" value="0" onchange="atualizarPontoSetor('R3', this.value)"><button class="btn-output" onclick="direcionarPonto('R3')">DIRECIONAR</button></div></div>
+                    <div class="printer-row"><span class="printer-name">#4 Ent Func 2 (TELEMATICA)</span><div class="printer-controls"><input type="number" id="ponto-R4" class="printer-counter-input" value="0" onchange="atualizarPontoSetor('R4', this.value)"><button class="btn-output" onclick="direcionarPonto('R4')">DIRECIONAR</button></div></div>
+                </div>
+            </div>
+            <nav class="bottom-nav">
+                <button class="nav-btn" onclick="openScreen('screen-home')"><i class="fa-solid fa-house"></i></button>
+                <button class="nav-btn" onclick="openScreen('screen-impressora')"><i class="fa-solid fa-rotate-left"></i></button>
+            </nav>
+        </div>
+
+        <!-- TELA 4: MOTOR DINÂMICO MULTI-INSUMOS -->
+        <div id="screen-insumos" class="screen">
+            <header><h1 id="insumo-screen-title">Insumos</h1></header>
+            <div id="insumo-tabs" class="tab-bar"></div>
+            <div class="sub-panel">
+                <h3 id="lbl-panel-modelo">Modelo Insumo</h3>
+                <div class="display-stock">
+                    <div><input type="number" id="lbl-total-estoque-insumo" class="stock-input-master" value="0" onchange="alterarEstoqueInsumoDireto(this.value)"><span style="display:block; font-size: 0.75rem; color: var(--text-muted); margin-top: 2px;">Saldo Central</span></div>
+                    <div style="text-align: right;"><span class="date-text" style="display:block; font-weight: bold;">Última Entrada:</span><span id="lbl-data-entrada-insumo" class="date-text">-</span></div>
+                </div>
+                <div class="input-group"><input type="number" id="input-qtd-insumo" class="input-futuristic" placeholder="Qtd Unidades"><button class="btn-action" onclick="adicionarEstoqueInsumo()">ADICIONAR</button></div>
+            </div>
+            <div class="sub-panel" style="flex-grow: 1;"><h3>Destinar Insumo</h3><div id="insumo-printer-list" class="printer-list"></div></div>
+            <nav class="bottom-nav"><button class="nav-btn" onclick="openScreen('screen-home')"><i class="fa-solid fa-house"></i></button><button class="nav-btn" onclick="openScreen('screen-impressora')"><i class="fa-solid fa-rotate-left"></i></button></nav>
+        </div>
+
+        <!-- TELA 5: TELA TONER CARTAZ -->
+        <div id="screen-cartaz" class="screen">
+            <header><h1>CARTAZ</h1></header>
+            <div class="sub-panel">
+                <div class="display-stock" style="border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 5px; margin-bottom: 10px;">
+                    <span style="font-size: 0.8rem; font-weight: bold; letter-spacing: 1px;">ESTOQUE</span><span style="font-size: 0.8rem; font-weight: bold; letter-spacing: 1px; color: var(--text-muted);">ÚLTIMA ENTRADA</span>
+                </div>
+                <div class="printer-list">
+                    <div class="printer-row cartaz-row"><span class="cartaz-label color-y">AMARELO</span><input type="number" id="input-est-amarelo" class="printer-counter-input" value="1" onchange="ajustarEstoqueCartazManual('amarelo', this.value)"><span id="date-cartaz-amarelo" class="date-text">-</span></div>
+                    <div class="printer-row cartaz-row"><span class="cartaz-label color-m">MAGENTA</span><input type="number" id="input-est-magenta" class="printer-counter-input" value="2" onchange="ajustarEstoqueCartazManual('magenta', this.value)"><span id="date-cartaz-magenta" class="date-text">-</span></div>
+                    <div class="printer-row cartaz-row"><span class="cartaz-label color-c">CYANO</span><input type="number" id="input-est-cyano" class="printer-counter-input" value="1" onchange="ajustarEstoqueCartazManual('cyano', this.value)"><span id="date-cartaz-cyano" class="date-text">-</span></div>
+                    <div class="printer-row cartaz-row"><span class="cartaz-label color-k">PRETO</span><input type="number" id="input-est-preto" class="printer-counter-input" value="3" onchange="ajustarEstoqueCartazManual('preto', this.value)"><span id="date-cartaz-preto" class="date-text">-</span></div>
+                </div>
+                <div class="input-group" style="margin-top: 15px;">
+                    <select id="select-cor-cartaz" class="input-futuristic" style="text-align-last: center; font-size: 0.8rem;"><option value="amarelo">AMARELO</option><option value="magenta">MAGENTA</option><option value="cyano">CYANO</option><option value="preto">PRETO</option></select>
+                    <input type="number" id="input-qtd-cartaz" class="input-futuristic" placeholder="Qtd"><button class="btn-action" onclick="adicionarEstoqueCartaz()">+</button>
+                </div>
+            </div>
+            <div class="sub-panel" style="flex-grow: 1;">
+                <h3 style="text-align: center; margin-bottom: 15px; font-size: 1rem; letter-spacing: 2px;">SAÍDA</h3>
+                <div class="printer-list">
+                    <div class="printer-row cartaz-row"><span class="cartaz-label color-y">AMARELO</span><input type="number" id="input-sai-amarelo" class="printer-counter-input" value="0" onchange="ajustarSaidaCartazManual('amarelo', this.value)"><button class="btn-output" onclick="direcionarCartaz('amarelo')">DIRECIONAR</button></div>
+                    <div class="printer-row cartaz-row"><span class="cartaz-label color-m">MAGENTA</span><input type="number" id="input-sai-magenta" class="printer-counter-input" value="0" onchange="ajustarSaidaCartazManual('magenta', this.value)"><button class="btn-output" onclick="direcionarCartaz('magenta')">DIRECIONAR</button></div>
+                    <div class="printer-row cartaz-row"><span class="cartaz-label color-c">CYANO</span><input type="number" id="input-sai-cyano" class="printer-counter-input" value="0" onchange="ajustarSaidaCartazManual('cyano', this.value)"><button class="btn-output" onclick="direcionarCartaz('cyano')">DIRECIONAR</button></div>
+                    <div class="printer-row cartaz-row"><span class="cartaz-label color-k">PRETO</span><input type="number" id="input-sai-preto" class="printer-counter-input" value="0" onchange="ajustarSaidaCartazManual('preto', this.value)"><button class="btn-output" onclick="direcionarCartaz('preto')">DIRECIONAR</button></div>
+                </div>
+            </div>
+            <nav class="bottom-nav"><button class="nav-btn" onclick="openScreen('screen-home')"><i class="fa-solid fa-house"></i></button><button class="nav-btn" onclick="openScreen('screen-impressora')"><i class="fa-solid fa-rotate-left"></i></button></nav>
+        </div>
+
+    </div>
+
+    <!-- --- IMPORTAÇÃO DOS MÓDULOS DO FIREBASE --- -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, doc, onSnapshot, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        // Configurações extraídas da imagem enviada pelo usuário
+        const firebaseConfig = {
+            apiKey: "AIzaSyA3odYvjY7mcWsCTvGcDKxoccz1qYSg_NE",
+            authDomain: "estoque-84295.firebaseapp.com",
+            databaseURL: "https://estoque-84295-default-rtdb.firebaseio.com",
+            projectId: "estoque-84295",
+            storageBucket: "estoque-84295.firebasestorage.app",
+            messagingSenderId: "70410448696",
+            appId: "1:70410448696:web:2be634dfc63baef31c221d",
+            measurementId: "G-D31RQ19END"
+        };
+
+        // Inicializa o Firebase e o Firestore
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        /* --- ARQUITETURA GLOBAL DE DADOS DO SISTEMA --- */
+        window.estoqueOficio = 0; window.dataOficioStr = "Nenhuma registrada";
+        window.consumoOficio = { NFE: 0, RME: 0, GER: 0, CPD: 0, RH: 0 };
+
+        window.estoqueGondola = 0; window.dataGondolaStr = "Nenhuma registrada";
+        window.consumoGondola = { PRECO: 0, LAMB: 0 };
+
+        window.estoqueRibbon = 0; window.dataRibbonStr = "Nenhuma registrada";
+        window.consumoRibbon = { PRECO: 0, LAMB: 0 };
+
+        window.estoqueAmarela = 0; window.dataAmarelaStr = "Nenhuma registrada";
+        window.consumoAmarela = { PRECO: 0 };
+
+        window.estoqueLaranja = 0; window.dataLaranjaStr = "Nenhuma registrada";
+        window.consumoLaranja = { LAMB: 0 };
+
+        window.estoqueTimbrado = 0; window.dataTimbradoStr = "Nenhuma registrada";
+        window.consumoTimbrado = { NFE: 0 };
+
+        window.estoquePonto = 0; window.dataPontoStr = "Nenhuma registrada";
+        window.consumoPonto = { R1: 0, R2: 0, R3: 0, R4: 0 };
+
+        window.bancoCartaz = {
+            amarelo: { estoque: 0, data: "-", saida: 0 },
+            magenta: { estoque: 0, data: "-", saida: 0 },
+            cyano: { estoque: 0, data: "-", saida: 0 },
+            preto: { estoque: 0, data: "-", saida: 0 }
+        };
+
+        window.bancoInsumos = {
+            fcd: { title: "Foto Condutor", itens: { "50F0Z00": { nome: "50F0Z00 (MX611)", estoque: 0, data: "-", impresas: { "GER": 0, "RH": 0 } }, "52D0Z00": { nome: "52D0Z00 (MS812)", estoque: 0, data: "-", impresas: { "CPD": 0, "RME": 0, "NFE": 0 } } } },
+            toner: { title: "Toners", itens: { "50FBU0E": { nome: "50FBU0E (MX611)", estoque: 0, data: "-", impresas: { "GER": 0, "RH": 0 } }, "55BBX00": { nome: "55BBX00 (MX611)", estoque: 0, data: "-", impresas: { "GER": 0, "RH": 0 } }, "52DBX0E": { nome: "52DBX0E (MS812)", estoque: 0, data: "-", impresas: { "CPD": 0, "RME": 0, "NFE": 0 } } } }
+        };
+
+        window.tipoInsumoAtivo = ""; window.itemChaveAtivo = "";   
+
+        // Documento Único no Firestore que guardará todo o estado do Banco
+        const docEstoqueRef = doc(db, "controle", "geral");
+
+        // ESCUTADOR EM TEMPO REAL: Sincroniza Nuvem -> Tela Local
+        onSnapshot(docEstoqueRef, (snapshot) => {
+            if (snapshot.exists()) {
+                const dados = snapshot.data();
+                
+                if (dados.oficio) { window.estoqueOficio = dados.oficio.estoque; window.dataOficioStr = dados.oficio.data; window.consumoOficio = dados.oficio.consumo; }
+                if (dados.gondola) { window.estoqueGondola = dados.gondola.estoque; window.dataGondolaStr = dados.gondola.data; window.consumoGondola = dados.gondola.consumo; }
+                if (dados.ribbon) { window.estoqueRibbon = dados.ribbon.estoque; window.dataRibbonStr = dados.ribbon.data; window.consumoRibbon = dados.ribbon.consumo; }
+                if (dados.amarela) { window.estoqueAmarela = dados.amarela.estoque; window.dataAmarelaStr = dados.amarela.data; window.consumoAmarela = dados.amarela.consumo; }
+                if (dados.laranja) { window.estoqueLaranja = dados.laranja.estoque; window.dataLaranjaStr = dados.laranja.data; window.consumoLaranja = dados.laranja.consumo; }
+                if (dados.timbrado) { window.estoqueTimbrado = dados.timbrado.estoque; window.dataTimbradoStr = dados.timbrado.data; window.consumoTimbrado = dados.timbrado.consumo; }
+                if (dados.ponto) { window.estoquePonto = dados.ponto.estoque; window.dataPontoStr = dados.ponto.data; window.consumoPonto = dados.ponto.consumo; }
+                if (dados.bancoCartaz) { window.bancoCartaz = dados.bancoCartaz; }
+                if (dados.bancoInsumos) { window.bancoInsumos = dados.bancoInsumos; }
+
+                // Atualiza a renderização da tela atual ativa
+                document.querySelectorAll('.screen').forEach(s => {
+                    if(s.classList.contains('active')) {
+                        if(s.id === "screen-oficio") window.renderizarOficio();
+                        if(s.id === "screen-gondola") window.renderizarGondola();
+                        if(s.id === "screen-ribbon") window.renderizarRibbon();
+                        if(s.id === "screen-amarela") window.renderizarAmarela();
+                        if(s.id === "screen-laranja") window.renderizarLaranja();
+                        if(s.id === "screen-timbrado") window.renderizarTimbrado();
+                        if(s.id === "screen-ponto") window.renderizarPonto();
+                        if(s.id === "screen-cartaz") window.renderizarCartaz();
+                        if(s.id === "screen-insumos") window.renderizarPainelInsumo();
+                    }
+                });
+            } else {
+                // Se o banco estiver vazio na primeira vez, cria a estrutura inicial limpa
+                salvarNoFirebase();
+            }
+        });
+
+        // SALVAR ESTADO LOCAL -> NUVEM
+        async function salvarNoFirebase() {
+            try {
+                await setDoc(docEstoqueRef, {
+                    oficio: { estoque: window.estoqueOficio, data: window.dataOficioStr, consumo: window.consumoOficio },
+                    gondola: { estoque: window.estoqueGondola, data: window.dataGondolaStr, consumo: window.consumoGondola },
+                    ribbon: { estoque: window.estoqueRibbon, data: window.dataRibbonStr, consumo: window.consumoRibbon },
+                    amarela: { estoque: window.estoqueAmarela, data: window.dataAmarelaStr, consumo: window.consumoAmarela },
+                    laranja: { estoque: window.estoqueLaranja, data: window.dataLaranjaStr, consumo: window.consumoLaranja },
+                    timbrado: { estoque: window.estoqueTimbrado, data: window.dataTimbradoStr, consumo: window.consumoTimbrado },
+                    ponto: { estoque: window.estoquePonto, data: window.dataPontoStr, consumo: window.consumoPonto },
+                    bancoCartaz: window.bancoCartaz,
+                    bancoInsumos: window.bancoInsumos
+                });
+            } catch (error) {
+                console.error("Erro ao sincronizar com Firestore: ", error);
+            }
+        }
+        window.salvarNoFirebase = salvarNoFirebase;
+    </script>
+
+    <!-- --- INTERFACE E EVENTOS JAVASCRIPT --- -->
+    <script>
+        function openScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+            
+            // Força remontagem visual na troca de tela
+            if(screenId === "screen-oficio" && window.renderizarOficio) window.renderizarOficio();
+            if(screenId === "screen-gondola" && window.renderizarGondola) window.renderizarGondola();
+            if(screenId === "screen-ribbon" && window.renderizarRibbon) window.renderizarRibbon();
+            if(screenId === "screen-amarela" && window.renderizarAmarela) window.renderizarAmarela();
+            if(screenId === "screen-laranja" && window.renderizarLaranja) window.renderizarLaranja();
+            if(screenId === "screen-timbrado" && window.renderizarTimbrado) window.renderizarTimbrado();
+            if(screenId === "screen-ponto" && window.renderizarPonto) window.renderizarPonto();
+            if(screenId === "screen-cartaz" && window.renderizarCartaz) window.renderizarCartaz();
+            if(screenId === "screen-insumos" && window.renderizarPainelInsumo) window.renderizarPainelInsumo();
+        }
+
+        function pegarDataHora() {
+            const agora = new Date();
+            return agora.toLocaleDateString('pt-BR') + ' ' + agora.toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'});
+        }
+
+        /* --- LÓGICA: PAPEL TIMBRADO --- */
+        function abrirTelaTimbrado() { window.renderizarTimbrado(); openScreen('screen-timbrado'); }
+        function adicionarTimbrado() {
+            const input = document.getElementById('input-qtd-timbrado'); const qtd = parseInt(input.value);
+            if (isNaN(qtd) || qtd <= 0) return alert('Insira uma quantidade válida.');
+            window.estoqueTimbrado += qtd; window.dataTimbradoStr = pegarDataHora(); input.value = ''; window.renderizarTimbrado(); window.salvarNoFirebase();
+        }
+        function direcionarTimbrado(setor) {
+            if (window.estoqueTimbrado <= 0) return alert('Estoque de Papel Timbrado Zerado!');
+            window.estoqueTimbrado--; window.consumoTimbrado[setor]++; window.renderizarTimbrado(); window.salvarNoFirebase();
+        }
+        function atualizarTimbradoSetor(setor, valor) {
+            let novaQtd = parseInt(valor); if (isNaN(novaQtd) || novaQtd < 0) return window.renderizarTimbrado();
+            let dif = novaQtd - window.consumoTimbrado[setor];
+            if (dif > window.estoqueTimbrado) { alert('Saldo Central Insuficiente!'); return window.renderizarTimbrado(); }
+            window.estoqueTimbrado -= dif; window.consumoTimbrado[setor] = novaQtd; window.renderizarTimbrado(); window.salvarNoFirebase();
+        }
+        function atualizarTimbradoManual(valor) {
+            let n = parseInt(valor); if (!isNaN(n) && n >= 0) window.estoqueTimbrado = n; window.renderizarTimbrado(); window.salvarNoFirebase();
+        }
+        function renderizarTimbrado() {
+            document.getElementById('lbl-total-estoque-timbrado').value = window.estoqueTimbrado;
+            document.getElementById('lbl-data-entrada-timbrado').innerText = window.dataTimbradoStr;
+            document.getElementById('timbrado-NFE').value = window.consumoTimbrado.NFE;
+        }
+        window.renderizarTimbrado = renderizarTimbrado;
+
+        /* --- LÓGICA: ETQ PONTO --- */
+        function abrirTelaPonto() { window.renderizarPonto(); openScreen('screen-ponto'); }
+        function adicionarPonto() {
+            const input = document.getElementById('input-qtd-ponto'); const qtd = parseInt(input.value);
+            if (isNaN(qtd) || qtd <= 0) return alert('Insira uma quantidade válida.');
+            window.estoquePonto += qtd; window.dataPontoStr = pegarDataHora(); input.value = ''; window.renderizarPonto(); window.salvarNoFirebase();
+        }
+        function direcionarPonto(relogio) {
+            if (window.estoquePonto <= 0) return alert('Estoque de Etiquetas de Ponto Zerado!');
+            window.estoquePonto--; window.consumoPonto[relogio]++; window.renderizarPonto(); window.salvarNoFirebase();
+        }
+        function atualizarPontoSetor(relogio, valor) {
+            let novaQtd = parseInt(valor); if (isNaN(novaQtd) || novaQtd < 0) return window.renderizarPonto();
+            let dif = novaQtd - window.consumoPonto[relogio];
+            if (dif > window.estoquePonto) { alert('Saldo Central Insuficiente!'); return window.renderizarPonto(); }
+            window.estoquePonto -= dif; window.consumoPonto[relogio] = novaQtd; window.renderizarPonto(); window.salvarNoFirebase();
+        }
+        function atualizarPontoManual(valor) {
+            let n = parseInt(valor); if (!isNaN(n) && n >= 0) window.estoquePonto = n; window.renderizarPonto(); window.salvarNoFirebase();
+        }
+        function renderizarPonto() {
+            document.getElementById('lbl-total-estoque-ponto').value = window.estoquePonto;
+            document.getElementById('lbl-data-entrada-ponto').innerText = window.dataPontoStr;
+            for (let r in window.consumoPonto) { document.getElementById(`ponto-${r}`).value = window.consumoPonto[r]; }
+        }
+        window.renderizarPonto = renderizarPonto;
+
+        /* --- LÓGICA: ETQ AMARELA --- */
+        function abrirTelaAmarela() { window.renderizarAmarela(); openScreen('screen-amarela'); }
+        function adicionarAmarela() {
+            const input = document.getElementById('input-qtd-amarela'); const qtd = parseInt(input.value);
+            if (isNaN(qtd) || qtd <= 0) return alert('Insira uma quantidade válida.');
+            window.estoqueAmarela += qtd; window.dataAmarelaStr = pegarDataHora(); input.value = ''; window.renderizarAmarela(); window.salvarNoFirebase();
+        }
+        function direcionarAmarela(setor) {
+            if (window.estoqueAmarela <= 0) return alert('Estoque de Etiquetas Amarelas Zerado!');
+            window.estoqueAmarela--; window.consumoAmarela[setor]++; window.renderizarAmarela(); window.salvarNoFirebase();
+        }
+        function atualizarAmarelaSetor(setor, valor) {
+            let novaQtd = parseInt(valor); if (isNaN(novaQtd) || novaQtd < 0) return window.renderizarAmarela();
+            let dif = novaQtd - window.consumoAmarela[setor];
+            if (dif > window.estoqueAmarela) { alert('Saldo Central Insuficiente!'); return window.renderizarAmarela(); }
+            window.estoqueAmarela -= dif; window.consumoAmarela[setor] = novaQtd; window.renderizarAmarela(); window.salvarNoFirebase();
+        }
+        function atualizarAmarelaManual(valor) {
+            let n = parseInt(valor); if (!isNaN(n) && n >= 0) window.estoqueAmarela = n; window.renderizarAmarela(); window.salvarNoFirebase();
+        }
+        function renderizarAmarela() {
+            document.getElementById('lbl-total-estoque-amarela').value = window.estoqueAmarela;
+            document.getElementById('lbl-data-entrada-amarela').innerText = window.dataAmarelaStr;
+            document.getElementById('amarela-PRECO').value = window.consumoAmarela.PRECO;
+        }
+        window.renderizarAmarela = renderizarAmarela;
+
+        /* --- LÓGICA: ETQ LARANJA --- */
+        function abrirTelaLaranja() { window.renderizarLaranja(); openScreen('screen-laranja'); }
+        function adicionarLaranja() {
+            const input = document.getElementById('input-qtd-laranja'); const qtd = parseInt(input.value);
+            if (isNaN(qtd) || qtd <= 0) return alert('Insira uma quantidade válida.');
+            window.estoqueLaranja += qtd; window.dataLaranjaStr = pegarDataHora(); input.value = ''; window.renderizarLaranja(); window.salvarNoFirebase();
+        }
+        function direcionarLaranja(setor) {
+            if (window.estoqueLaranja <= 0) return alert('Estoque de Etiquetas Laranjas Zerado!');
+            window.estoqueLaranja--; window.consumoLaranja[setor]++; window.renderizarLaranja(); window.salvarNoFirebase();
+        }
+        function atualizarLaranjaSetor(setor, valor) {
+            let novaQtd = parseInt(valor); if (isNaN(novaQtd) || novaQtd < 0) return window.renderizarLaranja();
+            let dif = novaQtd - window.consumoLaranja[setor];
+            if (dif > window.estoqueLaranja) { alert('Saldo Central Insuficiente!'); return window.renderizarLaranja(); }
+            window.estoqueLaranja -= dif; window.consumoLaranja[setor] = novaQtd; window.renderizarLaranja(); window.salvarNoFirebase();
+        }
+        function atualizarLaranjaManual(valor) {
+            let n = parseInt(valor); if (!isNaN(n) && n >= 0) window.estoqueLaranja = n; window.renderizarLaranja(); window.salvarNoFirebase();
+        }
+        function renderizarLaranja() {
+            document.getElementById('lbl-total-estoque-laranja').value = window.estoqueLaranja;
+            document.getElementById('lbl-data-entrada-laranja').innerText = window.dataLaranjaStr;
+            document.getElementById('laranja-LAMB').value = window.consumoLaranja.LAMB;
+        }
+        window.renderizarLaranja = renderizarLaranja;
+
+        /* --- LÓGICA: RIBBON --- */
+        function abrirTelaRibbon() { window.renderizarRibbon(); openScreen('screen-ribbon'); }
+        function adicionarRibbon() {
+            const input = document.getElementById('input-qtd-ribbon'); const qtd = parseInt(input.value);
+            if (isNaN(qtd) || qtd <= 0) return alert('Insira uma quantidade válida.');
+            window.estoqueRibbon += qtd; window.dataRibbonStr = pegarDataHora(); input.value = ''; window.renderizarRibbon(); window.salvarNoFirebase();
+        }
+        function direcionarRibbon(setor) {
+            if (window.estoqueRibbon <= 0) return alert('Estoque de Ribbon Zerado!');
+            window.estoqueRibbon--; window.consumoRibbon[setor]++; window.renderizarRibbon(); window.salvarNoFirebase();
+        }
+        function atualizarRibbonSetor(setor, valor) {
+            let novaQtd = parseInt(valor); if (isNaN(novaQtd) || novaQtd < 0) return window.renderizarRibbon();
+            let dif = novaQtd - window.consumoRibbon[setor];
+            if (dif > window.estoqueRibbon) { alert('Saldo Central Insuficiente!'); return window.renderizarRibbon(); }
+            window.estoqueRibbon -= dif; window.consumoRibbon[setor] = novaQtd; window.renderizarRibbon(); window.salvarNoFirebase();
+        }
+        function atualizarRibbonManual(valor) {
+            let n = parseInt(valor); if (!isNaN(n) && n >= 0) window.estoqueRibbon = n; window.renderizarRibbon(); window.salvarNoFirebase();
+        }
+        function renderizarRibbon() {
+            document.getElementById('lbl-total-estoque-ribbon').value = window.estoqueRibbon;
+            document.getElementById('lbl-data-entrada-ribbon').innerText = window.dataRibbonStr;
+            document.getElementById('ribbon-PRECO').value = window.consumoRibbon.PRECO;
+            document.getElementById('ribbon-LAMB').value = window.consumoRibbon.LAMB;
+        }
+        window.renderizarRibbon = renderizarRibbon;
+
+        /* --- LÓGICA: ETQ GÔNDOLA --- */
+        function abrirTelaGondola() { window.renderizarGondola(); openScreen('screen-gondola'); }
+        function adicionarGondola() {
+            const input = document.getElementById('input-qtd-gondola'); const qtd = parseInt(input.value);
+            if (isNaN(qtd) || qtd <= 0) return alert('Insira uma quantidade válida.');
+            window.estoqueGondola += qtd; window.dataGondolaStr = pegarDataHora(); input.value = ''; window.renderizarGondola(); window.salvarNoFirebase();
+        }
+        function direcionarGondola(setor) {
+            if (window.estoqueGondola <= 0) return alert('Estoque de Etiquetas de Gôndola Zerado!');
+            window.estoqueGondola--; window.consumoGondola[setor]++; window.renderizarGondola(); window.salvarNoFirebase();
+        }
+        function atualizarGondolaSetor(setor, valor) {
+            let novaQtd = parseInt(valor); if (isNaN(novaQtd) || novaQtd < 0) return window.renderizarGondola();
+            let dif = novaQtd - window.consumoGondola[setor];
+            if (dif > window.estoqueGondola) { alert('Saldo Central Insuficiente!'); return window.renderizarGondola(); }
+            window.estoqueGondola -= dif; window.consumoGondola[setor] = novaQtd; window.renderizarGondola(); window.salvarNoFirebase();
+        }
+        function atualizarGondolaManual(valor) {
+            let n = parseInt(valor); if (!isNaN(n) && n >= 0) window.estoqueGondola = n; window.renderizarGondola(); window.salvarNoFirebase();
+        }
+        function renderizarGondola() {
+            document.getElementById('lbl-total-estoque-gondola').value = window.estoqueGondola;
+            document.getElementById('lbl-data-entrada-gondola').innerText = window.dataGondolaStr;
+            document.getElementById('gondola-PRECO').value = window.consumoGondola.PRECO;
+            document.getElementById('gondola-LAMB').value = window.consumoGondola.LAMB;
+        }
+        window.renderizarGondola = renderizarGondola;
+
+        /* --- LÓGICA: PAPEL OFÍCIO --- */
+        function adicionarOficio() {
+            const input = document.getElementById('input-qtd-oficio'); const qtd = parseInt(input.value);
+            if (isNaN(qtd) || qtd <= 0) return alert('Insira uma quantidade válida.');
+            window.estoqueOficio += qtd; window.dataOficioStr = pegarDataHora(); input.value = ''; window.renderizarOficio(); window.salvarNoFirebase();
+        }
+        function direcionarOficio(setor) {
+            if (window.estoqueOficio <= 0) return alert('Estoque de Ofício Zerado!');
+            window.estoqueOficio--; window.consumoOficio[setor]++; window.renderizarOficio(); window.salvarNoFirebase();
+        }
+        function atualizarOficioSetor(setor, valor) {
+            let novaQtd = parseInt(valor); if (isNaN(novaQtd) || novaQtd < 0) return window.renderizarOficio();
+            let dif = novaQtd - window.consumoOficio[setor];
+            if (dif > window.estoqueOficio) { alert('Saldo Central Insuficiente!'); return window.renderizarOficio(); }
+            window.estoqueOficio -= dif; window.consumoOficio[setor] = novaQtd; window.renderizarOficio(); window.salvarNoFirebase();
+        }
+        function atualizarOficioManual(valor) {
+            let n = parseInt(valor); if (!isNaN(n) && n >= 0) window.estoqueOficio = n; window.renderizarOficio(); window.salvarNoFirebase();
+        }
+        function renderizarOficio() {
+            document.getElementById('lbl-total-estoque-oficio').value = window.estoqueOficio;
+            document.getElementById('lbl-data-entrada-oficio').innerText = window.dataOficioStr;
+            for (let s in window.consumoOficio) { document.getElementById(`oficio-${s}`).value = window.consumoOficio[s]; }
+        }
+        window.renderizarOficio = renderizarOficio;
+
+        /* --- MOTOR DINÂMICO MULTI-INSUMOS --- */
+        function abrirTelaInsumo(tipo) {
+            window.tipoInsumoAtivo = tipo; const config = window.bancoInsumos[tipo];
+            document.getElementById('insumo-screen-title').innerText = config.title;
+            const barraAbas = document.getElementById('insumo-tabs'); barraAbas.innerHTML = "";
+            const chaves = Object.keys(config.itens); window.itemChaveAtivo = chaves[0]; 
+            chaves.forEach(chave => {
+                const btn = document.createElement('button'); btn.className = `tab-btn ${chave === window.itemChaveAtivo ? 'active' : ''}`;
+                btn.innerText = chave; btn.onclick = () => mudarAbaInsumo(chave); barraAbas.appendChild(btn);
+            });
+            window.renderizarPainelInsumo(); openScreen('screen-insumos');
+        }
+        function mudarAbaInsumo(chave) {
+            window.itemChaveAtivo = chave; document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            Array.from(document.getElementById('insumo-tabs').children).forEach(btn => { if(btn.innerText === chave) btn.classList.add('active'); });
+            window.renderizarPainelInsumo();
+        }
+        function renderizarPainelInsumo() {
+            if(!window.tipoInsumoAtivo || !window.itemChaveAtivo) return;
+            const item = window.bancoInsumos[window.tipoInsumoAtivo].itens[window.itemChaveAtivo];
+            document.getElementById('lbl-panel-modelo').innerText = `Modelo: ${item.nome}`;
+            document.getElementById('lbl-total-estoque-insumo').value = item.estoque;
+            document.getElementById('lbl-data-entrada-insumo').innerText = item.data;
+            document.getElementById('input-qtd-insumo').value = '';
+            const containerLista = document.getElementById('insumo-printer-list'); containerLista.innerHTML = "";
+            for (let impressora in item.impresas) {
+                const row = document.createElement('div'); row.className = "printer-row";
+                let subTag = (impressora === "GER" || impressora === "RH") ? "Lexmark MX611dhe" : "Lexmark MS812";
+                row.innerHTML = `<div><span class="printer-name">${impressora}</span><span class="printer-model-tag">${subTag}</span></div>
+                    <div class="printer-controls"><input type="number" class="printer-counter-input" value="${item.impresas[impressora]}" onchange="atualizarInsumoImpressoraManual('${impressora}', this.value)"><button class="btn-output" onclick="direcionarInsumoAtivo('${impressora}')">DIRECIONAR</button></div>`;
+                containerLista.appendChild(row);
+            }
+        }
+        function adicionarEstoqueInsumo() {
+            const input = document.getElementById('input-qtd-insumo'); const qtd = parseInt(input.value);
+            if (isNaN(qtd) || qtd <= 0) return alert('Por favor, informe um número válido.');
+            const item = window.bancoInsumos[window.tipoInsumoAtivo].itens[window.itemChaveAtivo]; item.estoque += qtd;
+            item.data = pegarDataHora(); window.renderizarPainelInsumo(); window.salvarNoFirebase();
+        }
+        function alterarEstoqueInsumoDireto(valor) {
+            let n = parseInt(valor); if (isNaN(n) || n < 0) return window.renderizarPainelInsumo();
+            window.bancoInsumos[window.tipoInsumoAtivo].itens[window.itemChaveAtivo].estoque = n; window.renderizarPainelInsumo(); window.salvarNoFirebase();
+        }
+        function direcionarInsumoAtivo(impressora) {
+            const item = window.bancoInsumos[window.tipoInsumoAtivo].itens[window.itemChaveAtivo]; if (item.estoque <= 0) return alert('Estoque Central deste insumo esgotado!');
+            item.estoque--; item.impresas[impressora]++; window.renderizarPainelInsumo(); window.salvarNoFirebase();
+        }
+        function atualizarInsumoImpressoraManual(impressora, valor) {
+            let novaQtd = parseInt(valor); if (isNaN(novaQtd) || novaQtd < 0) return window.renderizarPainelInsumo();
+            const item = window.bancoInsumos[window.tipoInsumoAtivo].itens[window.itemChaveAtivo]; let dif = novaQtd - item.impresas[impressora];
+            if (dif > item.estoque) { alert('Aviso: Saldo no Estoque Central insuficiente para este ajuste!'); return window.renderizarPainelInsumo(); }
+            item.estoque -= dif; item.impresas[impressora] = novaQtd; window.renderizarPainelInsumo(); window.salvarNoFirebase();
+        }
+        window.renderizarPainelInsumo = renderizarPainelInsumo;
+
+        /* --- LÓGICA: TELA CARTAZ --- */
+        function abrirTelaCartaz() { window.renderizarCartaz(); openScreen('screen-cartaz'); }
+        function renderizarCartaz() {
+            Object.keys(window.bancoCartaz).forEach(cor => {
+                document.getElementById(`input-est-${cor}`).value = window.bancoCartaz[cor].estoque;
+                document.getElementById(`date-cartaz-${cor}`).innerText = window.bancoCartaz[cor].data;
+                document.getElementById(`input-sai-${cor}`).value = window.bancoCartaz[cor].saida;
+            });
+        }
+        function adicionarEstoqueCartaz() {
+            const cor = document.getElementById('select-cor-cartaz').value; const inputQtd = document.getElementById('input-qtd-cartaz'); const qtd = parseInt(inputQtd.value);
+            if (isNaN(qtd) || qtd <= 0) return alert('Informe uma quantidade válida para a entrada.');
+            window.bancoCartaz[cor].estoque += qtd; window.bancoCartaz[cor].data = pegarDataHora(); inputQtd.value = ''; window.renderizarCartaz(); window.salvarNoFirebase();
+        }
+        function ajustarEstoqueCartazManual(cor, valor) {
+            let novaQtdEstoque = parseInt(valor); if (isNaN(novaQtdEstoque) || novaQtdEstoque < 0) return window.renderizarCartaz();
+            window.bancoCartaz[cor].estoque = novaQtdEstoque; window.renderizarCartaz(); window.salvarNoFirebase();
+        }
+        function ajustarSaidaCartazManual(cor, valor) {
+            let novaQtdSaida = parseInt(valor); if (isNaN(novaQtdSaida) || novaQtdSaida < 0) return window.renderizarCartaz();
+            let diferenca = novaQtdSaida - window.bancoCartaz[cor].saida;
+            if (diferenca > window.bancoCartaz[cor].estoque) { alert('Saldo no Estoque Central insuficiente!'); return window.renderizarCartaz(); }
+            window.bancoCartaz[cor].estoque -= diferenca; window.bancoCartaz[cor].saida = novaQtdSaida; window.renderizarCartaz(); window.salvarNoFirebase();
+        }
+        function direcionarCartaz(cor) {
+            if (window.bancoCartaz[cor].estoque <= 0) return alert(`Estoque central de toner CARTAZ (${cor.toUpperCase()}) esgotado!`);
+            window.bancoCartaz[cor].estoque--; window.bancoCartaz[cor].saida++; window.renderizarCartaz(); window.salvarNoFirebase();
+        }
+        window.renderizarCartaz = renderizarCartaz;
+    </script>
+</body>
+</html>
