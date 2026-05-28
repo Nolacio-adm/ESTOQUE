@@ -234,7 +234,6 @@
 
     <div class="app-container">
         
-        <!-- TELA 1: HOME -->
         <div id="screen-home" class="screen active">
             <header><h1>Status Estoque</h1></header>
             <main class="grid-main">
@@ -246,15 +245,12 @@
             </main>
         </div>
 
-        <!-- TELA 2: SELEÇÃO IMPRESSORA -->
         <div id="screen-impressora" class="screen">
             <header><h1>Impressora</h1></header>
             <main class="grid-items">
                 <button class="btn btn-green" onclick="openScreen('screen-oficio')"><span>Papel Ofício</span></button>
                 <button class="btn btn-green" onclick="openScreen('screen-gondola')"><span>ETQ Gondola</span></button>
-                <button class="btn btn-green" onclick="abrirFotoCondutor('50F0Z00')"><span>Foto Condutor</span></button>
                 <button class="btn btn-green" onclick="openScreen('screen-ribbon')"><span>Ribbon</span></button>
-                <button class="btn btn-green" onclick="abrirToners('55BBX00')"><span>Toner</span></button>
                 <button class="btn btn-green" onclick="openScreen('screen-amarela')"><span>ETQ Amarela</span></button>
                 <button class="btn btn-orange" onclick="openScreen('screen-cartaz')"><span>Toner Cartaz</span></button>
                 <button class="btn btn-green" onclick="openScreen('screen-laranja')"><span>ETQ Laranja</span></button>
@@ -267,7 +263,6 @@
             </nav>
         </div>
 
-        <!-- TELA: BALANÇA -->
         <div id="screen-balanca" class="screen">
             <header><h1>Balança</h1></header>
             <main class="grid-items">
@@ -282,7 +277,6 @@
             </nav>
         </div>
 
-        <!-- TELA: RELÓGIO -->
         <div id="screen-relogio" class="screen">
             <header><h1>Relógio</h1></header>
             <main class="grid-items">
@@ -294,34 +288,33 @@
             </nav>
         </div>
 
-        <!-- TELA: PAPEL OFÍCIO -->
         <div id="screen-oficio" class="screen">
             <header><h1>Papel Ofício</h1></header>
             <div class="sub-panel">
                 <h3>Estoque Central</h3>
                 <div class="display-stock">
                     <div>
-                        <input type="number" class="stock-input-master" value="0">
+                        <input type="number" id="input-oficio-saldo" class="stock-input-master" value="0" readonly>
                         <span style="display:block; font-size: 0.7rem; color: var(--text-muted); margin-top: 2px;">Saldo Central</span>
                     </div>
                     <div style="text-align: right;">
                         <span class="date-text" style="display:block;">Última Entrada:</span>
-                        <span class="date-text" style="font-weight: bold;">-</span>
+                        <span id="date-oficio-saldo" class="date-text" style="font-weight: bold;">-</span>
                     </div>
                 </div>
                 <div class="input-group">
-                    <input type="number" class="input-futuristic" placeholder="Qtd Unidades">
-                    <button class="btn-action">ADICIONAR</button>
+                    <input type="number" id="input-oficio-add" class="input-futuristic" placeholder="Qtd Unidades">
+                    <button class="btn-action" onclick="adicionarEstoque('papel_oficio', 'input-oficio-add')">ADICIONAR</button>
                 </div>
             </div>
             <div class="sub-panel">
                 <h3>Destinar Insumo</h3>
                 <div class="printer-list">
-                    <div class="printer-row"><span class="printer-name">NFE</span><div class="printer-controls"><input type="number" class="printer-counter-input" value="0"><button class="btn-output">DIRECIONAR</button></div></div>
-                    <div class="printer-row"><span class="printer-name">RME</span><div class="printer-controls"><input type="number" class="printer-counter-input" value="0"><button class="btn-output">DIRECIONAR</button></div></div>
-                    <div class="printer-row"><span class="printer-name">GER</span><div class="printer-controls"><input type="number" class="printer-counter-input" value="0"><button class="btn-output">DIRECIONAR</button></div></div>
-                    <div class="printer-row"><span class="printer-name">CPD</span><div class="printer-controls"><input type="number" class="printer-counter-input" value="0"><button class="btn-output">DIRECIONAR</button></div></div>
-                    <div class="printer-row"><span class="printer-name">RH</span><div class="printer-controls"><input type="number" class="printer-counter-input" value="0"><button class="btn-output">DIRECIONAR</button></div></div>
+                    <div class="printer-row"><span class="printer-name">NFE</span><div class="printer-controls"><input type="number" id="out-oficio-nfe" class="printer-counter-input" value="0"><button class="btn-output" onclick="removerEstoque('papel_oficio', 'out-oficio-nfe', 'NFE')">DIRECIONAR</button></div></div>
+                    <div class="printer-row"><span class="printer-name">RME</span><div class="printer-controls"><input type="number" id="out-oficio-rme" class="printer-counter-input" value="0"><button class="btn-output" onclick="removerEstoque('papel_oficio', 'out-oficio-rme', 'RME')">DIRECIONAR</button></div></div>
+                    <div class="printer-row"><span class="printer-name">GER</span><div class="printer-controls"><input type="number" id="out-oficio-ger" class="printer-counter-input" value="0"><button class="btn-output" onclick="removerEstoque('papel_oficio', 'out-oficio-ger', 'GER')">DIRECIONAR</button></div></div>
+                    <div class="printer-row"><span class="printer-name">CPD</span><div class="printer-controls"><input type="number" id="out-oficio-cpd" class="printer-counter-input" value="0"><button class="btn-output" onclick="removerEstoque('papel_oficio', 'out-oficio-cpd', 'CPD')">DIRECIONAR</button></div></div>
+                    <div class="printer-row"><span class="printer-name">RH</span><div class="printer-controls"><input type="number" id="out-oficio-rh" class="printer-counter-input" value="0"><button class="btn-output" onclick="removerEstoque('papel_oficio', 'out-oficio-rh', 'RH')">DIRECIONAR</button></div></div>
                 </div>
             </div>
             <nav class="bottom-nav">
@@ -330,31 +323,30 @@
             </nav>
         </div>
 
-        <!-- TELA: ETQ GÔNDOLA -->
         <div id="screen-gondola" class="screen">
             <header><h1>ETQ Gondola</h1></header>
             <div class="sub-panel">
                 <h3>Estoque Central</h3>
                 <div class="display-stock">
                     <div>
-                        <input type="number" class="stock-input-master" value="0">
+                        <input type="number" id="input-gondola-saldo" class="stock-input-master" value="0" readonly>
                         <span style="display:block; font-size: 0.7rem; color: var(--text-muted); margin-top: 2px;">Saldo Central</span>
                     </div>
                     <div style="text-align: right;">
                         <span class="date-text" style="display:block;">Última Entrada:</span>
-                        <span class="date-text" style="font-weight: bold;">-</span>
+                        <span id="date-gondola-saldo" class="date-text" style="font-weight: bold;">-</span>
                     </div>
                 </div>
                 <div class="input-group">
-                    <input type="number" class="input-futuristic" placeholder="Qtd Unidades">
-                    <button class="btn-action">ADICIONAR</button>
+                    <input type="number" id="input-gondola-add" class="input-futuristic" placeholder="Qtd Unidades">
+                    <button class="btn-action" onclick="adicionarEstoque('etq_gondola', 'input-gondola-add')">ADICIONAR</button>
                 </div>
             </div>
             <div class="sub-panel">
                 <h3>Destinar Insumo</h3>
                 <div class="printer-list">
-                    <div class="printer-row"><span class="printer-name">IMPRESSORA PREÇO</span><div class="printer-controls"><input type="number" class="printer-counter-input" value="0"><button class="btn-output">DIRECIONAR</button></div></div>
-                    <div class="printer-row"><span class="printer-name">LAMB LAMB</span><div class="printer-controls"><input type="number" class="printer-counter-input" value="0"><button class="btn-output">DIRECIONAR</button></div></div>
+                    <div class="printer-row"><span class="printer-name">IMPRESSORA PREÇO</span><div class="printer-controls"><input type="number" id="out-gondola-preco" class="printer-counter-input" value="0"><button class="btn-output" onclick="removerEstoque('etq_gondola', 'out-gondola-preco', 'IMPRESSORA PREÇO')">DIRECIONAR</button></div></div>
+                    <div class="printer-row"><span class="printer-name">LAMB LAMB</span><div class="printer-controls"><input type="number" id="out-gondola-lamb" class="printer-counter-input" value="0"><button class="btn-output" onclick="removerEstoque('etq_gondola', 'out-gondola-lamb', 'LAMB LAMB')">DIRECIONAR</button></div></div>
                 </div>
             </div>
             <nav class="bottom-nav">
@@ -363,272 +355,56 @@
             </nav>
         </div>
 
-        <!-- TELA: RIBBON -->
-        <div id="screen-ribbon" class="screen">
-            <header><h1>Ribbon</h1></header>
-            <div class="sub-panel">
-                <h3>Estoque Central</h3>
-                <div class="display-stock">
-                    <div>
-                        <input type="number" class="stock-input-master" value="0">
-                        <span style="display:block; font-size: 0.7rem; color: var(--text-muted); margin-top: 2px;">Saldo Central</span>
-                    </div>
-                    <div style="text-align: right;">
-                        <span class="date-text" style="display:block;">Última Entrada:</span>
-                        <span class="date-text" style="font-weight: bold;">-</span>
-                    </div>
-                </div>
-                <div class="input-group">
-                    <input type="number" class="input-futuristic" placeholder="Qtd Unidades">
-                    <button class="btn-action">ADICIONAR</button>
-                </div>
-            </div>
-            <div class="sub-panel">
-                <h3>Destinar Insumo</h3>
-                <div class="printer-list">
-                    <div class="printer-row"><span class="printer-name">IMPRESSORA PREÇO</span><div class="printer-controls"><input type="number" class="printer-counter-input" value="0"><button class="btn-output">DIRECIONAR</button></div></div>
-                    <div class="printer-row"><span class="printer-name">LAMB LAMB</span><div class="printer-controls"><input type="number" class="printer-counter-input" value="0"><button class="btn-output">DIRECIONAR</button></div></div>
-                </div>
-            </div>
-            <nav class="bottom-nav">
-                <button class="nav-btn" onclick="openScreen('screen-home')"><i class="fa-solid fa-house"></i></button>
-                <button class="nav-btn" onclick="openScreen('screen-impressora')"><i class="fa-solid fa-rotate-left"></i></button>
-            </nav>
-        </div>
-
-        <!-- TELA: ETQ AMARELA -->
-        <div id="screen-amarela" class="screen">
-            <header><h1>ETQ Amarela</h1></header>
-            <div class="sub-panel">
-                <h3>Estoque Central</h3>
-                <div class="display-stock">
-                    <div>
-                        <input type="number" class="stock-input-master" value="0">
-                        <span style="display:block; font-size: 0.7rem; color: var(--text-muted); margin-top: 2px;">Saldo Central</span>
-                    </div>
-                    <div style="text-align: right;">
-                        <span class="date-text" style="display:block;">Última Entrada:</span>
-                        <span class="date-text" style="font-weight: bold;">-</span>
-                    </div>
-                </div>
-                <div class="input-group">
-                    <input type="number" class="input-futuristic" placeholder="Qtd Unidades">
-                    <button class="btn-action">ADICIONAR</button>
-                </div>
-            </div>
-            <div class="sub-panel">
-                <h3>Destinar Insumo</h3>
-                <div class="printer-list">
-                    <div class="printer-row"><span class="printer-name">IMPRESSORA PREÇO</span><div class="printer-controls"><input type="number" class="printer-counter-input" value="0"><button class="btn-output">DIRECIONAR</button></div></div>
-                </div>
-            </div>
-            <nav class="bottom-nav">
-                <button class="nav-btn" onclick="openScreen('screen-home')"><i class="fa-solid fa-house"></i></button>
-                <button class="nav-btn" onclick="openScreen('screen-impressora')"><i class="fa-solid fa-rotate-left"></i></button>
-            </nav>
-        </div>
-
-        <!-- TELA: ETQ LARANJA -->
-        <div id="screen-laranja" class="screen">
-            <header><h1>ETQ Laranja</h1></header>
-            <div class="sub-panel">
-                <h3>Estoque Central</h3>
-                <div class="display-stock">
-                    <div>
-                        <input type="number" class="stock-input-master" value="0">
-                        <span style="display:block; font-size: 0.7rem; color: var(--text-muted); margin-top: 2px;">Saldo Central</span>
-                    </div>
-                    <div style="text-align: right;">
-                        <span class="date-text" style="display:block;">Última Entrada:</span>
-                        <span class="date-text" style="font-weight: bold;">-</span>
-                    </div>
-                </div>
-                <div class="input-group">
-                    <input type="number" class="input-futuristic" placeholder="Qtd Unidades">
-                    <button class="btn-action">ADICIONAR</button>
-                </div>
-            </div>
-            <div class="sub-panel">
-                <h3>Destinar Insumo</h3>
-                <div class="printer-list">
-                    <div class="printer-row"><span class="printer-name">LAMB LAMB</span><div class="printer-controls"><input type="number" class="printer-counter-input" value="0"><button class="btn-output">DIRECIONAR</button></div></div>
-                </div>
-            </div>
-            <nav class="bottom-nav">
-                <button class="nav-btn" onclick="openScreen('screen-home')"><i class="fa-solid fa-house"></i></button>
-                <button class="nav-btn" onclick="openScreen('screen-impressora')"><i class="fa-solid fa-rotate-left"></i></button>
-            </nav>
-        </div>
-
-        <!-- TELA: PAPEL TIMBRADO -->
-        <div id="screen-timbrado" class="screen">
-            <header><h1>Papel Timbrado</h1></header>
-            <div class="sub-panel">
-                <h3>Estoque Central</h3>
-                <div class="display-stock">
-                    <div>
-                        <input type="number" class="stock-input-master" value="0">
-                        <span style="display:block; font-size: 0.7rem; color: var(--text-muted); margin-top: 2px;">Saldo Central</span>
-                    </div>
-                    <div style="text-align: right;">
-                        <span class="date-text" style="display:block;">Última Entrada:</span>
-                        <span class="date-text" style="font-weight: bold;">-</span>
-                    </div>
-                </div>
-                <div class="input-group">
-                    <input type="number" class="input-futuristic" placeholder="Qtd Unidades">
-                    <button class="btn-action">ADICIONAR</button>
-                </div>
-            </div>
-            <div class="sub-panel">
-                <h3>Destinar Insumo</h3>
-                <div class="printer-list">
-                    <div class="printer-row"><span class="printer-name">NFE</span><div class="printer-controls"><input type="number" class="printer-counter-input" value="0"><button class="btn-output">DIRECIONAR</button></div></div>
-                </div>
-            </div>
-            <nav class="bottom-nav">
-                <button class="nav-btn" onclick="openScreen('screen-home')"><i class="fa-solid fa-house"></i></button>
-                <button class="nav-btn" onclick="openScreen('screen-impressora')"><i class="fa-solid fa-rotate-left"></i></button>
-            </nav>
-        </div>
-
-        <!-- TELA: ETQ PONTO -->
-        <div id="screen-ponto" class="screen">
-            <header><h1>ETQ Ponto</h1></header>
-            <div class="sub-panel">
-                <h3>Estoque Central</h3>
-                <div class="display-stock">
-                    <div>
-                        <input type="number" class="stock-input-master" value="0">
-                        <span style="display:block; font-size: 0.7rem; color: var(--text-muted); margin-top: 2px;">Saldo Central</span>
-                    </div>
-                    <div style="text-align: right;">
-                        <span class="date-text" style="display:block;">Última Entrada:</span>
-                        <span class="date-text" style="font-weight: bold;">-</span>
-                    </div>
-                </div>
-                <div class="input-group">
-                    <input type="number" class="input-futuristic" placeholder="Qtd Unidades">
-                    <button class="btn-action">ADICIONAR</button>
-                </div>
-            </div>
-            <div class="sub-panel">
-                <h3>Destinar Insumo</h3>
-                <div class="printer-list">
-                    <div class="printer-row"><span class="printer-name">#1 Ent Func (DIGICON)</span><div class="printer-controls"><input type="number" class="printer-counter-input" value="0"><button class="btn-output">DIRECIONAR</button></div></div>
-                    <div class="printer-row"><span class="printer-name">#2 FCX (TELEMATICA)</span><div class="printer-controls"><input type="number" class="printer-counter-input" value="0"><button class="btn-output">DIRECIONAR</button></div></div>
-                    <div class="printer-row"><span class="printer-name">#3 DEP (DIGINON)</span><div class="printer-controls"><input type="number" class="printer-counter-input" value="0"><button class="btn-output">DIRECIONAR</button></div></div>
-                    <div class="printer-row"><span class="printer-name">#4 Ent Func 2 (TELEMATICA)</span><div class="printer-controls"><input type="number" class="printer-counter-input" value="0"><button class="btn-output">DIRECIONAR</button></div></div>
-                </div>
-            </div>
-            <nav class="bottom-nav">
-                <button class="nav-btn" onclick="openScreen('screen-home')"><i class="fa-solid fa-house"></i></button>
-                <button class="nav-btn" onclick="openScreen('screen-impressora')"><i class="fa-solid fa-rotate-left"></i></button>
-            </nav>
-        </div>
-
-        <!-- TELA: FOTO CONDUTOR (Ajustada conforme image_c838d0.png e image_c83907.png) -->
-        <div id="screen-fotocondutor" class="screen">
-            <header><h1>Foto Condutor</h1></header>
-            <div class="tab-bar">
-                <button id="tab-fc-50F0Z00" class="tab-btn active" onclick="abrirFotoCondutor('50F0Z00')">50F0Z00</button>
-                <button id="tab-fc-52D0Z00" class="tab-btn" onclick="abrirFotoCondutor('52D0Z00')">52D0Z00</button>
-            </div>
-            <div class="sub-panel">
-                <h3 id="lbl-modelo-fc">MODELO: 50F0Z00 (MX611)</h3>
-                <div class="display-stock">
-                    <div>
-                        <input type="number" class="stock-input-master" value="0">
-                        <span style="display:block; font-size: 0.7rem; color: var(--text-muted); margin-top: 2px;">Saldo Central</span>
-                    </div>
-                    <div style="text-align: right;">
-                        <span class="date-text" style="display:block;">Última Entrada:</span>
-                        <span class="date-text" style="font-weight: bold;">-</span>
-                    </div>
-                </div>
-                <div class="input-group">
-                    <input type="number" class="input-futuristic" placeholder="Qtd Unidades">
-                    <button class="btn-action">ADICIONAR</button>
-                </div>
-            </div>
-            <div class="sub-panel">
-                <h3>Destinar Insumo</h3>
-                <div id="container-lista-fc" class="printer-list">
-                    <!-- Gerado Dinamicamente -->
-                </div>
-            </div>
-            <nav class="bottom-nav">
-                <button class="nav-btn" onclick="openScreen('screen-home')"><i class="fa-solid fa-house"></i></button>
-                <button class="nav-btn" onclick="openScreen('screen-impressora')"><i class="fa-solid fa-rotate-left"></i></button>
-            </nav>
-        </div>
-
-        <!-- TELA: TONERS (Ajustada conforme image_c83c8c.png, image_c83cac.png e image_c83ccd.png) -->
-        <div id="screen-toner" class="screen">
-            <header><h1>Toners</h1></header>
-            <div class="tab-bar">
-                <button id="tab-toner-55BBX00" class="tab-btn active" onclick="abrirToners('55BBX00')">55BBX00</button>
-                <button id="tab-toner-50FBU0E" class="tab-btn" onclick="abrirToners('50FBU0E')">50FBU0E</button>
-                <button id="tab-toner-52DBX0E" class="tab-btn" onclick="abrirToners('52DBX0E')">52DBX0E</button>
-            </div>
-            <div class="sub-panel">
-                <h3 id="lbl-modelo-toner">MODELO: 55BBX00 (MX611)</h3>
-                <div class="display-stock">
-                    <div>
-                        <input type="number" class="stock-input-master" value="0">
-                        <span style="display:block; font-size: 0.7rem; color: var(--text-muted); margin-top: 2px;">Saldo Central</span>
-                    </div>
-                    <div style="text-align: right;">
-                        <span class="date-text" style="display:block;">Última Entrada:</span>
-                        <span class="date-text" style="font-weight: bold;">-</span>
-                    </div>
-                </div>
-                <div class="input-group">
-                    <input type="number" class="input-futuristic" placeholder="Qtd Unidades">
-                    <button class="btn-action">ADICIONAR</button>
-                </div>
-            </div>
-            <div class="sub-panel">
-                <h3>Destinar Insumo</h3>
-                <div id="container-lista-toner" class="printer-list">
-                    <!-- Gerado Dinamicamente -->
-                </div>
-            </div>
-            <nav class="bottom-nav">
-                <button class="nav-btn" onclick="openScreen('screen-home')"><i class="fa-solid fa-house"></i></button>
-                <button class="nav-btn" onclick="openScreen('screen-impressora')"><i class="fa-solid fa-rotate-left"></i></button>
-            </nav>
-        </div>
-
-        <!-- TELA: TONER CARTAZ (Ajustada conforme image_c8402d.png) -->
         <div id="screen-cartaz" class="screen">
             <header><h1>Toner Cartaz</h1></header>
             <div class="sub-panel">
-                <h3>Estoque</h3>
-                <div class="printer-list" style="gap: 0.4rem; margin-bottom: 0.8rem;">
-                    <div class="row-cartaz-stock"><span class="label-cartaz cartaz-y">Amarelo</span><div class="cartaz-stock-right"><span class="cartaz-stock-value">0</span><span class="cartaz-date-value">-</span></div></div>
-                    <div class="row-cartaz-stock"><span class="label-cartaz cartaz-m">Magenta</span><div class="cartaz-stock-right"><span class="cartaz-stock-value">0</span><span class="cartaz-date-value">-</span></div></div>
-                    <div class="row-cartaz-stock"><span class="label-cartaz cartaz-c">Cyano</span><div class="cartaz-stock-right"><span class="cartaz-stock-value">0</span><span class="cartaz-date-value">-</span></div></div>
-                    <div class="row-cartaz-stock"><span class="label-cartaz cartaz-k">Preto</span><div class="cartaz-stock-right"><span class="cartaz-stock-value">0</span><span class="cartaz-date-value">-</span></div></div>
-                </div>
-                <div class="input-group">
-                    <select class="select-futuristic">
-                        <option value="Y">AMARELO</option>
-                        <option value="M">MAGENTA</option>
-                        <option value="C">CYANO</option>
-                        <option value="K">PRETO</option>
-                    </select>
-                    <input type="number" class="input-futuristic" placeholder="Qtd">
-                    <button class="btn-action">ADICIONAR</button>
+                <h3>Saldo das Cores</h3>
+                <div style="display: flex; flex-direction: column; gap: 0.6rem;">
+                    <div class="row-cartaz-stock">
+                        <span class="label-cartaz cartaz-y">AMARELO</span>
+                        <div class="cartaz-stock-right">
+                            <span id="saldo-cartaz-yellow" class="cartaz-stock-value">0</span>
+                            <span id="date-cartaz-yellow" class="cartaz-date-value">-</span>
+                        </div>
+                    </div>
+                    <div class="row-cartaz-stock">
+                        <span class="label-cartaz cartaz-m">MAGENTA</span>
+                        <div class="cartaz-stock-right">
+                            <span id="saldo-cartaz-magenta" class="cartaz-stock-value">0</span>
+                            <span id="date-cartaz-magenta" class="cartaz-date-value">-</span>
+                        </div>
+                    </div>
+                    <div class="row-cartaz-stock">
+                        <span class="label-cartaz cartaz-c">CYANO</span>
+                        <div class="cartaz-stock-right">
+                            <span id="saldo-cartaz-cyan" class="cartaz-stock-value">0</span>
+                            <span id="date-cartaz-cyan" class="cartaz-date-value">-</span>
+                        </div>
+                    </div>
+                    <div class="row-cartaz-stock">
+                        <span class="label-cartaz cartaz-k">PRETO</span>
+                        <div class="cartaz-stock-right">
+                            <span id="saldo-cartaz-black" class="cartaz-stock-value">0</span>
+                            <span id="date-cartaz-black" class="cartaz-date-value">-</span>
+                        </div>
+                    </div>
                 </div>
             </div>
+
             <div class="sub-panel">
-                <h3>Saída</h3>
-                <div class="printer-list">
-                    <div class="printer-row"><span class="label-cartaz cartaz-y">Amarelo</span><div class="printer-controls"><input type="number" class="printer-counter-input" value="0"><button class="btn-output">DIRECIONAR</button></div></div>
-                    <div class="printer-row"><span class="printer-name cartaz-m">Magenta</span><div class="printer-controls"><input type="number" class="printer-counter-input" value="0"><button class="btn-output">DIRECIONAR</button></div></div>
-                    <div class="printer-row"><span class="printer-name cartaz-c">Cyano</span><div class="printer-controls"><input type="number" class="printer-counter-input" value="0"><button class="btn-output">DIRECIONAR</button></div></div>
-                    <div class="printer-row"><span class="printer-name cartaz-k">Preto</span><div class="printer-controls"><input type="number" class="printer-counter-input" value="0"><button class="btn-output">DIRECIONAR</button></div></div>
+                <h3>Entrada / Saída</h3>
+                <div style="display:flex; gap: 0.4rem; margin-bottom: 0.8rem;">
+                    <select id="select-cartaz-cor" class="select-futuristic" style="flex: 1;">
+                        <option value="yellow">AMARELO</option>
+                        <option value="magenta">MAGENTA</option>
+                        <option value="cyan">CYANO</option>
+                        <option value="black">PRETO</option>
+                    </select>
+                    <input type="number" id="input-cartaz-qtd" class="input-futuristic" placeholder="Qtd" style="width: 70px;">
+                </div>
+                <div style="display:flex; gap: 0.5rem;">
+                    <button class="btn-action" style="flex:1; background: var(--glow-green);" onclick="movimentarCartaz('entrada')">ENTRADA</button>
+                    <button class="btn-action" style="flex:1; background: var(--glow-orange);" onclick="movimentarCartaz('saida')">DIRECIONAR</button>
                 </div>
             </div>
             <nav class="bottom-nav">
@@ -639,122 +415,179 @@
 
     </div>
 
-    <!-- CONTROLE E RENDERIZAÇÃO SPA -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        // Configurações do seu Firebase vinculadas ao projeto estoque-84295
+        const firebaseConfig = {
+            apiKey: "AIzaSyA3odYvjY7mcWsCTvGcDKxoccz1qYSg_NE",
+            authDomain: "estoque-84295.firebaseapp.com",
+            projectId: "estoque-84295",
+            storageBucket: "estoque-84295.firebasestorage.app",
+            messagingSenderId: "704104486696",
+            appId: "1:704104486696:web:2be634dfc63baef31c221d",
+            measurementId: "G-D31RQ19END"
+        };
+
+        // Inicializa o Firebase e o Banco Firestore
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // Objeto global de cache do estoque local
+        let estoqueLocal = {
+            papel_oficio: { saldo: 0, ultimaEntrada: "-" },
+            etq_gondola: { saldo: 0, ultimaEntrada: "-" },
+            cartaz: { yellow: 0, magenta: 0, cyan: 0, black: 0, data_yellow: "-", data_magenta: "-", data_cyan: "-", data_black: "-" }
+        };
+
+        // Sincronização em Tempo Real (Realtime Listener do Firestore)
+        function iniciarEscutaEstoque() {
+            onSnapshot(doc(db, "controle", "geral"), (snapshot) => {
+                if (snapshot.exists()) {
+                    const dados = snapshot.data();
+                    if (dados.papel_oficio) {
+                        estoqueLocal.papel_oficio = dados.papel_oficio;
+                        document.getElementById("input-oficio-saldo").value = dados.papel_oficio.saldo || 0;
+                        document.getElementById("date-oficio-saldo").innerText = dados.papel_oficio.ultimaEntrada || "-";
+                    }
+                    if (dados.etq_gondola) {
+                        estoqueLocal.etq_gondola = dados.etq_gondola;
+                        document.getElementById("input-gondola-saldo").value = dados.etq_gondola.saldo || 0;
+                        document.getElementById("date-gondola-saldo").innerText = dados.etq_gondola.ultimaEntrada || "-";
+                    }
+                    if (dados.cartaz) {
+                        estoqueLocal.cartaz = dados.cartaz;
+                        document.getElementById("saldo-cartaz-yellow").innerText = dados.cartaz.yellow || 0;
+                        document.getElementById("saldo-cartaz-magenta").innerText = dados.cartaz.magenta || 0;
+                        document.getElementById("saldo-cartaz-cyan").innerText = dados.cartaz.cyan || 0;
+                        document.getElementById("saldo-cartaz-black").innerText = dados.cartaz.black || 0;
+                        
+                        document.getElementById("date-cartaz-yellow").innerText = dados.cartaz.data_yellow || "-";
+                        document.getElementById("date-cartaz-magenta").innerText = dados.cartaz.data_magenta || "-";
+                        document.getElementById("date-cartaz-cyan").innerText = dados.cartaz.data_cyan || "-";
+                        document.getElementById("date-cartaz-black").innerText = dados.cartaz.data_black || "-";
+                    }
+                }
+            });
+        }
+
+        // Retorna a Data e Hora Atual Formatada (DD/MM/AAAA HH:MM)
+        function obterDataFormatada() {
+            const agora = new Date();
+            const dia = String(agora.getDate()).padStart(2, '0');
+            const mes = String(agora.getMonth() + 1).padStart(2, '0');
+            const ano = agora.getFullYear();
+            const horas = String(agora.getHours()).padStart(2, '0');
+            const minutos = String(agora.getMinutes()).padStart(2, '0');
+            return `${dia}/${mes}/${ano} ${horas}:${minutos}`;
+        }
+
+        // Função de Entrada de Estoque Comum
+        async function adicionarEstoque(itemKey, inputId) {
+            const inputField = document.getElementById(inputId);
+            const qtdAdicionar = parseInt(inputField.value);
+
+            if (!qtdAdicionar || qtdAdicionar <= 0) {
+                alert("Por favor, digite uma quantidade válida!");
+                return;
+            }
+
+            const dataAtual = obterDataFormatada();
+            estoqueLocal[itemKey].saldo = (estoqueLocal[itemKey].saldo || 0) + qtdAdicionar;
+            estoqueLocal[itemKey].ultimaEntrada = dataAtual;
+
+            try {
+                await setDoc(doc(db, "controle", "geral"), estoqueLocal, { merge: true });
+                inputField.value = ""; 
+            } catch (erro) {
+                console.error("Erro ao salvar dados no Firebase:", erro);
+                alert("Erro de conexão ao salvar na nuvem.");
+            }
+        }
+
+        // Função de Saída / Destinação de Estoque Comum
+        async function removerEstoque(itemKey, inputId, destinoNome) {
+            const inputField = document.getElementById(inputId);
+            const qtdRemover = parseInt(inputField.value);
+
+            if (!qtdRemover || qtdRemover <= 0) {
+                alert("Por favor, digite uma quantidade válida para direcionar!");
+                return;
+            }
+
+            if (qtdRemover > estoqueLocal[itemKey].saldo) {
+                alert(`Saldo insuficiente! Estoque atual: ${estoqueLocal[itemKey].saldo}`);
+                return;
+            }
+
+            estoqueLocal[itemKey].saldo -= qtdRemover;
+
+            try {
+                await setDoc(doc(db, "controle", "geral"), estoqueLocal, { merge: true });
+                inputField.value = "0"; 
+                alert(`Sucesso: ${qtdRemover} un. direcionadas para ${destinoNome}`);
+            } catch (erro) {
+                console.error("Erro ao abater estoque:", erro);
+            }
+        }
+
+        // Função de movimentação específica para os Toners de Cartaz (Yellow, Magenta, Cyan, Black)
+        async function movimentarCartaz(tipo) {
+            const cor = document.getElementById("select-cartaz-cor").value;
+            const inputQtd = document.getElementById("input-cartaz-qtd");
+            const qtd = parseInt(inputQtd.value);
+
+            if (!qtd || qtd <= 0) {
+                alert("Digite uma quantidade válida!");
+                return;
+            }
+
+            if (!estoqueLocal.cartaz) {
+                estoqueLocal.cartaz = { yellow: 0, magenta: 0, cyan: 0, black: 0, data_yellow: "-", data_magenta: "-", data_cyan: "-", data_black: "-" };
+            }
+
+            const dataAtual = obterDataFormatada();
+
+            if (tipo === 'entrada') {
+                estoqueLocal.cartaz[cor] = (estoqueLocal.cartaz[cor] || 0) + qtd;
+                estoqueLocal.cartaz[`data_${cor}`] = dataAtual;
+            } else if (tipo === 'saida') {
+                if (qtd > estoqueLocal.cartaz[cor]) {
+                    alert(`Saldo insuficiente de toner ${cor.toUpperCase()}! Saldo atual: ${estoqueLocal.cartaz[cor]}`);
+                    return;
+                }
+                estoqueLocal.cartaz[cor] -= qtd;
+            }
+
+            try {
+                await setDoc(doc(db, "controle", "geral"), estoqueLocal, { merge: true });
+                inputQtd.value = "";
+            } catch (erro) {
+                console.error("Erro ao atualizar Toner Cartaz:", erro);
+            }
+        }
+
+        // Expõe as funções criadas no módulo para o escopo global do HTML (onclick)
+        window.adicionarEstoque = adicionarEstoque;
+        window.removerEstoque = removerEstoque;
+        window.movimentarCartaz = movimentarCartaz;
+
+        // Inicia o monitoramento automático assim que a página abre
+        iniciarEscutaEstoque();
+    </script>
+
     <script>
         function openScreen(screenId) {
+            // Oculta todas as telas
             document.querySelectorAll('.screen').forEach(screen => {
                 screen.classList.remove('active');
             });
-            const target = document.getElementById(screenId);
-            if(target) {
-                target.classList.add('active');
-                target.scrollTop = 0; // Garante que a rolagem reinicie do topo
+            // Exibe a tela desejada
+            const targetScreen = document.getElementById(screenId);
+            if (targetScreen) {
+                targetScreen.classList.add('active');
             }
-        }
-
-        // Dicionário mapeando exatamente as configurações de cada aba do Foto Condutor
-        const dadosFotoCondutor = {
-            '50F0Z00': {
-                titulo: 'MODELO: 50F0Z00 (MX611)',
-                setores: [
-                    { nome: 'GER', desc: 'Lexmark MX611dhe' },
-                    { nome: 'RH', desc: 'Lexmark MX611dhe' }
-                ]
-            },
-            '52D0Z00': {
-                titulo: 'MODELO: 52D0Z00 (MS812)',
-                setores: [
-                    { nome: 'NFE', desc: 'Lexmark MS812' },
-                    { nome: 'RME', desc: 'Lexmark MS812' },
-                    { nome: 'CPD', desc: 'Lexmark MS812' }
-                ]
-            }
-        };
-
-        // Dicionário mapeando exatamente as configurações de cada aba do Toner
-        const dadosToners = {
-            '55BBX00': {
-                titulo: 'MODELO: 55BBX00 (MX611)',
-                setores: [
-                    { nome: 'RH', desc: 'Lexmark MX611dhe' },
-                    { nome: 'GER', desc: 'Lexmark MX611dhe' }
-                ]
-            },
-            '50FBU0E': {
-                titulo: 'MODELO: 50FBU0E (MX611)',
-                setores: [
-                    { nome: 'GER', desc: 'Lexmark MX611dhe' },
-                    { nome: 'RH', desc: 'Lexmark MX611dhe' }
-                ]
-            },
-            '52DBX0E': {
-                titulo: 'MODELO: 52DBX0E (MS812)',
-                setores: [
-                    { nome: 'RME', desc: 'Lexmark MS812' },
-                    { nome: 'NFE', desc: 'Lexmark MS812' },
-                    { nome: 'CPD', desc: 'Lexmark MS812' }
-                ]
-            }
-        };
-
-        function abrirFotoCondutor(codigoAba) {
-            // Gerencia classes ativas das abas
-            document.querySelectorAll('#screen-fotocondutor .tab-btn').forEach(btn => btn.classList.remove('active'));
-            document.getElementById(`tab-fc-${codigoAba}`).classList.add('active');
-            
-            // Atualiza título do modelo
-            const config = dadosFotoCondutor[codigoAba];
-            document.getElementById('lbl-modelo-fc').innerText = config.titulo;
-
-            // Renderiza os setores corretos da aba
-            const container = document.getElementById('container-lista-fc');
-            container.innerHTML = '';
-            config.setores.forEach(setor => {
-                container.innerHTML += `
-                    <div class="printer-row">
-                        <div>
-                            <span class="printer-name">${setor.nome}</span>
-                            <span class="printer-model-tag">${setor.desc}</span>
-                        </div>
-                        <div class="printer-controls">
-                            <input type="number" class="printer-counter-input" value="0">
-                            <button class="btn-output">DIRECIONAR</button>
-                        </div>
-                    </div>
-                `;
-            });
-
-            openScreen('screen-fotocondutor');
-        }
-
-        function abrirToners(codigoAba) {
-            // Gerencia classes ativas das abas
-            document.querySelectorAll('#screen-toner .tab-btn').forEach(btn => btn.classList.remove('active'));
-            document.getElementById(`tab-toner-${codigoAba}`).classList.add('active');
-            
-            // Atualiza título do modelo
-            const config = dadosToners[codigoAba];
-            document.getElementById('lbl-modelo-toner').innerText = config.titulo;
-
-            // Renderiza os setores corretos da aba
-            const container = document.getElementById('container-lista-toner');
-            container.innerHTML = '';
-            config.setores.forEach(setor => {
-                container.innerHTML += `
-                    <div class="printer-row">
-                        <div>
-                            <span class="printer-name">${setor.nome}</span>
-                            <span class="printer-model-tag">${setor.desc}</span>
-                        </div>
-                        <div class="printer-controls">
-                            <input type="number" class="printer-counter-input" value="0">
-                            <button class="btn-output">DIRECIONAR</button>
-                        </div>
-                    </div>
-                `;
-            });
-
-            openScreen('screen-toner');
         }
     </script>
 </body>
