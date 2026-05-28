@@ -874,63 +874,81 @@
 
         /* FUNÇÕES ADAPTADAS PARA O NOVO FORMATO DE TONER (IMAGE_D8A8D0.PNG) */
         
-        async function entradaCartazUnica() {
-            const corSelect = document.getElementById("select-cartaz-cor").value;
-            const inputQtd = document.getElementById("input-cartaz-qtd");
-            const qtd = parseInt(inputQtd.value);
+        // 1. ADICIONAR: Soma ao estoque central da cor selecionada no <select>
+async function entradaCartazUnica() {
+    const corSelect = document.getElementById("select-cartaz-cor").value; // 'yellow', 'magenta', 'cyan', 'black'
+    const inputQtd = document.getElementById("input-cartaz-qtd");
+    const qtd = parseInt(inputQtd.value);
 
-            if (!qtd || qtd <= 0) {
-                alert("Digite uma quantidade válida para a entrada!");
-                return;
-            }
+    // Validação de entrada
+    if (!qtd || qtd <= 0) {
+        alert("Por favor, digite uma quantidade válida para a entrada!");
+        return;
+    }
 
-            if (!estoqueLocal.cartaz) {
-                estoqueLocal.cartaz = { yellow: 0, magenta: 0, cyan: 0, black: 0, data_yellow: "-", data_magenta: "-", data_cyan: "-", data_black: "-" };
-            }
+    // Inicializa o objeto cartaz caso ele não exista no banco ainda
+    if (!estoqueLocal.cartaz) {
+        estoqueLocal.cartaz = { 
+            yellow: 0, magenta: 0, cyan: 0, black: 0, 
+            data_yellow: "-", data_magenta: "-", data_cyan: "-", data_black: "-" 
+        };
+    }
 
-            const dataAtual = obterDataFormatada();
-            estoqueLocal.cartaz[corSelect] = (estoqueLocal.cartaz[corSelect] || 0) + qtd;
-            estoqueLocal.cartaz[`data_${corSelect}`] = dataAtual;
+    const dataAtual = obterDataFormatada();
+    
+    // SOMA ao estoque existente
+    estoqueLocal.cartaz[corSelect] = (estoqueLocal.cartaz[corSelect] || 0) + qtd;
+    estoqueLocal.cartaz[`data_${corSelect}`] = dataAtual;
 
-            try {
-                await setDoc(doc(db, "controle", "geral"), estoqueLocal, { merge: true });
-                inputQtd.value = "";
-            } catch (erro) {
-                console.error("Erro ao dar entrada no Toner:", erro);
-            }
-        }
+    try {
+        // Envia para o Firestore mantendo o merge ativo
+        await setDoc(doc(db, "controle", "geral"), estoqueLocal, { merge: true });
+        inputQtd.value = ""; // Limpa o campo de entrada
+    } catch (erro) {
+        console.error("Erro ao dar entrada no Toner:", erro);
+        alert("Erro ao salvar no banco de dados.");
+    }
+}
 
-        async function saidaCartazDireta(cor, inputId) {
-            const inputField = document.getElementById(inputId);
-            const qtd = parseInt(inputField.value);
+// 2. DIRECIONAR: Diminui do estoque atual da cor correspondente à linha
+async function saidaCartazDireta(cor, inputId) {
+    const inputField = document.getElementById(inputId);
+    const qtd = parseInt(inputField.value);
 
-            if (!qtd || qtd <= 0) {
-                alert("Digite uma quantidade válida para direcionar!");
-                return;
-            }
+    // Validação de entrada
+    if (!qtd || qtd <= 0) {
+        alert("Por favor, digite uma quantidade válida para direcionar!");
+        return;
+    }
 
-            if (!estoqueLocal.cartaz || qtd > (estoqueLocal.cartaz[cor] || 0)) {
-                alert(`Saldo insuficiente para a cor selecionada! Estoque atual: ${estoqueLocal.cartaz?.[cor] || 0}`);
-                return;
-            }
+    // Verifica se há saldo suficiente para abater
+    const saldoAtual = estoqueLocal.cartaz ? (estoqueLocal.cartaz[cor] || 0) : 0;
+    if (qtd > saldoAtual) {
+        alert(`Saldo insuficiente para a cor ${cor.toUpperCase()}!\nEstoque atual: ${saldoAtual}`);
+        return;
+    }
 
-            estoqueLocal.cartaz[cor] -= qtd;
+    // SUBTRAI (diminui) do estoque atual
+    estoqueLocal.cartaz[cor] = saldoAtual - qtd;
 
-            try {
-                await setDoc(doc(db, "controle", "geral"), estoqueLocal, { merge: true });
-                inputField.value = "0";
-                alert(`Sucesso: ${qtd} un. de Toner ${cor.toUpperCase()} direcionadas!`);
-            } catch (erro) {
-                console.error("Erro ao abater Toner:", erro);
-            }
-        }
+    try {
+        // Salva a alteração decrementada no Firestore
+        await setDoc(doc(db, "controle", "geral"), estoqueLocal, { merge: true });
+        
+        // Retorna o valor do input da linha para 0 após o sucesso
+        inputField.value = "0"; 
+        
+        // Alerta opcional de confirmação para o operador do scanner
+        alert(`Sucesso: ${qtd} un. de Toner ${cor.toUpperCase()} direcionadas!`);
+    } catch (erro) {
+        console.error("Erro ao abater Toner:", erro);
+        alert("Erro ao processar a saída no banco de dados.");
+    }
+}
 
-        window.adicionarEstoque = adicionarEstoque;
-        window.removerEstoque = removerEstoque;
-        window.entradaCartazUnica = entradaCartazUnica;
-        window.saidaCartazDireta = saidaCartazDireta;
-
-        iniciarEscutaEstoque();
+// Vincula as funções ao escopo global (window) para os botões do HTML continuarem funcionando
+window.entradaCartazUnica = entradaCartazUnica;
+window.saidaCartazDireta = saidaCartazDireta;
     </script>
 
     <!-- NAVEGAÇÃO SPA -->
