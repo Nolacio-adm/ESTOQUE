@@ -640,12 +640,14 @@
             </nav>
         </div>
 
-        <!-- TELA 5: TONER CARTAZ -->
+        <!-- TELA 5: TONER CARTAZ (ATUALIZADA) -->
         <div id="screen-cartaz" class="screen">
             <header><h1>Toner Cartaz</h1></header>
+            
+            <!-- PAINEL 1: ESTOQUE (Baseado em image_d8a8d0.png) -->
             <div class="sub-panel">
-                <h3>Saldo das Cores</h3>
-                <div style="display: flex; flex-direction: column; gap: 0.6rem;">
+                <h3>Estoque</h3>
+                <div style="display: flex; flex-direction: column; gap: 0.6rem; margin-bottom: 0.8rem;">
                     <div class="row-cartaz-stock">
                         <span class="label-cartaz cartaz-y">AMARELO</span>
                         <div class="cartaz-stock-right">
@@ -675,24 +677,55 @@
                         </div>
                     </div>
                 </div>
-            </div>
-
-            <div class="sub-panel">
-                <h3>Entrada / Saída</h3>
-                <div style="display:flex; gap: 0.4rem; margin-bottom: 0.8rem;">
-                    <select id="select-cartaz-cor" class="select-futuristic" style="flex: 1;">
+                
+                <!-- Entrada única do painel de estoque -->
+                <div style="display:flex; gap: 0.4rem;">
+                    <select id="select-cartaz-cor" class="select-futuristic" style="flex: 13;">
                         <option value="yellow">AMARELO</option>
                         <option value="magenta">MAGENTA</option>
                         <option value="cyan">CYANO</option>
                         <option value="black">PRETO</option>
                     </select>
-                    <input type="number" id="input-cartaz-qtd" class="input-futuristic" placeholder="Qtd" style="width: 70px;">
-                </div>
-                <div style="display:flex; gap: 0.5rem;">
-                    <button class="btn-action" style="flex:1; background: var(--glow-green);" onclick="movimentarCartaz('entrada')">ENTRADA</button>
-                    <button class="btn-action" style="flex:1; background: var(--glow-orange);" onclick="movimentarCartaz('saida')">DIRECIONAR</button>
+                    <input type="number" id="input-cartaz-qtd" class="input-futuristic" placeholder="Qtd" style="flex: 10;">
+                    <button class="btn-action" style="background: var(--glow-cyan); flex: 10;" onclick="entradaCartazUnica()">ADICIONAR</button>
                 </div>
             </div>
+
+            <!-- PAINEL 2: SAÍDA DIRETA POR LINHA (Baseado em image_d8a8d0.png) -->
+            <div class="sub-panel">
+                <h3>Saída</h3>
+                <div class="printer-list">
+                    <div class="printer-row">
+                        <span class="label-cartaz cartaz-y">AMARELO</span>
+                        <div class="printer-controls">
+                            <input type="number" id="out-cartaz-yellow" class="printer-counter-input" value="0">
+                            <button class="btn-output" onclick="saidaCartazDireta('yellow', 'out-cartaz-yellow')">DIRECIONAR</button>
+                        </div>
+                    </div>
+                    <div class="printer-row">
+                        <span class="label-cartaz cartaz-m">MAGENTA</span>
+                        <div class="printer-controls">
+                            <input type="number" id="out-cartaz-magenta" class="printer-counter-input" value="0">
+                            <button class="btn-output" onclick="saidaCartazDireta('magenta', 'out-cartaz-magenta')">DIRECIONAR</button>
+                        </div>
+                    </div>
+                    <div class="printer-row">
+                        <span class="label-cartaz cartaz-c">CYANO</span>
+                        <div class="printer-controls">
+                            <input type="number" id="out-cartaz-cyan" class="printer-counter-input" value="0">
+                            <button class="btn-output" onclick="saidaCartazDireta('cyan', 'out-cartaz-cyan')">DIRECIONAR</button>
+                        </div>
+                    </div>
+                    <div class="printer-row">
+                        <span class="label-cartaz cartaz-k">PRETO</span>
+                        <div class="printer-controls">
+                            <input type="number" id="out-cartaz-black" class="printer-counter-input" value="0">
+                            <button class="btn-output" onclick="saidaCartazDireta('black', 'out-cartaz-black')">DIRECIONAR</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
             <nav class="bottom-nav">
                 <button class="nav-btn" onclick="openScreen('screen-home')"><i class="fa-solid fa-house"></i></button>
                 <button class="nav-btn" onclick="openScreen('screen-impressora')"><i class="fa-solid fa-rotate-left"></i></button>
@@ -839,13 +872,15 @@
             }
         }
 
-        async function movimentarCartaz(tipo) {
-            const coreSelect = document.getElementById("select-cartaz-cor").value;
+        /* FUNÇÕES ADAPTADAS PARA O NOVO FORMATO DE TONER (IMAGE_D8A8D0.PNG) */
+        
+        async function entradaCartazUnica() {
+            const corSelect = document.getElementById("select-cartaz-cor").value;
             const inputQtd = document.getElementById("input-cartaz-qtd");
             const qtd = parseInt(inputQtd.value);
 
             if (!qtd || qtd <= 0) {
-                alert("Digite uma quantidade válida!");
+                alert("Digite uma quantidade válida para a entrada!");
                 return;
             }
 
@@ -854,29 +889,46 @@
             }
 
             const dataAtual = obterDataFormatada();
-
-            if (tipo === 'entrada') {
-                estoqueLocal.cartaz[coreSelect] = (estoqueLocal.cartaz[coreSelect] || 0) + qtd;
-                estoqueLocal.cartaz[`data_${coreSelect}`] = dataAtual;
-            } else if (tipo === 'saida') {
-                if (qtd > (estoqueLocal.cartaz[coreSelect] || 0)) {
-                    alert(`Saldo insuficiente!`);
-                    return;
-                }
-                estoqueLocal.cartaz[coreSelect] -= qtd;
-            }
+            estoqueLocal.cartaz[corSelect] = (estoqueLocal.cartaz[corSelect] || 0) + qtd;
+            estoqueLocal.cartaz[`data_${corSelect}`] = dataAtual;
 
             try {
                 await setDoc(doc(db, "controle", "geral"), estoqueLocal, { merge: true });
                 inputQtd.value = "";
             } catch (erro) {
-                console.error("Erro ao atualizar Toner:", erro);
+                console.error("Erro ao dar entrada no Toner:", erro);
+            }
+        }
+
+        async function saidaCartazDireta(cor, inputId) {
+            const inputField = document.getElementById(inputId);
+            const qtd = parseInt(inputField.value);
+
+            if (!qtd || qtd <= 0) {
+                alert("Digite uma quantidade válida para direcionar!");
+                return;
+            }
+
+            if (!estoqueLocal.cartaz || qtd > (estoqueLocal.cartaz[cor] || 0)) {
+                alert(`Saldo insuficiente para a cor selecionada! Estoque atual: ${estoqueLocal.cartaz?.[cor] || 0}`);
+                return;
+            }
+
+            estoqueLocal.cartaz[cor] -= qtd;
+
+            try {
+                await setDoc(doc(db, "controle", "geral"), estoqueLocal, { merge: true });
+                inputField.value = "0";
+                alert(`Sucesso: ${qtd} un. de Toner ${cor.toUpperCase()} direcionadas!`);
+            } catch (erro) {
+                console.error("Erro ao abater Toner:", erro);
             }
         }
 
         window.adicionarEstoque = adicionarEstoque;
         window.removerEstoque = removerEstoque;
-        window.movimentarCartaz = movimentarCartaz;
+        window.entradaCartazUnica = entradaCartazUnica;
+        window.saidaCartazDireta = saidaCartazDireta;
 
         iniciarEscutaEstoque();
     </script>
@@ -890,7 +942,6 @@
             const targetScreen = document.getElementById(screenId);
             if (targetScreen) {
                 targetScreen.classList.add('active');
-                // Faz o scroll voltar ao topo ao mudar de tela
                 targetScreen.scrollTop = 0;
             } else {
                 console.error("Tela não encontrada: " + screenId);
