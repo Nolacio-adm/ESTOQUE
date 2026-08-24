@@ -787,7 +787,7 @@
     <!-- CONFIGURAÇÃO DO FIREBASE CLOUD FIRESTORE -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, doc, setDoc, onSnapshot, runTransaction } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { initializeFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyA3odYvjY7mcWsCTvGcDKxoccz1qYSg_NE",
@@ -800,7 +800,12 @@
         };
 
         const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
+        // Usa Long Polling para maior compatibilidade com redes, proxies e
+        // dispositivos que apresentam falha no WebChannel/HTTP2.
+        const db = initializeFirestore(app, {
+            experimentalForceLongPolling: true,
+            useFetchStreams: false
+        });
 
         let toastTimer;
         function mostrarToast(mensagem, erro = false) {
@@ -837,7 +842,9 @@
         }
 
         function iniciarEscutaEstoque() {
-            onSnapshot(doc(db, "controle", "geral"), (snapshot) => {
+            onSnapshot(
+                doc(db, "controle", "geral"),
+                (snapshot) => {
                 if (snapshot.exists()) {
                     const dados = snapshot.data();
                     
@@ -872,7 +879,12 @@
                         });
                     }
                 }
-            });
+                },
+                (erro) => {
+                    console.error("Erro na sincronização do Firestore:", erro);
+                    mostrarToast("Falha na conexão com o banco. Verifique a internet.", true);
+                }
+            );
         }
 
         function obterDataFormatada() {
@@ -906,6 +918,7 @@
                 mostrarToast(`✓ ${qtdAdicionar} un. adicionadas ao estoque`);
             } catch (erro) {
                 console.error("Erro ao salvar dados no Firebase:", erro);
+                mostrarToast(`Erro ao salvar: ${erro.code || erro.message}`, true);
             }
         }
 
@@ -931,6 +944,7 @@
                 mostrarToast(`✓ ${qtdRemover} un. direcionadas para ${destinoNome}`);
             } catch (erro) {
                 console.error("Erro ao abater estoque:", erro);
+                mostrarToast(`Erro ao salvar: ${erro.code || erro.message}`, true);
             }
         }
 
