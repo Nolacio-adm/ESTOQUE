@@ -38,24 +38,22 @@
             color: var(--text-main);
             display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: stretch;
             min-height: 100vh;
-            min-height: 100dvh; 
+            min-height: 100dvh;
             background: radial-gradient(circle at 50% 0%, #1a2332 0%, #0b0e14 70%);
-            overflow: hidden;
+            overflow-x: hidden;
         }
 
         .app-container {
             width: 100%;
-            max-width: 430px;
-            height: 100vh;
-            height: 100dvh;
-            max-height: 850px;
-            padding: 1.5rem 1.2rem;
+            max-width: 760px;
+            min-height: 100vh;
+            min-height: 100dvh;
+            padding: 1.25rem 1.2rem;
             display: flex;
             flex-direction: column;
             position: relative;
-            overflow: hidden;
             border: 1px solid rgba(0, 243, 255, 0.1);
             background: rgba(11, 14, 20, 0.95);
         }
@@ -64,10 +62,12 @@
         .screen {
             display: none;
             flex-direction: column;
-            height: 100%;
+            flex: 1;
+            min-height: 0;
             overflow-y: auto;
-            padding-bottom: 75px;
+            padding: 0.25rem 0.1rem calc(6rem + env(safe-area-inset-bottom));
             scrollbar-width: none;
+            -webkit-overflow-scrolling: touch;
         }
         .screen::-webkit-scrollbar { display: none; }
 
@@ -186,10 +186,20 @@
 
         /* Rodapé de Navegação */
         .bottom-nav {
-            position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%);
-            display: flex; gap: 2rem; background: rgba(10, 14, 20, 0.95); padding: 0.5rem 1.8rem;
-            border-radius: 30px; border: 1px solid rgba(0, 243, 255, 0.2); backdrop-filter: blur(10px); z-index: 10;
+            position: sticky;
+            bottom: calc(0.6rem + env(safe-area-inset-bottom));
+            align-self: center;
+            margin-top: auto;
+            display: flex;
+            gap: 2rem;
+            background: rgba(10, 14, 20, 0.97);
+            padding: 0.55rem 1.8rem;
+            border-radius: 30px;
+            border: 1px solid rgba(0, 243, 255, 0.2);
+            backdrop-filter: blur(10px);
+            z-index: 10;
             width: max-content;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.35);
         }
         .nav-btn { background: none; border: none; color: var(--text-main); font-size: 1.2rem; cursor: pointer; transition: 0.2s; }
         .nav-btn:hover { color: var(--glow-cyan); transform: scale(1.05); }
@@ -209,8 +219,47 @@
         input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
         input[type=number] { -moz-appearance: textfield; }
 
+        .grid-main .btn:last-child:nth-child(odd) { grid-column: 1 / -1; }
+
+        .toast {
+            position: fixed;
+            left: 50%;
+            bottom: calc(1rem + env(safe-area-inset-bottom));
+            transform: translate(-50%, 150%);
+            width: min(92vw, 430px);
+            padding: 0.9rem 1rem;
+            border-radius: 12px;
+            background: rgba(20,25,34,0.98);
+            border: 1px solid var(--glow-cyan);
+            color: #fff;
+            text-align: center;
+            font-weight: 700;
+            z-index: 9999;
+            transition: transform .25s ease;
+            box-shadow: 0 0 18px rgba(0,243,255,.18);
+        }
+        .toast.show { transform: translate(-50%, 0); }
+        .toast.error { border-color: var(--glow-red); }
+
+        @media (max-width: 560px) {
+            .printer-row {
+                align-items: stretch;
+                flex-direction: column;
+                gap: 0.6rem;
+            }
+            .printer-controls {
+                width: 100%;
+                justify-content: space-between;
+            }
+            .printer-counter-input { width: 34%; min-width: 70px; }
+            .btn-output { flex: 1; min-height: 40px; }
+            .input-group { flex-wrap: wrap; }
+            .input-group .input-futuristic { min-width: 0; }
+            .input-group .btn-action { min-height: 42px; }
+        }
+
         @media (max-width: 480px) {
-            .app-container { max-width: 100%; border: none; border-radius: 0; padding: 1rem 0.8rem; }
+            .app-container { max-width: 100%; border: none; border-radius: 0; padding: 1rem 0.8rem; min-height: 100dvh; }
             h1 { font-size: 1.2rem; }
             .btn span { font-size: 0.72rem; }
             .printer-row { padding: 0.45rem 0.6rem; }
@@ -733,11 +782,12 @@
         </div>
 
     </div>
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
     <!-- CONFIGURAÇÃO DO FIREBASE CLOUD FIRESTORE -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, onSnapshot, runTransaction } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyA3odYvjY7mcWsCTvGcDKxoccz1qYSg_NE",
@@ -751,6 +801,17 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
+
+        let toastTimer;
+        function mostrarToast(mensagem, erro = false) {
+            const toast = document.getElementById('toast');
+            if (!toast) return;
+            toast.textContent = mensagem;
+            toast.classList.toggle('error', erro);
+            toast.classList.add('show');
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => toast.classList.remove('show'), 2600);
+        }
 
         let estoqueLocal = {
             papel_oficio: { saldo: 0, ultimaEntrada: "-" },
@@ -829,7 +890,7 @@
             const qtdAdicionar = parseInt(inputField.value);
 
             if (!qtdAdicionar || qtdAdicionar <= 0) {
-                alert("Por favor, digite uma quantidade válida!");
+                mostrarToast("Digite uma quantidade válida.", true);
                 return;
             }
 
@@ -841,7 +902,8 @@
 
             try {
                 await setDoc(doc(db, "controle", "geral"), estoqueLocal, { merge: true });
-                inputField.value = ""; 
+                inputField.value = "";
+                mostrarToast(`✓ ${qtdAdicionar} un. adicionadas ao estoque`);
             } catch (erro) {
                 console.error("Erro ao salvar dados no Firebase:", erro);
             }
@@ -852,12 +914,12 @@
             const qtdRemover = parseInt(inputField.value);
 
             if (!qtdRemover || qtdRemover <= 0) {
-                alert("Por favor, digite uma quantidade válida!");
+                mostrarToast("Digite uma quantidade válida.", true);
                 return;
             }
 
             if (!estoqueLocal[itemKey] || qtdRemover > (estoqueLocal[itemKey].saldo || 0)) {
-                alert(`Saldo insuficiente! Estoque atual: ${estoqueLocal[itemKey]?.saldo || 0}`);
+                mostrarToast(`Saldo insuficiente. Estoque atual: ${estoqueLocal[itemKey]?.saldo || 0}`, true);
                 return;
             }
 
@@ -866,7 +928,7 @@
             try {
                 await setDoc(doc(db, "controle", "geral"), estoqueLocal, { merge: true });
                 inputField.value = "0"; 
-                alert(`Sucesso: ${qtdRemover} un. direcionadas para ${destinoNome}`);
+                mostrarToast(`✓ ${qtdRemover} un. direcionadas para ${destinoNome}`);
             } catch (erro) {
                 console.error("Erro ao abater estoque:", erro);
             }
@@ -882,7 +944,7 @@ async function entradaCartazUnica() {
 
     // Validação de entrada
     if (!qtd || qtd <= 0) {
-        alert("Por favor, digite uma quantidade válida para a entrada!");
+        mostrarToast("Digite uma quantidade válida para a entrada.", true);
         return;
     }
 
@@ -903,10 +965,11 @@ async function entradaCartazUnica() {
     try {
         // Envia para o Firestore mantendo o merge ativo
         await setDoc(doc(db, "controle", "geral"), estoqueLocal, { merge: true });
-        inputQtd.value = ""; // Limpa o campo de entrada
+        inputQtd.value = "";
+        mostrarToast(`✓ ${qtd} un. de Toner ${corSelect.toUpperCase()} adicionadas`);
     } catch (erro) {
         console.error("Erro ao dar entrada no Toner:", erro);
-        alert("Erro ao salvar no banco de dados.");
+        mostrarToast("Erro ao salvar no banco de dados.", true);
     }
 }
 
@@ -917,14 +980,14 @@ async function saidaCartazDireta(cor, inputId) {
 
     // Validação de entrada
     if (!qtd || qtd <= 0) {
-        alert("Por favor, digite uma quantidade válida para direcionar!");
+        mostrarToast("Digite uma quantidade válida para direcionar.", true);
         return;
     }
 
     // Verifica se há saldo suficiente para abater
     const saldoAtual = estoqueLocal.cartaz ? (estoqueLocal.cartaz[cor] || 0) : 0;
     if (qtd > saldoAtual) {
-        alert(`Saldo insuficiente para a cor ${cor.toUpperCase()}!\nEstoque atual: ${saldoAtual}`);
+        mostrarToast(`Saldo insuficiente para ${cor.toUpperCase()}. Estoque atual: ${saldoAtual}`, true);
         return;
     }
 
@@ -939,10 +1002,10 @@ async function saidaCartazDireta(cor, inputId) {
         inputField.value = "0"; 
         
         // Alerta opcional de confirmação para o operador do scanner
-        alert(`Sucesso: ${qtd} un. de Toner ${cor.toUpperCase()} direcionadas!`);
+        mostrarToast(`✓ ${qtd} un. de Toner ${cor.toUpperCase()} direcionadas`);
     } catch (erro) {
         console.error("Erro ao abater Toner:", erro);
-        alert("Erro ao processar a saída no banco de dados.");
+        mostrarToast("Erro ao processar a saída no banco de dados.", true);
     }
 }
 
