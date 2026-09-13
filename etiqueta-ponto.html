@@ -1,0 +1,2619 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    >
+
+    <title>CPD851 - Etiqueta de Ponto</title>
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    >
+
+    <style>
+
+        :root {
+
+            --bg-color: #0b0e14;
+
+            --surface-color: rgba(20, 25, 34, 0.7);
+
+            --text-main: #ffffff;
+
+            --text-muted: #8b9bb4;
+
+            --glow-cyan: #00f3ff;
+
+            --glow-green: #00ff66;
+
+            --glow-orange: #ff9900;
+
+            --glow-red: #ff3366;
+
+        }
+
+
+        * {
+
+            margin: 0;
+
+            padding: 0;
+
+            box-sizing: border-box;
+
+            font-family:
+                'Segoe UI',
+                Roboto,
+                Helvetica,
+                Arial,
+                sans-serif;
+
+        }
+
+
+        body {
+
+            background-color: var(--bg-color);
+
+            color: var(--text-main);
+
+            display: flex;
+
+            justify-content: center;
+
+            align-items: stretch;
+
+            min-height: 100vh;
+
+            min-height: 100dvh;
+
+            background:
+                radial-gradient(
+                    circle at 50% 0%,
+                    #1a2332 0%,
+                    #0b0e14 70%
+                );
+
+            overflow-x: hidden;
+
+        }
+
+
+        .app-container {
+
+            width: 100%;
+
+            max-width: 760px;
+
+            min-height: 100vh;
+
+            min-height: 100dvh;
+
+            padding: 1.25rem 1.2rem;
+
+            display: flex;
+
+            flex-direction: column;
+
+            position: relative;
+
+            border:
+                1px solid rgba(0, 243, 255, 0.1);
+
+            background:
+                rgba(11, 14, 20, 0.95);
+
+        }
+
+
+        header {
+
+            text-align: center;
+
+            position: relative;
+
+            padding-bottom: 0.8rem;
+
+            margin-bottom: 1.5rem;
+
+            flex-shrink: 0;
+
+        }
+
+
+        h1 {
+
+            font-size: 1.35rem;
+
+            font-weight: 700;
+
+            letter-spacing: 2px;
+
+            text-transform: uppercase;
+
+            text-shadow:
+                0 0 10px rgba(0, 243, 255, 0.3);
+
+        }
+
+
+        header::after {
+
+            content: '';
+
+            position: absolute;
+
+            bottom: 0;
+
+            left: 50%;
+
+            transform: translateX(-50%);
+
+            width: 55%;
+
+            height: 2px;
+
+            background: var(--glow-cyan);
+
+            box-shadow:
+                0 0 15px var(--glow-cyan);
+
+            border-radius: 50%;
+
+        }
+
+
+        .sub-panel {
+
+            background:
+                rgba(20, 25, 34, 0.6);
+
+            border:
+                1px solid rgba(0, 243, 255, 0.1);
+
+            border-radius: 16px;
+
+            padding: 1rem;
+
+            margin-bottom: 1rem;
+
+        }
+
+
+        .sub-panel h3 {
+
+            font-size: 0.85rem;
+
+            color: var(--glow-cyan);
+
+            letter-spacing: 1px;
+
+            margin-bottom: 0.8rem;
+
+            text-transform: uppercase;
+
+        }
+
+
+        .display-stock {
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            margin-bottom: 0.8rem;
+
+        }
+
+
+        .stock-input-master {
+
+            font-size: 1.8rem;
+
+            font-weight: bold;
+
+            color: var(--glow-green);
+
+            text-shadow:
+                0 0 10px rgba(0,255,102,0.2);
+
+            background: transparent;
+
+            border: none;
+
+            border-bottom:
+                1px dashed rgba(0, 255, 102, 0.3);
+
+            width: 80px;
+
+            text-align: left;
+
+            padding: 0;
+
+        }
+
+
+        .stock-input-master:focus {
+
+            outline: none;
+
+            border-bottom-style: solid;
+
+            border-color: var(--glow-green);
+
+        }
+
+
+        .date-text {
+
+            font-size: 0.7rem;
+
+            color: var(--text-muted);
+
+        }
+
+
+        .input-group {
+
+            display: flex;
+
+            gap: 0.5rem;
+
+        }
+
+
+        .input-futuristic {
+
+            flex-grow: 1;
+
+            background: #141922;
+
+            border:
+                1px solid rgba(255,255,255,0.1);
+
+            border-radius: 8px;
+
+            padding: 0.6rem;
+
+            color: #fff;
+
+            font-weight: bold;
+
+            text-align: center;
+
+            font-size: 0.85rem;
+
+        }
+
+
+        .input-futuristic:focus {
+
+            outline: none;
+
+            border-color: var(--glow-cyan);
+
+            box-shadow:
+                0 0 8px rgba(0,243,255,0.3);
+
+        }
+
+
+        .btn-action {
+
+            background: var(--glow-cyan);
+
+            color: #000;
+
+            border: none;
+
+            border-radius: 8px;
+
+            padding: 0.6rem 1.2rem;
+
+            font-weight: bold;
+
+            cursor: pointer;
+
+            transition: 0.2s;
+
+            white-space: nowrap;
+
+            font-size: 0.8rem;
+
+            letter-spacing: 0.5px;
+
+        }
+
+
+        .btn-action:hover {
+
+            background: #00d2dd;
+
+            box-shadow:
+                0 0 10px rgba(0,243,255,0.4);
+
+        }
+
+
+        .printer-list {
+
+            display: flex;
+
+            flex-direction: column;
+
+            gap: 0.5rem;
+
+        }
+
+
+        .printer-info {
+
+            display: flex;
+
+            flex-direction: column;
+
+            gap: 3px;
+
+            min-width: 120px;
+
+        }
+
+
+        .printer-usage {
+
+            font-size: 0.78rem;
+
+            color: var(--glow-green);
+
+        }
+
+
+        .printer-date {
+
+            font-size: 0.65rem;
+
+            color: var(--text-muted);
+
+            white-space: nowrap;
+
+        }
+
+
+        .printer-row {
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            background:
+                rgba(255,255,255,0.03);
+
+            padding: 0.6rem 0.8rem;
+
+            border-radius: 8px;
+
+            border-left:
+                3px solid var(--glow-cyan);
+
+            gap: 8px;
+
+        }
+
+
+        .printer-name {
+
+            font-weight: bold;
+
+            letter-spacing: 0.5px;
+
+            font-size: 0.85rem;
+
+        }
+
+
+        .printer-model {
+
+            font-size: 0.65rem;
+
+            color: var(--text-muted);
+
+            margin-top: 1px;
+
+        }
+
+
+        .printer-controls {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 0.5rem;
+
+            flex-shrink: 0;
+
+        }
+
+
+        .printer-counter {
+
+            color: var(--glow-orange);
+
+            font-weight: bold;
+
+            background:
+                rgba(20, 25, 34, 0.8);
+
+            border:
+                1px solid rgba(255, 153, 0, 0.3);
+
+            border-radius: 6px;
+
+            min-width: 42px;
+
+            text-align: center;
+
+            padding: 0.35rem 0.5rem;
+
+            font-size: 0.85rem;
+
+        }
+
+
+        .btn-output {
+
+            background: transparent;
+
+            border:
+                1px solid var(--glow-orange);
+
+            color: var(--glow-orange);
+
+            border-radius: 6px;
+
+            padding: 0.35rem 0.7rem;
+
+            font-size: 0.72rem;
+
+            font-weight: bold;
+
+            cursor: pointer;
+
+            transition: 0.2s;
+
+            letter-spacing: 0.5px;
+
+        }
+
+
+        .btn-output:hover:not(:disabled) {
+
+            background: var(--glow-orange);
+
+            color: #000;
+
+            box-shadow:
+                0 0 8px rgba(255,153,0,0.3);
+
+        }
+
+
+        .btn-output:disabled {
+
+            opacity: 0.25;
+
+            cursor: not-allowed;
+
+            box-shadow: none;
+
+        }
+
+
+        .btn-undo {
+
+            background: transparent;
+
+            border:
+                1px solid var(--glow-red);
+
+            color: var(--glow-red);
+
+            border-radius: 6px;
+
+            padding: 0.35rem 0.6rem;
+
+            font-size: 0.68rem;
+
+            font-weight: bold;
+
+            cursor: pointer;
+
+            transition: 0.2s;
+
+            letter-spacing: 0.3px;
+
+        }
+
+
+        .btn-undo:hover:not(:disabled) {
+
+            background: var(--glow-red);
+
+            color: #000;
+
+            box-shadow:
+                0 0 8px rgba(255,51,102,0.3);
+
+        }
+
+
+        .btn-undo:disabled {
+
+            opacity: 0.25;
+
+            cursor: not-allowed;
+
+            box-shadow: none;
+
+        }
+
+
+        .btn-clear-stock {
+
+            width: 100%;
+
+            margin-top: 0.7rem;
+
+            background: transparent;
+
+            border:
+                1px solid var(--glow-red);
+
+            color: var(--glow-red);
+
+            border-radius: 8px;
+
+            padding: 0.65rem 1rem;
+
+            font-size: 0.75rem;
+
+            font-weight: bold;
+
+            cursor: pointer;
+
+            transition: 0.2s;
+
+            letter-spacing: 0.5px;
+
+        }
+
+
+        .btn-clear-stock:hover {
+
+            background: var(--glow-red);
+
+            color: #000;
+
+            box-shadow:
+                0 0 10px rgba(255,51,102,0.35);
+
+        }
+
+
+        .bottom-nav {
+
+            position: sticky;
+
+            bottom:
+                calc(
+                    0.6rem +
+                    env(safe-area-inset-bottom)
+                );
+
+            align-self: center;
+
+            margin-top: auto;
+
+            display: flex;
+
+            gap: 2rem;
+
+            background:
+                rgba(10, 14, 20, 0.97);
+
+            padding: 0.55rem 1.8rem;
+
+            border-radius: 30px;
+
+            border:
+                1px solid rgba(0, 243, 255, 0.2);
+
+            backdrop-filter: blur(10px);
+
+            z-index: 10;
+
+            width: max-content;
+
+            box-shadow:
+                0 8px 24px rgba(0,0,0,0.35);
+
+        }
+
+
+        .nav-btn {
+
+            background: none;
+
+            border: none;
+
+            color: var(--text-main);
+
+            font-size: 1.2rem;
+
+            cursor: pointer;
+
+            transition: 0.2s;
+
+        }
+
+
+        .nav-btn:hover {
+
+            color: var(--glow-cyan);
+
+            transform: scale(1.05);
+
+        }
+
+
+        .toast {
+
+            position: fixed;
+
+            left: 50%;
+
+            bottom:
+                calc(
+                    1rem +
+                    env(safe-area-inset-bottom)
+                );
+
+            transform:
+                translate(-50%, 150%);
+
+            width: min(92vw, 430px);
+
+            padding: 0.9rem 1rem;
+
+            border-radius: 12px;
+
+            background:
+                rgba(20,25,34,0.98);
+
+            border:
+                1px solid var(--glow-cyan);
+
+            color: #fff;
+
+            text-align: center;
+
+            font-weight: 700;
+
+            z-index: 9999;
+
+            transition:
+                transform .25s ease;
+
+            box-shadow:
+                0 0 18px rgba(0,243,255,.18);
+
+        }
+
+
+        .toast.show {
+
+            transform:
+                translate(-50%, 0);
+
+        }
+
+
+        .toast.error {
+
+            border-color:
+                var(--glow-red);
+
+        }
+
+
+        @media (max-width: 560px) {
+
+            .printer-row {
+
+                align-items: stretch;
+
+                flex-direction: column;
+
+                gap: 0.6rem;
+
+            }
+
+
+            .printer-controls {
+
+                width: 100%;
+
+                justify-content: space-between;
+
+                flex-wrap: wrap;
+
+            }
+
+
+            .printer-counter {
+
+                min-width: 50px;
+
+            }
+
+
+            .btn-output {
+
+                flex: 1;
+
+                min-height: 40px;
+
+            }
+
+
+            .btn-undo {
+
+                flex: 1;
+
+                min-height: 40px;
+
+            }
+
+
+            .input-group {
+
+                flex-wrap: wrap;
+
+            }
+
+
+            .input-group .input-futuristic {
+
+                min-width: 0;
+
+            }
+
+
+            .input-group .btn-action {
+
+                min-height: 42px;
+
+            }
+
+        }
+
+
+        @media (max-width: 480px) {
+
+            .app-container {
+
+                max-width: 100%;
+
+                border: none;
+
+                border-radius: 0;
+
+                padding:
+                    1rem 0.8rem;
+
+                min-height: 100dvh;
+
+            }
+
+
+            h1 {
+
+                font-size: 1.2rem;
+
+            }
+
+
+            .printer-row {
+
+                padding:
+                    0.45rem 0.6rem;
+
+            }
+
+
+            .printer-name {
+
+                font-size: 0.8rem;
+
+            }
+
+
+            .btn-output,
+            .btn-undo {
+
+                padding:
+                    0.3rem 0.5rem;
+
+                font-size: 0.68rem;
+
+            }
+
+
+            .stock-input-master {
+
+                width: 70px;
+
+                font-size: 1.6rem;
+
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+    <div class="app-container">
+
+        <main style="
+            display:flex;
+            flex-direction:column;
+            flex:1;
+        ">
+
+
+            <header>
+
+                <h1>Etiqueta de Ponto</h1>
+
+            </header>
+
+
+            <!-- ============================== -->
+            <!-- ESTOQUE CENTRAL -->
+            <!-- ============================== -->
+
+            <div class="sub-panel">
+
+                <h3>Estoque Central</h3>
+
+
+                <div class="display-stock">
+
+                    <div>
+
+                        <input
+                            type="number"
+                            id="input-etiqueta-ponto-saldo"
+                            class="stock-input-master"
+                            value="0"
+                            readonly
+                        >
+
+                        <span style="
+                            display:block;
+                            font-size:0.7rem;
+                            color:var(--text-muted);
+                            margin-top:2px;
+                        ">
+                            Saldo Central
+                        </span>
+
+                    </div>
+
+
+                    <div style="text-align:right;">
+
+                        <span
+                            class="date-text"
+                            style="display:block;"
+                        >
+                            Última Entrada:
+                        </span>
+
+                        <span
+                            id="date-etiqueta-ponto-saldo"
+                            class="date-text"
+                            style="font-weight:bold;"
+                        >
+                            -
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <!-- ADICIONAR -->
+
+                <div class="input-group">
+
+                    <input
+                        type="number"
+                        id="input-etiqueta-ponto-add"
+                        class="input-futuristic"
+                        placeholder="Qtd Unidades"
+                        min="1"
+                    >
+
+
+                    <button
+                        class="btn-action"
+                        onclick="adicionarEtiquetaPonto()"
+                    >
+                        ADICIONAR
+                    </button>
+
+                </div>
+
+
+                <!-- ZERAR -->
+
+                <button
+                    class="btn-clear-stock"
+                    onclick="zerarEstoqueCentral()"
+                >
+
+                    <i class="fa-solid fa-trash"></i>
+
+                    ZERAR ESTOQUE CENTRAL
+
+                </button>
+
+            </div>
+
+
+            <!-- ============================== -->
+            <!-- DESTINAÇÃO -->
+            <!-- ============================== -->
+
+            <div class="sub-panel">
+
+                <h3>Destinar Etiqueta de Ponto</h3>
+
+
+                <div class="printer-list">
+
+
+                    <!-- ====================== -->
+                    <!-- EF - DIGICON -->
+                    <!-- ====================== -->
+
+                    <div class="printer-row">
+
+                        <div class="printer-info">
+
+                            <span class="printer-name">
+                                EF
+                            </span>
+
+                            <span class="printer-model">
+                                DIGICON
+                            </span>
+
+
+                            <span class="printer-usage">
+
+                                Usado:
+
+                                <strong
+                                    id="uso-etiqueta-ef"
+                                >
+                                    0
+                                </strong>
+
+                                unidades
+
+                            </span>
+
+
+                            <span
+                                class="printer-date"
+                                id="data-etiqueta-ef"
+                            >
+                                Último: -
+                            </span>
+
+                        </div>
+
+
+                        <div class="printer-controls">
+
+                            <span
+                                id="contador-etiqueta-EF"
+                                class="printer-counter"
+                            >
+                                0
+                            </span>
+
+
+                            <button
+                                id="direcionar-etiqueta-EF"
+                                class="btn-output"
+                                onclick="
+                                    direcionarUmaUnidade('EF')
+                                "
+                            >
+                                DIRECIONAR
+                            </button>
+
+
+                            <button
+                                id="desfazer-etiqueta-EF"
+                                class="btn-undo"
+                                onclick="
+                                    desfazerDirecionamento('EF')
+                                "
+                                disabled
+                            >
+                                DESFAZER
+                            </button>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- ====================== -->
+                    <!-- FC1 - TELEMATICA -->
+                    <!-- ====================== -->
+
+                    <div class="printer-row">
+
+                        <div class="printer-info">
+
+                            <span class="printer-name">
+                                FC1
+                            </span>
+
+                            <span class="printer-model">
+                                TELEMATICA
+                            </span>
+
+
+                            <span class="printer-usage">
+
+                                Usado:
+
+                                <strong
+                                    id="uso-etiqueta-fc1"
+                                >
+                                    0
+                                </strong>
+
+                                unidades
+
+                            </span>
+
+
+                            <span
+                                class="printer-date"
+                                id="data-etiqueta-fc1"
+                            >
+                                Último: -
+                            </span>
+
+                        </div>
+
+
+                        <div class="printer-controls">
+
+                            <span
+                                id="contador-etiqueta-FC1"
+                                class="printer-counter"
+                            >
+                                0
+                            </span>
+
+
+                            <button
+                                id="direcionar-etiqueta-FC1"
+                                class="btn-output"
+                                onclick="
+                                    direcionarUmaUnidade('FC1')
+                                "
+                            >
+                                DIRECIONAR
+                            </button>
+
+
+                            <button
+                                id="desfazer-etiqueta-FC1"
+                                class="btn-undo"
+                                onclick="
+                                    desfazerDirecionamento('FC1')
+                                "
+                                disabled
+                            >
+                                DESFAZER
+                            </button>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- ====================== -->
+                    <!-- FC2 - TELEMATICA -->
+                    <!-- ====================== -->
+
+                    <div class="printer-row">
+
+                        <div class="printer-info">
+
+                            <span class="printer-name">
+                                FC2
+                            </span>
+
+                            <span class="printer-model">
+                                TELEMATICA
+                            </span>
+
+
+                            <span class="printer-usage">
+
+                                Usado:
+
+                                <strong
+                                    id="uso-etiqueta-fc2"
+                                >
+                                    0
+                                </strong>
+
+                                unidades
+
+                            </span>
+
+
+                            <span
+                                class="printer-date"
+                                id="data-etiqueta-fc2"
+                            >
+                                Último: -
+                            </span>
+
+                        </div>
+
+
+                        <div class="printer-controls">
+
+                            <span
+                                id="contador-etiqueta-FC2"
+                                class="printer-counter"
+                            >
+                                0
+                            </span>
+
+
+                            <button
+                                id="direcionar-etiqueta-FC2"
+                                class="btn-output"
+                                onclick="
+                                    direcionarUmaUnidade('FC2')
+                                "
+                            >
+                                DIRECIONAR
+                            </button>
+
+
+                            <button
+                                id="desfazer-etiqueta-FC2"
+                                class="btn-undo"
+                                onclick="
+                                    desfazerDirecionamento('FC2')
+                                "
+                                disabled
+                            >
+                                DESFAZER
+                            </button>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- ====================== -->
+                    <!-- EF2 - TELEMATICA -->
+                    <!-- ====================== -->
+
+                    <div class="printer-row">
+
+                        <div class="printer-info">
+
+                            <span class="printer-name">
+                                EF2
+                            </span>
+
+                            <span class="printer-model">
+                                TELEMATICA
+                            </span>
+
+
+                            <span class="printer-usage">
+
+                                Usado:
+
+                                <strong
+                                    id="uso-etiqueta-ef2"
+                                >
+                                    0
+                                </strong>
+
+                                unidades
+
+                            </span>
+
+
+                            <span
+                                class="printer-date"
+                                id="data-etiqueta-ef2"
+                            >
+                                Último: -
+                            </span>
+
+                        </div>
+
+
+                        <div class="printer-controls">
+
+                            <span
+                                id="contador-etiqueta-EF2"
+                                class="printer-counter"
+                            >
+                                0
+                            </span>
+
+
+                            <button
+                                id="direcionar-etiqueta-EF2"
+                                class="btn-output"
+                                onclick="
+                                    direcionarUmaUnidade('EF2')
+                                "
+                            >
+                                DIRECIONAR
+                            </button>
+
+
+                            <button
+                                id="desfazer-etiqueta-EF2"
+                                class="btn-undo"
+                                onclick="
+                                    desfazerDirecionamento('EF2')
+                                "
+                                disabled
+                            >
+                                DESFAZER
+                            </button>
+
+                        </div>
+
+                    </div>
+
+
+                </div>
+
+            </div>
+
+
+            <!-- ============================== -->
+            <!-- NAVEGAÇÃO -->
+            <!-- ============================== -->
+
+            <nav class="bottom-nav">
+
+                <button
+                    class="nav-btn"
+                    onclick="
+                        window.location.href='index.html'
+                    "
+                    title="Voltar ao CPD851"
+                >
+
+                    <i class="fa-solid fa-house"></i>
+
+                </button>
+
+            </nav>
+
+        </main>
+
+    </div>
+
+
+    <!-- TOAST -->
+
+    <div
+        id="toast"
+        class="toast"
+        role="status"
+        aria-live="polite"
+    ></div>
+
+
+    <!-- ============================== -->
+    <!-- FIREBASE -->
+    <!-- ============================== -->
+
+    <script type="module">
+
+        import {
+            initializeApp
+        }
+        from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+
+
+        import {
+            initializeFirestore,
+            doc,
+            setDoc,
+            onSnapshot
+        }
+        from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+
+        const firebaseConfig = {
+
+            apiKey:
+                "AIzaSyA3odYvjY7mcWsCTvGcDKxoccz1qYSg_NE",
+
+            authDomain:
+                "estoque-84295.firebaseapp.com",
+
+            projectId:
+                "estoque-84295",
+
+            storageBucket:
+                "estoque-84295.firebasestorage.app",
+
+            messagingSenderId:
+                "704104486696",
+
+            appId:
+                "1:704104486696:web:2be634dfc63baef31c221d",
+
+            measurementId:
+                "G-D31RQ19END"
+
+        };
+
+
+        const app =
+            initializeApp(firebaseConfig);
+
+
+        const db =
+            initializeFirestore(app, {
+
+                experimentalForceLongPolling: true,
+
+                useFetchStreams: false
+
+            });
+
+
+        /*
+         * =========================================
+         * ESTADO LOCAL
+         * =========================================
+         *
+         * Um único estoque central.
+         *
+         * Os 4 relógios possuem somente seus
+         * próprios contadores de utilização.
+         */
+
+        let estoqueEtiquetaPonto = {
+
+            saldo: 0,
+
+            ultimaEntrada: "-",
+
+            historicoEntradas: [],
+
+            direcionamentos: {
+
+                ef: {
+
+                    total: 0,
+
+                    ultimaData: "-",
+
+                    historico: []
+
+                },
+
+                fc1: {
+
+                    total: 0,
+
+                    ultimaData: "-",
+
+                    historico: []
+
+                },
+
+                fc2: {
+
+                    total: 0,
+
+                    ultimaData: "-",
+
+                    historico: []
+
+                },
+
+                ef2: {
+
+                    total: 0,
+
+                    ultimaData: "-",
+
+                    historico: []
+
+                }
+
+            }
+
+        };
+
+
+        let toastTimer;
+
+
+        /*
+         * =========================================
+         * TOAST
+         * =========================================
+         */
+
+        function mostrarToast(
+            mensagem,
+            erro = false
+        ) {
+
+            const toast =
+                document.getElementById("toast");
+
+
+            if (!toast) return;
+
+
+            toast.textContent =
+                mensagem;
+
+
+            toast.classList.toggle(
+                "error",
+                erro
+            );
+
+
+            toast.classList.add(
+                "show"
+            );
+
+
+            clearTimeout(
+                toastTimer
+            );
+
+
+            toastTimer =
+                setTimeout(() => {
+
+                    toast.classList.remove(
+                        "show"
+                    );
+
+                }, 2600);
+
+        }
+
+
+        /*
+         * =========================================
+         * DATA / HORA
+         * =========================================
+         */
+
+        function obterDataFormatada() {
+
+            const agora =
+                new Date();
+
+
+            const dia =
+                String(
+                    agora.getDate()
+                ).padStart(2, "0");
+
+
+            const mes =
+                String(
+                    agora.getMonth() + 1
+                ).padStart(2, "0");
+
+
+            const ano =
+                agora.getFullYear();
+
+
+            const horas =
+                String(
+                    agora.getHours()
+                ).padStart(2, "0");
+
+
+            const minutos =
+                String(
+                    agora.getMinutes()
+                ).padStart(2, "0");
+
+
+            return `${dia}/${mes}/${ano} ${horas}:${minutos}`;
+
+        }
+
+
+        /*
+         * =========================================
+         * ESTRUTURA PADRÃO DOS DESTINOS
+         * =========================================
+         */
+
+        function criarDirecionamentosPadrao(
+            direcionamentos = {}
+        ) {
+
+            return {
+
+                ef:
+                    direcionamentos.ef || {
+
+                        total: 0,
+
+                        ultimaData: "-",
+
+                        historico: []
+
+                    },
+
+
+                fc1:
+                    direcionamentos.fc1 || {
+
+                        total: 0,
+
+                        ultimaData: "-",
+
+                        historico: []
+
+                    },
+
+
+                fc2:
+                    direcionamentos.fc2 || {
+
+                        total: 0,
+
+                        ultimaData: "-",
+
+                        historico: []
+
+                    },
+
+
+                ef2:
+                    direcionamentos.ef2 || {
+
+                        total: 0,
+
+                        ultimaData: "-",
+
+                        historico: []
+
+                    }
+
+            };
+
+        }
+
+
+        /*
+         * =========================================
+         * ATUALIZA A TELA
+         * =========================================
+         */
+
+        function atualizarTela() {
+
+            /*
+             * ESTOQUE CENTRAL
+             */
+
+            const saldo =
+                Number(
+                    estoqueEtiquetaPonto.saldo || 0
+                );
+
+
+            document.getElementById(
+                "input-etiqueta-ponto-saldo"
+            ).value =
+                saldo;
+
+
+            document.getElementById(
+                "date-etiqueta-ponto-saldo"
+            ).innerText =
+                estoqueEtiquetaPonto.ultimaEntrada || "-";
+
+
+            /*
+             * DIRECIONAMENTOS
+             */
+
+            const direcionamentos =
+                estoqueEtiquetaPonto.direcionamentos || {};
+
+
+            const relogios = [
+
+                {
+                    nome: "EF",
+                    chave: "ef"
+                },
+
+                {
+                    nome: "FC1",
+                    chave: "fc1"
+                },
+
+                {
+                    nome: "FC2",
+                    chave: "fc2"
+                },
+
+                {
+                    nome: "EF2",
+                    chave: "ef2"
+                }
+
+            ];
+
+
+            relogios.forEach(
+                (relogio) => {
+
+                    const dados =
+                        direcionamentos[
+                            relogio.chave
+                        ] || {
+
+                            total: 0,
+
+                            ultimaData: "-",
+
+                            historico: []
+
+                        };
+
+
+                    const total =
+                        Number(
+                            dados.total || 0
+                        );
+
+
+                    const ultimaData =
+                        dados.ultimaData || "-";
+
+
+                    /*
+                     * CONTADOR DE USO
+                     */
+
+                    const contador =
+                        document.getElementById(
+                            `uso-etiqueta-${relogio.chave}`
+                        );
+
+
+                    if (contador) {
+
+                        contador.innerText =
+                            total;
+
+                    }
+
+
+                    /*
+                     * CONTADOR VISUAL
+                     */
+
+                    const contadorVisual =
+                        document.getElementById(
+                            `contador-etiqueta-${relogio.nome}`
+                        );
+
+
+                    if (contadorVisual) {
+
+                        contadorVisual.innerText =
+                            total;
+
+                    }
+
+
+                    /*
+                     * ÚLTIMA DATA
+                     */
+
+                    const data =
+                        document.getElementById(
+                            `data-etiqueta-${relogio.chave}`
+                        );
+
+
+                    if (data) {
+
+                        data.innerText =
+                            `Último: ${ultimaData}`;
+
+                    }
+
+
+                    /*
+                     * BOTÃO DIRECIONAR
+                     *
+                     * Todos dependem do MESMO
+                     * estoque central.
+                     */
+
+                    const botaoDirecionar =
+                        document.getElementById(
+                            `direcionar-etiqueta-${relogio.nome}`
+                        );
+
+
+                    if (botaoDirecionar) {
+
+                        botaoDirecionar.disabled =
+                            saldo <= 0;
+
+                    }
+
+
+                    /*
+                     * BOTÃO DESFAZER
+                     */
+
+                    const botaoDesfazer =
+                        document.getElementById(
+                            `desfazer-etiqueta-${relogio.nome}`
+                        );
+
+
+                    if (botaoDesfazer) {
+
+                        botaoDesfazer.disabled =
+                            total <= 0;
+
+                    }
+
+                }
+            );
+
+        }
+
+
+        /*
+         * =========================================
+         * FIRESTORE
+         * =========================================
+         */
+
+        onSnapshot(
+
+            doc(
+                db,
+                "controle",
+                "geral"
+            ),
+
+            (snapshot) => {
+
+                if (!snapshot.exists()) {
+
+                    estoqueEtiquetaPonto = {
+
+                        saldo: 0,
+
+                        ultimaEntrada: "-",
+
+                        historicoEntradas: [],
+
+                        direcionamentos:
+                            criarDirecionamentosPadrao()
+
+                    };
+
+
+                    atualizarTela();
+
+                    return;
+
+                }
+
+
+                const dados =
+                    snapshot.data();
+
+
+                /*
+                 * Campo exclusivo:
+                 *
+                 * etiqueta_ponto
+                 *
+                 * Não interfere no Ribbon,
+                 * Papel Ofício ou outros estoques.
+                 */
+
+                if (dados.etiqueta_ponto) {
+
+                    const salvo =
+                        dados.etiqueta_ponto;
+
+
+                    estoqueEtiquetaPonto = {
+
+                        saldo:
+                            Number(
+                                salvo.saldo || 0
+                            ),
+
+                        ultimaEntrada:
+                            salvo.ultimaEntrada || "-",
+
+                        historicoEntradas:
+                            Array.isArray(
+                                salvo.historicoEntradas
+                            )
+                                ? salvo.historicoEntradas
+                                : [],
+
+                        direcionamentos:
+                            criarDirecionamentosPadrao(
+                                salvo.direcionamentos || {}
+                            )
+
+                    };
+
+                } else {
+
+                    estoqueEtiquetaPonto = {
+
+                        saldo: 0,
+
+                        ultimaEntrada: "-",
+
+                        historicoEntradas: [],
+
+                        direcionamentos:
+                            criarDirecionamentosPadrao()
+
+                    };
+
+                }
+
+
+                atualizarTela();
+
+            },
+
+
+            (erro) => {
+
+                console.error(
+                    "Erro na sincronização do Firestore:",
+                    erro
+                );
+
+
+                mostrarToast(
+                    "Falha na conexão com o banco. Verifique a internet.",
+                    true
+                );
+
+            }
+
+        );
+
+
+        /*
+         * =========================================
+         * ADICIONAR ETIQUETA DE PONTO
+         * =========================================
+         */
+
+        window.adicionarEtiquetaPonto =
+            async function() {
+
+                const input =
+                    document.getElementById(
+                        "input-etiqueta-ponto-add"
+                    );
+
+
+                const quantidade =
+                    parseInt(
+                        input.value,
+                        10
+                    );
+
+
+                if (
+                    !quantidade ||
+                    quantidade <= 0
+                ) {
+
+                    mostrarToast(
+                        "Digite uma quantidade válida.",
+                        true
+                    );
+
+                    return;
+
+                }
+
+
+                const saldoAtual =
+                    Number(
+                        estoqueEtiquetaPonto.saldo || 0
+                    );
+
+
+                const novoSaldo =
+                    saldoAtual + quantidade;
+
+
+                const dataAtual =
+                    obterDataFormatada();
+
+
+                /*
+                 * HISTÓRICO DE ENTRADA
+                 */
+
+                const historicoEntradas =
+                    Array.isArray(
+                        estoqueEtiquetaPonto.historicoEntradas
+                    )
+                        ? [
+                            ...estoqueEtiquetaPonto.historicoEntradas
+                        ]
+                        : [];
+
+
+                /*
+                 * Como a quantidade pode ser
+                 * maior que 1, registramos cada
+                 * entrada individualmente.
+                 */
+
+                for (
+                    let i = 0;
+                    i < quantidade;
+                    i++
+                ) {
+
+                    historicoEntradas.push(
+                        dataAtual
+                    );
+
+                }
+
+
+                const novoEstoque = {
+
+                    saldo:
+                        novoSaldo,
+
+                    ultimaEntrada:
+                        dataAtual,
+
+                    historicoEntradas:
+                        historicoEntradas,
+
+                    direcionamentos:
+                        estoqueEtiquetaPonto.direcionamentos ||
+                        criarDirecionamentosPadrao()
+
+                };
+
+
+                try {
+
+                    await setDoc(
+
+                        doc(
+                            db,
+                            "controle",
+                            "geral"
+                        ),
+
+                        {
+
+                            etiqueta_ponto:
+                                novoEstoque
+
+                        },
+
+                        {
+
+                            merge: true
+
+                        }
+
+                    );
+
+
+                    input.value = "";
+
+
+                    mostrarToast(
+                        `✓ ${quantidade} etiqueta(s) adicionada(s) ao estoque`
+                    );
+
+
+                } catch (erro) {
+
+                    console.error(
+                        "Erro ao salvar Etiqueta de Ponto:",
+                        erro
+                    );
+
+
+                    mostrarToast(
+                        `Erro ao salvar: ${erro.code || erro.message}`,
+                        true
+                    );
+
+                }
+
+            };
+
+
+        /*
+         * =========================================
+         * ZERAR ESTOQUE CENTRAL
+         * =========================================
+         */
+
+        window.zerarEstoqueCentral =
+            async function() {
+
+                const saldoAtual =
+                    Number(
+                        estoqueEtiquetaPonto.saldo || 0
+                    );
+
+
+                if (saldoAtual <= 0) {
+
+                    mostrarToast(
+                        "O estoque central já está zerado.",
+                        true
+                    );
+
+                    return;
+
+                }
+
+
+                const confirmar =
+                    confirm(
+
+                        `⚠️ ATENÇÃO!\n\n` +
+
+                        `O estoque central possui ${saldoAtual} etiqueta(s).\n\n` +
+
+                        `Tem certeza que deseja ZERAR o estoque central?\n\n` +
+
+                        `Os contadores dos relógios NÃO serão alterados.`
+
+                    );
+
+
+                if (!confirmar) {
+
+                    mostrarToast(
+                        "Operação cancelada."
+                    );
+
+                    return;
+
+                }
+
+
+                try {
+
+                    await setDoc(
+
+                        doc(
+                            db,
+                            "controle",
+                            "geral"
+                        ),
+
+                        {
+
+                            etiqueta_ponto: {
+
+                                saldo: 0,
+
+                                ultimaEntrada:
+                                    estoqueEtiquetaPonto.ultimaEntrada || "-",
+
+                                historicoEntradas: [],
+
+                                direcionamentos:
+                                    estoqueEtiquetaPonto.direcionamentos ||
+                                    criarDirecionamentosPadrao()
+
+                            }
+
+                        },
+
+                        {
+
+                            merge: true
+
+                        }
+
+                    );
+
+
+                    mostrarToast(
+                        `✓ Estoque central zerado (${saldoAtual} unidade(s))`
+                    );
+
+
+                } catch (erro) {
+
+                    console.error(
+                        "Erro ao zerar estoque:",
+                        erro
+                    );
+
+
+                    mostrarToast(
+                        `Erro ao zerar: ${erro.code || erro.message}`,
+                        true
+                    );
+
+                }
+
+            };
+
+
+        /*
+         * =========================================
+         * DIRECIONAR 1 UNIDADE
+         * =========================================
+         */
+
+        window.direcionarUmaUnidade =
+            async function(relogioNome) {
+
+                const saldoAtual =
+                    Number(
+                        estoqueEtiquetaPonto.saldo || 0
+                    );
+
+
+                /*
+                 * TODOS OS RELÓGIOS USAM
+                 * O MESMO ESTOQUE.
+                 */
+
+                if (saldoAtual <= 0) {
+
+                    mostrarToast(
+                        "Estoque central zerado.",
+                        true
+                    );
+
+                    return;
+
+                }
+
+
+                const chaveDestino =
+                    relogioNome.toLowerCase();
+
+
+                const dataAtual =
+                    obterDataFormatada();
+
+
+                const direcionamentosAtuais =
+                    {
+                        ...(
+                            estoqueEtiquetaPonto.direcionamentos ||
+                            criarDirecionamentosPadrao()
+                        )
+                    };
+
+
+                const dadosDestino =
+                    direcionamentosAtuais[
+                        chaveDestino
+                    ] || {
+
+                        total: 0,
+
+                        ultimaData: "-",
+
+                        historico: []
+
+                    };
+
+
+                /*
+                 * HISTÓRICO
+                 */
+
+                const historico =
+                    Array.isArray(
+                        dadosDestino.historico
+                    )
+                        ? [
+                            ...dadosDestino.historico
+                        ]
+                        : [];
+
+
+                historico.push(
+                    dataAtual
+                );
+
+
+                /*
+                 * INCREMENTA O RELÓGIO
+                 */
+
+                direcionamentosAtuais[
+                    chaveDestino
+                ] = {
+
+                    total:
+                        Number(
+                            dadosDestino.total || 0
+                        ) + 1,
+
+                    ultimaData:
+                        dataAtual,
+
+                    historico:
+                        historico
+
+                };
+
+
+                /*
+                 * RETIRA 1 DO ESTOQUE CENTRAL
+                 */
+
+                const novoSaldo =
+                    saldoAtual - 1;
+
+
+                const novoEstoque = {
+
+                    saldo:
+                        novoSaldo,
+
+                    ultimaEntrada:
+                        estoqueEtiquetaPonto.ultimaEntrada || "-",
+
+                    historicoEntradas:
+                        estoqueEtiquetaPonto.historicoEntradas || [],
+
+                    direcionamentos:
+                        direcionamentosAtuais
+
+                };
+
+
+                try {
+
+                    await setDoc(
+
+                        doc(
+                            db,
+                            "controle",
+                            "geral"
+                        ),
+
+                        {
+
+                            etiqueta_ponto:
+                                novoEstoque
+
+                        },
+
+                        {
+
+                            merge: true
+
+                        }
+
+                    );
+
+
+                    mostrarToast(
+                        `✓ 1 etiqueta direcionada para ${relogioNome}`
+                    );
+
+
+                } catch (erro) {
+
+                    console.error(
+                        "Erro ao direcionar etiqueta:",
+                        erro
+                    );
+
+
+                    mostrarToast(
+                        `Erro ao salvar: ${erro.code || erro.message}`,
+                        true
+                    );
+
+                }
+
+            };
+
+
+        /*
+         * =========================================
+         * DESFAZER DIRECIONAMENTO
+         * =========================================
+         */
+
+        window.desfazerDirecionamento =
+            async function(relogioNome) {
+
+                const chaveDestino =
+                    relogioNome.toLowerCase();
+
+
+                const direcionamentosAtuais =
+                    {
+                        ...(
+                            estoqueEtiquetaPonto.direcionamentos ||
+                            criarDirecionamentosPadrao()
+                        )
+                    };
+
+
+                const dadosDestino =
+                    direcionamentosAtuais[
+                        chaveDestino
+                    ];
+
+
+                if (!dadosDestino) {
+
+                    mostrarToast(
+                        "Nenhum direcionamento encontrado.",
+                        true
+                    );
+
+                    return;
+
+                }
+
+
+                const totalAtual =
+                    Number(
+                        dadosDestino.total || 0
+                    );
+
+
+                if (totalAtual <= 0) {
+
+                    mostrarToast(
+                        "Não há direcionamento para desfazer.",
+                        true
+                    );
+
+                    return;
+
+                }
+
+
+                /*
+                 * HISTÓRICO DO RELÓGIO
+                 */
+
+                let historico =
+                    Array.isArray(
+                        dadosDestino.historico
+                    )
+                        ? [
+                            ...dadosDestino.historico
+                        ]
+                        : [];
+
+
+                if (historico.length > 0) {
+
+                    historico.pop();
+
+                }
+
+
+                const novoTotal =
+                    totalAtual - 1;
+
+
+                const novaUltimaData =
+                    historico.length > 0
+                        ? historico[
+                            historico.length - 1
+                        ]
+                        : "-";
+
+
+                /*
+                 * ATUALIZA O RELÓGIO
+                 */
+
+                direcionamentosAtuais[
+                    chaveDestino
+                ] = {
+
+                    total:
+                        novoTotal,
+
+                    ultimaData:
+                        novaUltimaData,
+
+                    historico:
+                        historico
+
+                };
+
+
+                /*
+                 * DEVOLVE 1 AO ESTOQUE CENTRAL
+                 */
+
+                const novoSaldo =
+                    Number(
+                        estoqueEtiquetaPonto.saldo || 0
+                    ) + 1;
+
+
+                const novoEstoque = {
+
+                    saldo:
+                        novoSaldo,
+
+                    ultimaEntrada:
+                        estoqueEtiquetaPonto.ultimaEntrada || "-",
+
+                    historicoEntradas:
+                        estoqueEtiquetaPonto.historicoEntradas || [],
+
+                    direcionamentos:
+                        direcionamentosAtuais
+
+                };
+
+
+                try {
+
+                    await setDoc(
+
+                        doc(
+                            db,
+                            "controle",
+                            "geral"
+                        ),
+
+                        {
+
+                            etiqueta_ponto:
+                                novoEstoque
+
+                        },
+
+                        {
+
+                            merge: true
+
+                        }
+
+                    );
+
+
+                    mostrarToast(
+                        `↩ 1 etiqueta devolvida de ${relogioNome}`
+                    );
+
+
+                } catch (erro) {
+
+                    console.error(
+                        "Erro ao desfazer direcionamento:",
+                        erro
+                    );
+
+
+                    mostrarToast(
+                        `Erro ao desfazer: ${erro.code || erro.message}`,
+                        true
+                    );
+
+                }
+
+            };
+
+
+        /*
+         * =========================================
+         * ENTER NO CAMPO ADICIONAR
+         * =========================================
+         */
+
+        document
+            .getElementById(
+                "input-etiqueta-ponto-add"
+            )
+            .addEventListener(
+                "keydown",
+                (event) => {
+
+                    if (
+                        event.key === "Enter"
+                    ) {
+
+                        window.adicionarEtiquetaPonto();
+
+                    }
+
+                }
+            );
+
+    </script>
+
+</body>
+
+</html>

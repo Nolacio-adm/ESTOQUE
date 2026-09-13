@@ -1,1047 +1,707 @@
 <!DOCTYPE html>
+
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Scanner Estoque PWA</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        :root {
-            --bg-color: #0b0e14;
-            --surface-color: rgba(20, 25, 34, 0.7);
-            --text-main: #ffffff;
-            --text-muted: #8b9bb4;
-            
-            /* Cores Neon */
-            --glow-cyan: #00f3ff;
-            --glow-green: #00ff66;
-            --glow-orange: #ff9900;
-            --glow-red: #ff3366;
-            --glow-grey: #4a5568;
-            
-            /* Cores de Toners CMYK */
-            --toner-yellow: #ffea00;
-            --toner-magenta: #ff007f;
-            --toner-cyan: #00bfff;
-            --toner-black: #ffffff;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0b1117">
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-        }
+  <title>CPD851 | NEOS</title>
 
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            display: flex;
-            justify-content: center;
-            align-items: stretch;
-            min-height: 100vh;
-            min-height: 100dvh;
-            background: radial-gradient(circle at 50% 0%, #1a2332 0%, #0b0e14 70%);
-            overflow-x: hidden;
-        }
+  <style>
+    :root {
+      --bg: #0b1117;
+      --panel: #101820;
+      --panel2: #0d151d;
 
-        .app-container {
-            width: 100%;
-            max-width: 760px;
-            min-height: 100vh;
-            min-height: 100dvh;
-            padding: 1.25rem 1.2rem;
-            display: flex;
-            flex-direction: column;
-            position: relative;
-            border: 1px solid rgba(0, 243, 255, 0.1);
-            background: rgba(11, 14, 20, 0.95);
-        }
+      --cyan: #00eaff;
+      --green: #00ff9c;
+      --orange: #ffb300;
+      --red: #ff4567;
 
-        /* Controle de Telas (SPA) */
-        .screen {
-            display: none;
-            flex-direction: column;
-            flex: 1;
-            min-height: 0;
-            overflow-y: auto;
-            padding: 0.25rem 0.1rem calc(6rem + env(safe-area-inset-bottom));
-            scrollbar-width: none;
-            -webkit-overflow-scrolling: touch;
-        }
-        .screen::-webkit-scrollbar { display: none; }
+      --text: #e7f7ff;
+      --muted: #71808d;
 
-        .screen.active { display: flex; }
+      --border: rgba(0, 234, 255, .22);
+      --shadow: 0 0 25px rgba(0, 234, 255, .08);
+    }
 
-        /* Cabeçalhos */
-        header {
-            text-align: center;
-            position: relative;
-            padding-bottom: 0.8rem;
-            margin-bottom: 1.5rem;
-            flex-shrink: 0;
-        }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
-        h1 {
-            font-size: 1.35rem;
-            font-weight: 700;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            text-shadow: 0 0 10px rgba(0, 243, 255, 0.3);
-        }
+    html {
+      min-height: 100%;
+      background: #05090d;
+    }
 
-        header::after {
-            content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
-            width: 55%; height: 2px; background: var(--glow-cyan); box-shadow: 0 0 15px var(--glow-cyan); border-radius: 50%;
-        }
+    body {
+      min-height: 100vh;
 
-        /* Grids de Navegação */
-        .grid-main, .grid-items {
-            display: grid; 
-            grid-template-columns: repeat(2, 1fr); 
-            gap: 0.8rem;
-        }
+      background:
+        radial-gradient(
+          circle at 50% -10%,
+          rgba(0,234,255,.08),
+          transparent 35%
+        ),
+        #05090d;
 
-        /* Botões Base */
-        .btn {
-            background: var(--surface-color); border-radius: 12px; padding: 1.2rem 0.5rem;
-            display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.8rem;
-            color: var(--text-main); cursor: pointer; transition: all 0.2s ease; backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.05); text-align: center;
-        }
-        .btn span { font-size: 0.8rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
+      color: var(--text);
+      font-family: Arial, Helvetica, sans-serif;
 
-        .btn-cyan i { color: var(--glow-cyan); font-size: 1.8rem; }
-        .btn-cyan:hover { border-color: var(--glow-cyan); box-shadow: 0 0 10px rgba(0, 243, 255, 0.2); }
-        .btn-green { border-bottom: 2px solid var(--glow-green); }
-        .btn-green:hover { border-color: var(--glow-green); box-shadow: 0 0 10px rgba(0,255,102,0.1); }
-        .btn-grey { border-bottom: 2px solid var(--glow-grey); }
-        .btn-grey:hover { border-color: var(--text-muted); box-shadow: 0 0 10px rgba(255,255,255,0.05); }
-        .btn-orange { border-bottom: 2px solid var(--glow-orange); }
-        .btn-orange:hover { border-color: var(--glow-orange); box-shadow: 0 0 10px rgba(255,153,0,0.1); }
+      display: flex;
+      justify-content: center;
+    }
 
-        /* Sub-painéis */
-        .sub-panel {
-            background: rgba(20, 25, 34, 0.6); border: 1px solid rgba(0, 243, 255, 0.1);
-            border-radius: 16px; padding: 1rem; margin-bottom: 1rem;
-        }
-        .sub-panel h3 { font-size: 0.85rem; color: var(--glow-cyan); letter-spacing: 1px; margin-bottom: 0.8rem; text-transform: uppercase; }
+    /* =========================
+       TELA DO APLICATIVO
+    ========================= */
 
-        .display-stock { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem; }
-        
-        .stock-input-master {
-            font-size: 1.8rem; font-weight: bold; color: var(--glow-green); text-shadow: 0 0 10px rgba(0,255,102,0.2);
-            background: transparent; border: none; border-bottom: 1px dashed rgba(0, 255, 102, 0.3);
-            width: 80px; text-align: left; padding: 0;
-        }
-        .stock-input-master:focus { outline: none; border-bottom-style: solid; border-color: var(--glow-green); }
-        
-        .date-text { font-size: 0.7rem; color: var(--text-muted); }
+    .app {
+      position: relative;
 
-        .input-group { display: flex; gap: 0.5rem; }
-        .input-futuristic {
-            flex-grow: 1; background: #141922; border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 8px; padding: 0.6rem; color: #fff; font-weight: bold; text-align: center; font-size: 0.85rem;
-        }
-        .input-futuristic:focus { outline: none; border-color: var(--glow-cyan); box-shadow: 0 0 8px rgba(0,243,255,0.3); }
-        
-        .select-futuristic {
-            background: #141922; border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 8px; padding: 0.6rem; color: #fff; font-weight: bold; font-size: 0.85rem; cursor: pointer;
-        }
-        .select-futuristic:focus { outline: none; border-color: var(--glow-cyan); }
+      width: 100%;
+      max-width: 430px;
+      min-height: 100vh;
 
-        .btn-action {
-            background: var(--glow-cyan); color: #000; border: none; border-radius: 8px;
-            padding: 0.6rem 1.2rem; font-weight: bold; cursor: pointer; transition: 0.2s; white-space: nowrap; font-size: 0.8rem;
-            letter-spacing: 0.5px;
-        }
-        .btn-action:hover { background: #00d2dd; box-shadow: 0 0 10px rgba(0,243,255,0.4); }
+      background:
+        radial-gradient(
+          circle at 50% 0%,
+          rgba(0,234,255,.035),
+          transparent 30%
+        ),
+        var(--bg);
 
-        /* Estruturação das Listas de Destino */
-        .printer-list { display: flex; flex-direction: column; gap: 0.5rem; }
-        .printer-row {
-            display: flex; justify-content: space-between; align-items: center;
-            background: rgba(255,255,255,0.03); padding: 0.5rem 0.8rem; border-radius: 8px;
-            border-left: 3px solid var(--glow-cyan); gap: 5px;
-        }
-        .printer-name { font-weight: bold; letter-spacing: 0.5px; font-size: 0.85rem; }
-        .printer-model-tag { font-size: 0.68rem; color: var(--text-muted); display: block; font-weight: normal; margin-top: 1px; }
-        
-        .printer-controls { display: flex; align-items: center; gap: 0.5rem; flex-shrink: 0; }
-        
-        .printer-counter-input {
-            color: var(--glow-orange); font-weight: bold; background: rgba(20, 25, 34, 0.8);
-            border: 1px solid rgba(255, 153, 0, 0.3); border-radius: 6px; width: 42px; 
-            text-align: center; padding: 0.3rem 0; font-size: 0.85rem;
-        }
-        .printer-counter-input:focus { outline: none; border-color: var(--glow-orange); box-shadow: 0 0 8px rgba(255,153,0,0.3); }
+      padding: 14px 12px 80px;
 
-        .btn-output {
-            background: transparent; border: 1px solid var(--glow-orange); color: var(--glow-orange);
-            border-radius: 6px; padding: 0.35rem 0.7rem; font-size: 0.72rem; font-weight: bold; cursor: pointer; transition: 0.2s;
-            letter-spacing: 0.5px;
-        }
-        .btn-output:hover { background: var(--glow-orange); color: #000; box-shadow: 0 0 8px rgba(255,153,0,0.3); }
+      box-shadow:
+        0 0 45px rgba(0,0,0,.55),
+        0 0 25px rgba(0,234,255,.04);
+    }
 
-        /* Rodapé de Navegação */
-        .bottom-nav {
-            position: sticky;
-            bottom: calc(0.6rem + env(safe-area-inset-bottom));
-            align-self: center;
-            margin-top: auto;
-            display: flex;
-            gap: 2rem;
-            background: rgba(10, 14, 20, 0.97);
-            padding: 0.55rem 1.8rem;
-            border-radius: 30px;
-            border: 1px solid rgba(0, 243, 255, 0.2);
-            backdrop-filter: blur(10px);
-            z-index: 10;
-            width: max-content;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.35);
-        }
-        .nav-btn { background: none; border: none; color: var(--text-main); font-size: 1.2rem; cursor: pointer; transition: 0.2s; }
-        .nav-btn:hover { color: var(--glow-cyan); transform: scale(1.05); }
+    /* =========================
+       HEADER
+    ========================= */
 
-        /* Estilos Customizados para a Tela de Toner Cartaz */
-        .label-cartaz { font-weight: bold; font-size: 0.8rem; letter-spacing: 0.5px; text-transform: uppercase; }
-        .cartaz-y { color: var(--toner-yellow); }
-        .cartaz-m { color: var(--toner-magenta); }
-        .cartaz-c { color: var(--toner-cyan); }
-        .cartaz-k { color: var(--toner-black); }
-        
-        .row-cartaz-stock { display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.02); padding: 0.45rem 0.8rem; border-radius: 8px; border-left: 3px solid var(--glow-cyan); }
-        .cartaz-stock-right { display: flex; align-items: center; gap: 1.5rem; }
-        .cartaz-stock-value { color: var(--glow-orange); font-weight: bold; font-size: 0.85rem; border: 1px solid rgba(255,153,0,0.2); padding: 0.2rem 0.5rem; border-radius: 4px; min-width: 30px; text-align: center; }
-        .cartaz-date-value { font-size: 0.7rem; color: var(--text-muted); min-width: 40px; text-align: right; }
+    header {
+      position: relative;
 
-        input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-        input[type=number] { -moz-appearance: textfield; }
+      padding: 16px 16px 14px;
+      margin-bottom: 12px;
 
-        .grid-main .btn:last-child:nth-child(odd) { grid-column: 1 / -1; }
+      background:
+        linear-gradient(
+          145deg,
+          rgba(0,234,255,.06),
+          rgba(0,255,156,.025)
+        ),
+        var(--panel);
 
-        .toast {
-            position: fixed;
-            left: 50%;
-            bottom: calc(1rem + env(safe-area-inset-bottom));
-            transform: translate(-50%, 150%);
-            width: min(92vw, 430px);
-            padding: 0.9rem 1rem;
-            border-radius: 12px;
-            background: rgba(20,25,34,0.98);
-            border: 1px solid var(--glow-cyan);
-            color: #fff;
-            text-align: center;
-            font-weight: 700;
-            z-index: 9999;
-            transition: transform .25s ease;
-            box-shadow: 0 0 18px rgba(0,243,255,.18);
-        }
-        .toast.show { transform: translate(-50%, 0); }
-        .toast.error { border-color: var(--glow-red); }
+      border: 1px solid var(--border);
+      border-radius: 13px;
 
-        @media (max-width: 560px) {
-            .printer-row {
-                align-items: stretch;
-                flex-direction: column;
-                gap: 0.6rem;
-            }
-            .printer-controls {
-                width: 100%;
-                justify-content: space-between;
-            }
-            .printer-counter-input { width: 34%; min-width: 70px; }
-            .btn-output { flex: 1; min-height: 40px; }
-            .input-group { flex-wrap: wrap; }
-            .input-group .input-futuristic { min-width: 0; }
-            .input-group .btn-action { min-height: 42px; }
-        }
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
 
-        @media (max-width: 480px) {
-            .app-container { max-width: 100%; border: none; border-radius: 0; padding: 1rem 0.8rem; min-height: 100dvh; }
-            h1 { font-size: 1.2rem; }
-            .btn span { font-size: 0.72rem; }
-            .printer-row { padding: 0.45rem 0.6rem; }
-            .printer-name { font-size: 0.8rem; }
-            .printer-model-tag { font-size: 0.65rem; }
-            .btn-output { padding: 0.3rem 0.5rem; font-size: 0.68rem; }
-            .stock-input-master { width: 70px; font-size: 1.6rem; }
-        }
-    </style>
+    header::before {
+      content: "";
+
+      position: absolute;
+      top: 0;
+      left: 0;
+
+      width: 100%;
+      height: 2px;
+
+      background:
+        linear-gradient(
+          90deg,
+          transparent,
+          var(--cyan),
+          var(--green),
+          transparent
+        );
+
+      opacity: .8;
+    }
+
+    .system {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+
+      color: var(--green);
+
+      font-size: 9px;
+      font-weight: bold;
+
+      letter-spacing: 2px;
+
+      margin-bottom: 6px;
+    }
+
+    .system-dot {
+      width: 6px;
+      height: 6px;
+
+      border-radius: 50%;
+
+      background: var(--green);
+
+      box-shadow:
+        0 0 10px var(--green);
+    }
+
+    h1 {
+      color: var(--cyan);
+
+      font-size: 27px;
+      letter-spacing: 4px;
+      line-height: 1;
+
+      text-shadow:
+        0 0 12px rgba(0,234,255,.25);
+    }
+
+    .subtitle {
+      margin-top: 6px;
+
+      color: #91a4b1;
+
+      font-size: 9px;
+      letter-spacing: 1.4px;
+
+      text-transform: uppercase;
+    }
+
+    .version {
+      position: absolute;
+
+      right: 15px;
+      bottom: 14px;
+
+      color: var(--muted);
+
+      font-size: 8px;
+      letter-spacing: 1px;
+    }
+
+    /* =========================
+       SECTION
+    ========================= */
+
+    .section-title {
+      display: flex;
+      align-items: center;
+
+      gap: 7px;
+
+      margin: 14px 3px 7px;
+
+      color: var(--muted);
+
+      font-size: 9px;
+      font-weight: bold;
+
+      letter-spacing: 2px;
+
+      text-transform: uppercase;
+    }
+
+    .section-title::after {
+      content: "";
+
+      flex: 1;
+
+      height: 1px;
+
+      background:
+        rgba(255,255,255,.07);
+    }
+
+    /* =========================
+       MENU
+    ========================= */
+
+    .menu {
+      display: grid;
+
+      grid-template-columns: repeat(2, 1fr);
+
+      gap: 7px;
+    }
+
+    .card {
+      position: relative;
+
+      display: flex;
+      align-items: center;
+
+      gap: 9px;
+
+      min-height: 67px;
+
+      padding: 10px;
+
+      background:
+        linear-gradient(
+          145deg,
+          rgba(255,255,255,.025),
+          rgba(255,255,255,.008)
+        ),
+        var(--panel2);
+
+      border: 1px solid rgba(255,255,255,.08);
+
+      border-radius: 10px;
+
+      color: var(--text);
+
+      text-decoration: none;
+
+      transition:
+        transform .18s ease,
+        border-color .18s ease,
+        box-shadow .18s ease,
+        background .18s ease;
+
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: "";
+
+      position: absolute;
+
+      left: 0;
+      top: 0;
+      bottom: 0;
+
+      width: 2px;
+
+      background: var(--cyan);
+
+      opacity: .65;
+    }
+
+    .card:hover {
+      transform: translateY(-2px);
+
+      border-color:
+        rgba(0,234,255,.35);
+
+      background:
+        linear-gradient(
+          145deg,
+          rgba(0,234,255,.07),
+          rgba(0,255,156,.025)
+        ),
+        var(--panel2);
+
+      box-shadow:
+        0 0 18px rgba(0,234,255,.08);
+    }
+
+    .card:active {
+      transform: scale(.98);
+    }
+
+    .icon {
+      flex-shrink: 0;
+
+      width: 34px;
+      height: 34px;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      border:
+        1px solid rgba(0,234,255,.2);
+
+      border-radius: 8px;
+
+      color: var(--cyan);
+
+      font-size: 17px;
+
+      background:
+        rgba(0,234,255,.035);
+    }
+
+    .card-info {
+      min-width: 0;
+
+      padding-right: 8px;
+    }
+
+    .card-title {
+      font-size: 10px;
+      font-weight: bold;
+
+      letter-spacing: .7px;
+
+      text-transform: uppercase;
+    }
+
+    .card-desc {
+      margin-top: 3px;
+
+      color: var(--muted);
+
+      font-size: 7.5px;
+
+      line-height: 1.25;
+    }
+
+    .arrow {
+      position: absolute;
+
+      right: 7px;
+      top: 50%;
+
+      transform:
+        translateY(-50%);
+
+      color:
+        rgba(0,234,255,.35);
+
+      font-size: 13px;
+    }
+
+    /* =========================
+       STATUS
+    ========================= */
+
+    .status {
+      margin-top: 8px;
+
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      padding: 8px 10px;
+
+      border:
+        1px solid rgba(0,255,156,.13);
+
+      border-radius: 8px;
+
+      background:
+        rgba(0,255,156,.025);
+
+      color: var(--muted);
+
+      font-size: 7.5px;
+
+      letter-spacing: .7px;
+    }
+
+    .status-online {
+      color: var(--green);
+
+      font-weight: bold;
+    }
+
+    /* =========================
+       FOOTER
+    ========================= */
+
+    footer {
+      margin-top: 18px;
+
+      text-align: center;
+
+      color: #46545f;
+
+      font-size: 7px;
+
+      letter-spacing: 1.5px;
+
+      text-transform: uppercase;
+    }
+
+    /* =========================
+       HOME
+    ========================= */
+
+    .home {
+      position: fixed;
+
+      z-index: 10;
+
+      left: 50%;
+      bottom: 12px;
+
+      transform:
+        translateX(-50%);
+
+      width: 48px;
+      height: 32px;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      border:
+        1px solid rgba(0,234,255,.3);
+
+      border-radius: 9px;
+
+      background:
+        rgba(11,17,23,.94);
+
+      color: var(--cyan);
+
+      text-decoration: none;
+
+      font-size: 15px;
+
+      box-shadow:
+        0 0 18px rgba(0,234,255,.08);
+
+      backdrop-filter:
+        blur(8px);
+    }
+
+    .home:hover {
+      border-color: var(--cyan);
+
+      box-shadow:
+        0 0 20px rgba(0,234,255,.18);
+    }
+
+    /* =========================
+       CELULAR
+    ========================= */
+
+    @media (max-width: 430px) {
+
+      body {
+        background: var(--bg);
+      }
+
+      .app {
+        max-width: 100%;
+
+        min-height: 100vh;
+
+        box-shadow: none;
+
+        padding:
+          12px
+          10px
+          75px;
+      }
+    }
+
+    /* =========================
+       TELAS MUITO PEQUENAS
+    ========================= */
+
+    @media (max-width: 350px) {
+
+      .menu {
+        grid-template-columns: 1fr;
+      }
+
+      .card {
+        min-height: 62px;
+      }
+
+      .card-desc {
+        font-size: 8px;
+      }
+    }
+
+  </style>
+
 </head>
+
 <body>
 
-    <div class="app-container">
-        
-        <!-- TELA 1: HOME -->
-        <div id="screen-home" class="screen active">
-            <header><h1>Status Estoque</h1></header>
-            <main class="grid-main">
-                <button class="btn btn-cyan" onclick="openScreen('screen-impressora')">
-                    <i class="fa-solid fa-print"></i><span>IMPRESSORA</span>
-                </button>
-                <button class="btn btn-cyan" onclick="openScreen('screen-balanca')"><i class="fa-solid fa-scale-balanced"></i><span>BALANÇA</span></button>
-                <button class="btn btn-cyan" onclick="openScreen('screen-relogio')"><i class="fa-solid fa-clock"></i><span>RELÓGIO PONTO</span></button>
-            </main>
-        </div>
+  <main class="app">
 
-        <!-- TELA 2: SELEÇÃO IMPRESSORA -->
-        <div id="screen-impressora" class="screen">
-            <header><h1>Impressora</h1></header>
-            <main class="grid-items">
-                <button class="btn btn-green" onclick="openScreen('screen-oficio')"><span>Papel Ofício</span></button>
-                <button class="btn btn-green" onclick="openScreen('screen-gondola')"><span>ETQ Gondola</span></button>
-                <button class="btn btn-green" onclick="openScreen('screen-ribbon')"><span>Ribbon</span></button>
-                <button class="btn btn-green" onclick="openScreen('screen-amarela')"><span>ETQ Amarela</span></button>
-                <button class="btn btn-orange" onclick="openScreen('screen-cartaz')"><span>Toner Cartaz</span></button>
-                <button class="btn btn-green" onclick="openScreen('screen-laranja')"><span>ETQ Laranja</span></button>
-                <button class="btn btn-green" onclick="openScreen('screen-timbrado')"><span>Papel Timbrado</span></button>
-                <button class="btn btn-green" onclick="openScreen('screen-ponto')"><span>ETQ Ponto</span></button>
-            </main>
-            <nav class="bottom-nav">
-                <button class="nav-btn" onclick="openScreen('screen-home')"><i class="fa-solid fa-house"></i></button>
-                <button class="nav-btn" onclick="openScreen('screen-home')"><i class="fa-solid fa-rotate-left"></i></button>
-            </nav>
-        </div>
+	
+<!-- =========================
+     HEADER
+========================== -->
 
-        <!-- TELA 3: BALANÇA -->
-        <div id="screen-balanca" class="screen">
-            <header><h1>Balança</h1></header>
-            <main class="grid-items">
-                <button class="btn btn-green" onclick="openScreen('screen-frios')"><span>ETQ Frios</span></button>
-                <button class="btn btn-green" onclick="openScreen('screen-hf')"><span>ETQ HF</span></button>
-                <button class="btn btn-green" onclick="openScreen('screen-lamb')"><span>Lamb Lamb</span></button>
-                <button class="btn btn-orange" onclick="openScreen('screen-lamb-laranja')"><span>Lamb Lamb Laranja</span></button>
-            </main>
-            <nav class="bottom-nav">
-                <button class="nav-btn" onclick="openScreen('screen-home')"><i class="fa-solid fa-house"></i></button>
-                <button class="nav-btn" onclick="openScreen('screen-home')"><i class="fa-solid fa-rotate-left"></i></button>
-            </nav>
-        </div>
+<header>
 
-        <!-- TELA 4: RELÓGIO -->
-        <div id="screen-relogio" class="screen">
-            <header><h1>Relógio</h1></header>
-            <main class="grid-items">
-                <button class="btn btn-orange" onclick="openScreen('screen-ponto')"><span>ETQ Ponto</span></button>
-            </main>
-            <nav class="bottom-nav">
-                <button class="nav-btn" onclick="openScreen('screen-home')"><i class="fa-solid fa-house"></i></button>
-                <button class="nav-btn" onclick="openScreen('screen-home')"><i class="fa-solid fa-rotate-left"></i></button>
-            </nav>
-        </div>
+  <div class="system">
+    <span class="system-dot"></span>
+    SYSTEM ONLINE
+  </div>
 
-        <!-- TELA INSUMO: PAPEL OFÍCIO -->
-        <div id="screen-oficio" class="screen">
-            <header><h1>Papel Ofício</h1></header>
-            <div class="sub-panel">
-                <h3>Estoque Central</h3>
-                <div class="display-stock">
-                    <div>
-                        <input type="number" id="input-oficio-saldo" class="stock-input-master" value="0" readonly>
-                        <span style="display:block; font-size: 0.7rem; color: var(--text-muted); margin-top: 2px;">Saldo Central</span>
-                    </div>
-                    <div style="text-align: right;">
-                        <span class="date-text" style="display:block;">Última Entrada:</span>
-                        <span id="date-oficio-saldo" class="date-text" style="font-weight: bold;">-</span>
-                    </div>
-                </div>
-                <div class="input-group">
-                    <input type="number" id="input-oficio-add" class="input-futuristic" placeholder="Qtd Unidades">
-                    <button class="btn-action" onclick="adicionarEstoque('papel_oficio', 'input-oficio-add')">ADICIONAR</button>
-                </div>
-            </div>
-            <div class="sub-panel">
-                <h3>Destinar Insumo</h3>
-                <div class="printer-list">
-                    <div class="printer-row"><span class="printer-name">NFE</span><div class="printer-controls"><input type="number" id="out-oficio-nfe" class="printer-counter-input" value="0"><button class="btn-output" onclick="removerEstoque('papel_oficio', 'out-oficio-nfe', 'NFE')">DIRECIONAR</button></div></div>
-                    <div class="printer-row"><span class="printer-name">RME</span><div class="printer-controls"><input type="number" id="out-oficio-rme" class="printer-counter-input" value="0"><button class="btn-output" onclick="removerEstoque('papel_oficio', 'out-oficio-rme', 'RME')">DIRECIONAR</button></div></div>
-                    <div class="printer-row"><span class="printer-name">GER</span><div class="printer-controls"><input type="number" id="out-oficio-ger" class="printer-counter-input" value="0"><button class="btn-output" onclick="removerEstoque('papel_oficio', 'out-oficio-ger', 'GER')">DIRECIONAR</button></div></div>
-                    <div class="printer-row"><span class="printer-name">CPD</span><div class="printer-controls"><input type="number" id="out-oficio-cpd" class="printer-counter-input" value="0"><button class="btn-output" onclick="removerEstoque('papel_oficio', 'out-oficio-cpd', 'CPD')">DIRECIONAR</button></div></div>
-                    <div class="printer-row"><span class="printer-name">RH</span><div class="printer-controls"><input type="number" id="out-oficio-rh" class="printer-counter-input" value="0"><button class="btn-output" onclick="removerEstoque('papel_oficio', 'out-oficio-rh', 'RH')">DIRECIONAR</button></div></div>
-                </div>
-            </div>
-            <nav class="bottom-nav">
-                <button class="nav-btn" onclick="openScreen('screen-home')"><i class="fa-solid fa-house"></i></button>
-                <button class="nav-btn" onclick="openScreen('screen-impressora')"><i class="fa-solid fa-rotate-left"></i></button>
-            </nav>
-        </div>
+  <h1>CPD851</h1>
 
-        <!-- TELA INSUMO: ETQ GÔNDOLA -->
-        <div id="screen-gondola" class="screen">
-            <header><h1>ETQ Gondola</h1></header>
-            <div class="sub-panel">
-                <h3>Estoque Central</h3>
-                <div class="display-stock">
-                    <div>
-                        <input type="number" id="input-gondola-saldo" class="stock-input-master" value="0" readonly>
-                        <span style="display:block; font-size: 0.7rem; color: var(--text-muted); margin-top: 2px;">Saldo Central</span>
-                    </div>
-                    <div style="text-align: right;">
-                        <span class="date-text" style="display:block;">Última Entrada:</span>
-                        <span id="date-gondola-saldo" class="date-text" style="font-weight: bold;">-</span>
-                    </div>
-                </div>
-                <div class="input-group">
-                    <input type="number" id="input-gondola-add" class="input-futuristic" placeholder="Qtd Unidades">
-                    <button class="btn-action" onclick="adicionarEstoque('etq_gondola', 'input-gondola-add')">ADICIONAR</button>
-                </div>
-            </div>
-            <div class="sub-panel">
-                <h3>Destinar Insumo</h3>
-                <div class="printer-list">
-                    <div class="printer-row"><span class="printer-name">IMPRESSORA PREÇO</span><div class="printer-controls"><input type="number" id="out-gondola-preco" class="printer-counter-input" value="0"><button class="btn-output" onclick="removerEstoque('etq_gondola', 'out-gondola-preco', 'IMPRESSORA PREÇO')">DIRECIONAR</button></div></div>
-                    <div class="printer-row"><span class="printer-name">LAMB LAMB</span><div class="printer-controls"><input type="number" id="out-gondola-lamb" class="printer-counter-input" value="0"><button class="btn-output" onclick="removerEstoque('etq_gondola', 'out-gondola-lamb', 'LAMB LAMB')">DIRECIONAR</button></div></div>
-                </div>
-            </div>
-            <nav class="bottom-nav">
-                <button class="nav-btn" onclick="openScreen('screen-home')"><i class="fa-solid fa-house"></i></button>
-                <button class="nav-btn" onclick="openScreen('screen-impressora')"><i class="fa-solid fa-rotate-left"></i></button>
-            </nav>
-        </div>
+  <div class="subtitle">
+    Controle de Materiais • TI
+  </div>
 
-        <!-- TELA INSUMO: RIBBON -->
-        <div id="screen-ribbon" class="screen">
-            <header><h1>Ribbon</h1></header>
-            <div class="sub-panel">
-                <h3>Estoque Central</h3>
-                <div class="display-stock">
-                    <div>
-                        <input type="number" id="input-ribbon-saldo" class="stock-input-master" value="0" readonly>
-                        <span style="display:block; font-size: 0.7rem; color: var(--text-muted); margin-top: 2px;">Saldo Central</span>
-                    </div>
-                    <div style="text-align: right;">
-                        <span class="date-text" style="display:block;">Última Entrada:</span>
-                        <span id="date-ribbon-saldo" class="date-text" style="font-weight: bold;">-</span>
-                    </div>
-                </div>
-                <div class="input-group">
-                    <input type="number" id="input-ribbon-add" class="input-futuristic" placeholder="Qtd Unidades">
-                    <button class="btn-action" onclick="adicionarEstoque('ribbon', 'input-ribbon-add')">ADICIONAR</button>
-                </div>
-            </div>
-            <div class="sub-panel">
-                <h3>Destinar Insumo</h3>
-                <div class="printer-list">
-                    <div class="printer-row"><span class="printer-name">SETOR OPERACIONAL</span><div class="printer-controls"><input type="number" id="out-ribbon-op" class="printer-counter-input" value="0"><button class="btn-output" onclick="removerEstoque('ribbon', 'out-ribbon-op', 'OPERACIONAL')">DIRECIONAR</button></div></div>
-                </div>
-            </div>
-            <nav class="bottom-nav">
-                <button class="nav-btn" onclick="openScreen('screen-home')"><i class="fa-solid fa-house"></i></button>
-                <button class="nav-btn" onclick="openScreen('screen-impressora')"><i class="fa-solid fa-rotate-left"></i></button>
-            </nav>
-        </div>
+  <div class="version">
+    NEOS v1.0
+  </div>
 
-        <!-- TELA INSUMO: ETQ AMARELA -->
-        <div id="screen-amarela" class="screen">
-            <header><h1>ETQ Amarela</h1></header>
-            <div class="sub-panel">
-                <h3>Estoque Central</h3>
-                <div class="display-stock">
-                    <div>
-                        <input type="number" id="input-amarela-saldo" class="stock-input-master" value="0" readonly>
-                        <span style="display:block; font-size: 0.7rem; color: var(--text-muted); margin-top: 2px;">Saldo Central</span>
-                    </div>
-                    <div style="text-align: right;">
-                        <span class="date-text" style="display:block;">Última Entrada:</span>
-                        <span id="date-amarela-saldo" class="date-text" style="font-weight: bold;">-</span>
-                    </div>
-                </div>
-                <div class="input-group">
-                    <input type="number" id="input-amarela-add" class="input-futuristic" placeholder="Qtd Unidades">
-                    <button class="btn-action" onclick="adicionarEstoque('etq_amarela', 'input-amarela-add')">ADICIONAR</button>
-                </div>
-            </div>
-            <div class="sub-panel">
-                <h3>Destinar Insumo</h3>
-                <div class="printer-list">
-                    <div class="printer-row"><span class="printer-name">PRECIFICAÇÃO</span><div class="printer-controls"><input type="number" id="out-amarela-pref" class="printer-counter-input" value="0"><button class="btn-output" onclick="removerEstoque('etq_amarela', 'out-amarela-pref', 'PRECIFICAÇÃO')">DIRECIONAR</button></div></div>
-                </div>
-            </div>
-            <nav class="bottom-nav">
-                <button class="nav-btn" onclick="openScreen('screen-home')"><i class="fa-solid fa-house"></i></button>
-                <button class="nav-btn" onclick="openScreen('screen-impressora')"><i class="fa-solid fa-rotate-left"></i></button>
-            </nav>
-        </div>
+</header>
 
-        <!-- TELA INSUMO: ETQ LARANJA -->
-        <div id="screen-laranja" class="screen">
-            <header><h1>ETQ Laranja</h1></header>
-            <div class="sub-panel">
-                <h3>Estoque Central</h3>
-                <div class="display-stock">
-                    <div>
-                        <input type="number" id="input-laranja-saldo" class="stock-input-master" value="0" readonly>
-                        <span style="display:block; font-size: 0.7rem; color: var(--text-muted); margin-top: 2px;">Saldo Central</span>
-                    </div>
-                    <div style="text-align: right;">
-                        <span class="date-text" style="display:block;">Última Entrada:</span>
-                        <span id="date-laranja-saldo" class="date-text" style="font-weight: bold;">-</span>
-                    </div>
-                </div>
-                <div class="input-group">
-                    <input type="number" id="input-laranja-add" class="input-futuristic" placeholder="Qtd Unidades">
-                    <button class="btn-action" onclick="adicionarEstoque('etq_laranja', 'input-laranja-add')">ADICIONAR</button>
-                </div>
-            </div>
-            <div class="sub-panel">
-                <h3>Destinar Insumo</h3>
-                <div class="printer-list">
-                    <div class="printer-row"><span class="printer-name">SALDO DE OFERTAS</span><div class="printer-controls"><input type="number" id="out-laranja-of" class="printer-counter-input" value="0"><button class="btn-output" onclick="removerEstoque('etq_laranja', 'out-laranja-of', 'OFERTAS')">DIRECIONAR</button></div></div>
-                </div>
-            </div>
-            <nav class="bottom-nav">
-                <button class="nav-btn" onclick="openScreen('screen-home')"><i class="fa-solid fa-house"></i></button>
-                <button class="nav-btn" onclick="openScreen('screen-impressora')"><i class="fa-solid fa-rotate-left"></i></button>
-            </nav>
-        </div>
 
-        <!-- TELA INSUMO: PAPEL TIMBRADO -->
-        <div id="screen-timbrado" class="screen">
-            <header><h1>Papel Timbrado</h1></header>
-            <div class="sub-panel">
-                <h3>Estoque Central</h3>
-                <div class="display-stock">
-                    <div>
-                        <input type="number" id="input-timbrado-saldo" class="stock-input-master" value="0" readonly>
-                        <span style="display:block; font-size: 0.7rem; color: var(--text-muted); margin-top: 2px;">Saldo Central</span>
-                    </div>
-                    <div style="text-align: right;">
-                        <span class="date-text" style="display:block;">Última Entrada:</span>
-                        <span id="date-timbrado-saldo" class="date-text" style="font-weight: bold;">-</span>
-                    </div>
-                </div>
-                <div class="input-group">
-                    <input type="number" id="input-timbrado-add" class="input-futuristic" placeholder="Qtd Unidades">
-                    <button class="btn-action" onclick="adicionarEstoque('papel_timbrado', 'input-timbrado-add')">ADICIONAR</button>
-                </div>
-            </div>
-            <div class="sub-panel">
-                <h3>Destinar Insumo</h3>
-                <div class="printer-list">
-                    <div class="printer-row"><span class="printer-name">DIRETORIA / GERÊNCIA</span><div class="printer-controls"><input type="number" id="out-timbrado-adm" class="printer-counter-input" value="0"><button class="btn-output" onclick="removerEstoque('papel_timbrado', 'out-timbrado-adm', 'ADM')">DIRECIONAR</button></div></div>
-                </div>
-            </div>
-            <nav class="bottom-nav">
-                <button class="nav-btn" onclick="openScreen('screen-home')"><i class="fa-solid fa-house"></i></button>
-                <button class="nav-btn" onclick="openScreen('screen-impressora')"><i class="fa-solid fa-rotate-left"></i></button>
-            </nav>
-        </div>
+<!-- =========================
+     ESTOQUE
+========================== -->
 
-        <!-- TELA INSUMO: ETQ PONTO -->
-        <div id="screen-ponto" class="screen">
-            <header><h1>ETQ Ponto</h1></header>
-            <div class="sub-panel">
-                <h3>Estoque Central</h3>
-                <div class="display-stock">
-                    <div>
-                        <input type="number" id="input-ponto-saldo" class="stock-input-master" value="0" readonly>
-                        <span style="display:block; font-size: 0.7rem; color: var(--text-muted); margin-top: 2px;">Saldo Central</span>
-                    </div>
-                    <div style="text-align: right;">
-                        <span class="date-text" style="display:block;">Última Entrada:</span>
-                        <span id="date-ponto-saldo" class="date-text" style="font-weight: bold;">-</span>
-                    </div>
-                </div>
-                <div class="input-group">
-                    <input type="number" id="input-ponto-add" class="input-futuristic" placeholder="Qtd Unidades">
-                    <button class="btn-action" onclick="adicionarEstoque('etq_ponto', 'input-ponto-add')">ADICIONAR</button>
-                </div>
-            </div>
-            <div class="sub-panel">
-                <h3>Destinar Insumo</h3>
-                <div class="printer-list">
-                    <div class="printer-row"><span class="printer-name">RELÓGIO DE PONTO</span><div class="printer-controls"><input type="number" id="out-ponto-maq" class="printer-counter-input" value="0"><button class="btn-output" onclick="removerEstoque('etq_ponto', 'out-ponto-maq', 'RELÓGIO')">DIRECIONAR</button></div></div>
-                </div>
-            </div>
-            <nav class="bottom-nav">
-                <button class="nav-btn" onclick="openScreen('screen-home')"><i class="fa-solid fa-house"></i></button>
-                <button class="nav-btn" onclick="openScreen('screen-home')"><i class="fa-solid fa-rotate-left"></i></button>
-            </nav>
-        </div>
+<div class="section-title">
+  Estoque
+</div>
 
-        <!-- TELA INSUMO: ETQ FRIOS -->
-        <div id="screen-frios" class="screen">
-            <header><h1>ETQ Frios</h1></header>
-            <div class="sub-panel">
-                <h3>Estoque Central</h3>
-                <div class="display-stock">
-                    <div>
-                        <input type="number" id="input-frios-saldo" class="stock-input-master" value="0" readonly>
-                        <span style="display:block; font-size: 0.7rem; color: var(--text-muted); margin-top: 2px;">Saldo Central</span>
-                    </div>
-                    <div style="text-align: right;">
-                        <span class="date-text" style="display:block;">Última Entrada:</span>
-                        <span id="date-frios-saldo" class="date-text" style="font-weight: bold;">-</span>
-                    </div>
-                </div>
-                <div class="input-group">
-                    <input type="number" id="input-frios-add" class="input-futuristic" placeholder="Qtd Unidades">
-                    <button class="btn-action" onclick="adicionarEstoque('etq_frios', 'input-frios-add')">ADICIONAR</button>
-                </div>
-            </div>
-            <div class="sub-panel">
-                <h3>Destinar Insumo</h3>
-                <div class="printer-list">
-                    <div class="printer-row"><span class="printer-name">SETOR DE FRIOS</span><div class="printer-controls"><input type="number" id="out-frios-setor" class="printer-counter-input" value="0"><button class="btn-output" onclick="removerEstoque('etq_frios', 'out-frios-setor', 'SETOR FRIOS')">DIRECIONAR</button></div></div>
-                </div>
-            </div>
-            <nav class="bottom-nav">
-                <button class="nav-btn" onclick="openScreen('screen-home')"><i class="fa-solid fa-house"></i></button>
-                <button class="nav-btn" onclick="openScreen('screen-balanca')"><i class="fa-solid fa-rotate-left"></i></button>
-            </nav>
-        </div>
+<nav class="menu">
 
-        <!-- TELA INSUMO: ETQ HF -->
-        <div id="screen-hf" class="screen">
-            <header><h1>ETQ Hortifruti</h1></header>
-            <div class="sub-panel">
-                <h3>Estoque Central</h3>
-                <div class="display-stock">
-                    <div>
-                        <input type="number" id="input-hf-saldo" class="stock-input-master" value="0" readonly>
-                        <span style="display:block; font-size: 0.7rem; color: var(--text-muted); margin-top: 2px;">Saldo Central</span>
-                    </div>
-                    <div style="text-align: right;">
-                        <span class="date-text" style="display:block;">Última Entrada:</span>
-                        <span id="date-hf-saldo" class="date-text" style="font-weight: bold;">-</span>
-                    </div>
-                </div>
-                <div class="input-group">
-                    <input type="number" id="input-hf-add" class="input-futuristic" placeholder="Qtd Unidades">
-                    <button class="btn-action" onclick="adicionarEstoque('etq_hf', 'input-hf-add')">ADICIONAR</button>
-                </div>
-            </div>
-            <div class="sub-panel">
-                <h3>Destinar Insumo</h3>
-                <div class="printer-list">
-                    <div class="printer-row"><span class="printer-name">BALANÇA HORTIFRUTI</span><div class="printer-controls"><input type="number" id="out-hf-setor" class="printer-counter-input" value="0"><button class="btn-output" onclick="removerEstoque('etq_hf', 'out-hf-setor', 'BALANÇA HF')">DIRECIONAR</button></div></div>
-                </div>
-            </div>
-            <nav class="bottom-nav">
-                <button class="nav-btn" onclick="openScreen('screen-home')"><i class="fa-solid fa-house"></i></button>
-                <button class="nav-btn" onclick="openScreen('screen-balanca')"><i class="fa-solid fa-rotate-left"></i></button>
-            </nav>
-        </div>
+  <a class="card" href="menu.html">
 
-        <!-- TELA INSUMO: LAMB LAMB -->
-        <div id="screen-lamb" class="screen">
-            <header><h1>Lamb Lamb</h1></header>
-            <div class="sub-panel">
-                <h3>Estoque Central</h3>
-                <div class="display-stock">
-                    <div>
-                        <input type="number" id="input-lamb-saldo" class="stock-input-master" value="0" readonly>
-                        <span style="display:block; font-size: 0.7rem; color: var(--text-muted); margin-top: 2px;">Saldo Central</span>
-                    </div>
-                    <div style="text-align: right;">
-                        <span class="date-text" style="display:block;">Última Entrada:</span>
-                        <span id="date-lamb-saldo" class="date-text" style="font-weight: bold;">-</span>
-                    </div>
-                </div>
-                <div class="input-group">
-                    <input type="number" id="input-lamb-add" class="input-futuristic" placeholder="Qtd Unidades">
-                    <button class="btn-action" onclick="adicionarEstoque('lamb_lamb', 'input-lamb-add')">ADICIONAR</button>
-                </div>
-            </div>
-            <div class="sub-panel">
-                <h3>Destinar Insumo</h3>
-                <div class="printer-list">
-                    <div class="printer-row"><span class="printer-name">BALANÇAS CHECKOUT</span><div class="printer-controls"><input type="number" id="out-lamb-setor" class="printer-counter-input" value="0"><button class="btn-output" onclick="removerEstoque('lamb_lamb', 'out-lamb-setor', 'CHECKOUT')">DIRECIONAR</button></div></div>
-                </div>
-            </div>
-            <nav class="bottom-nav">
-                <button class="nav-btn" onclick="openScreen('screen-home')"><i class="fa-solid fa-house"></i></button>
-                <button class="nav-btn" onclick="openScreen('screen-balanca')"><i class="fa-solid fa-rotate-left"></i></button>
-            </nav>
-        </div>
+    <div class="icon">▤</div>
 
-        <!-- TELA INSUMO: LAMB LAMB LARANJA -->
-        <div id="screen-lamb-laranja" class="screen">
-            <header><h1>Lamb Lamb Laranja</h1></header>
-            <div class="sub-panel">
-                <h3>Estoque Central</h3>
-                <div class="display-stock">
-                    <div>
-                        <input type="number" id="input-lamblaranja-saldo" class="stock-input-master" value="0" readonly>
-                        <span style="display:block; font-size: 0.7rem; color: var(--text-muted); margin-top: 2px;">Saldo Central</span>
-                    </div>
-                    <div style="text-align: right;">
-                        <span class="date-text" style="display:block;">Última Entrada:</span>
-                        <span id="date-lamblaranja-saldo" class="date-text" style="font-weight: bold;">-</span>
-                    </div>
-                </div>
-                <div class="input-group">
-                    <input type="number" id="input-lamblaranja-add" class="input-futuristic" placeholder="Qtd Unidades">
-                    <button class="btn-action" onclick="adicionarEstoque('lamb_lamb_laranja', 'input-lamblaranja-add')">ADICIONAR</button>
-                </div>
-            </div>
-            <div class="sub-panel">
-                <h3>Destinar Insumo</h3>
-                <div class="printer-list">
-                    <div class="printer-row"><span class="printer-name">BALANÇAS OFERTA</span><div class="printer-controls"><input type="number" id="out-lamblaranja-setor" class="printer-counter-input" value="0"><button class="btn-output" onclick="removerEstoque('lamb_lamb_laranja', 'out-lamblaranja-setor', 'BALANÇA OFERTAS')">DIRECIONAR</button></div></div>
-                </div>
-            </div>
-            <nav class="bottom-nav">
-                <button class="nav-btn" onclick="openScreen('screen-home')"><i class="fa-solid fa-house"></i></button>
-                <button class="nav-btn" onclick="openScreen('screen-balanca')"><i class="fa-solid fa-rotate-left"></i></button>
-            </nav>
-        </div>
+    <div class="card-info">
 
-        <!-- TELA 5: TONER CARTAZ (ATUALIZADA) -->
-        <div id="screen-cartaz" class="screen">
-            <header><h1>Toner Cartaz</h1></header>
-            
-            <!-- PAINEL 1: ESTOQUE (Baseado em image_d8a8d0.png) -->
-            <div class="sub-panel">
-                <h3>Estoque</h3>
-                <div style="display: flex; flex-direction: column; gap: 0.6rem; margin-bottom: 0.8rem;">
-                    <div class="row-cartaz-stock">
-                        <span class="label-cartaz cartaz-y">AMARELO</span>
-                        <div class="cartaz-stock-right">
-                            <span id="saldo-cartaz-yellow" class="cartaz-stock-value">0</span>
-                            <span id="date-cartaz-yellow" class="cartaz-date-value">-</span>
-                        </div>
-                    </div>
-                    <div class="row-cartaz-stock">
-                        <span class="label-cartaz cartaz-m">MAGENTA</span>
-                        <div class="cartaz-stock-right">
-                            <span id="saldo-cartaz-magenta" class="cartaz-stock-value">0</span>
-                            <span id="date-cartaz-magenta" class="cartaz-date-value">-</span>
-                        </div>
-                    </div>
-                    <div class="row-cartaz-stock">
-                        <span class="label-cartaz cartaz-c">CYANO</span>
-                        <div class="cartaz-stock-right">
-                            <span id="saldo-cartaz-cyan" class="cartaz-stock-value">0</span>
-                            <span id="date-cartaz-cyan" class="cartaz-date-value">-</span>
-                        </div>
-                    </div>
-                    <div class="row-cartaz-stock">
-                        <span class="label-cartaz cartaz-k">PRETO</span>
-                        <div class="cartaz-stock-right">
-                            <span id="saldo-cartaz-black" class="cartaz-stock-value">0</span>
-                            <span id="date-cartaz-black" class="cartaz-date-value">-</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Entrada única do painel de estoque -->
-                <div style="display:flex; gap: 0.4rem;">
-                    <select id="select-cartaz-cor" class="select-futuristic" style="flex: 13;">
-                        <option value="yellow">AMARELO</option>
-                        <option value="magenta">MAGENTA</option>
-                        <option value="cyan">CYANO</option>
-                        <option value="black">PRETO</option>
-                    </select>
-                    <input type="number" id="input-cartaz-qtd" class="input-futuristic" placeholder="Qtd" style="flex: 10;">
-                    <button class="btn-action" style="background: var(--glow-cyan); flex: 10;" onclick="entradaCartazUnica()">ADICIONAR</button>
-                </div>
-            </div>
+      <div class="card-title">
+        Impressoras
+      </div>
 
-            <!-- PAINEL 2: SAÍDA DIRETA POR LINHA (Baseado em image_d8a8d0.png) -->
-            <div class="sub-panel">
-                <h3>Saída</h3>
-                <div class="printer-list">
-                    <div class="printer-row">
-                        <span class="label-cartaz cartaz-y">AMARELO</span>
-                        <div class="printer-controls">
-                            <input type="number" id="out-cartaz-yellow" class="printer-counter-input" value="0">
-                            <button class="btn-output" onclick="saidaCartazDireta('yellow', 'out-cartaz-yellow')">DIRECIONAR</button>
-                        </div>
-                    </div>
-                    <div class="printer-row">
-                        <span class="label-cartaz cartaz-m">MAGENTA</span>
-                        <div class="printer-controls">
-                            <input type="number" id="out-cartaz-magenta" class="printer-counter-input" value="0">
-                            <button class="btn-output" onclick="saidaCartazDireta('magenta', 'out-cartaz-magenta')">DIRECIONAR</button>
-                        </div>
-                    </div>
-                    <div class="printer-row">
-                        <span class="label-cartaz cartaz-c">CYANO</span>
-                        <div class="printer-controls">
-                            <input type="number" id="out-cartaz-cyan" class="printer-counter-input" value="0">
-                            <button class="btn-output" onclick="saidaCartazDireta('cyan', 'out-cartaz-cyan')">DIRECIONAR</button>
-                        </div>
-                    </div>
-                    <div class="printer-row">
-                        <span class="label-cartaz cartaz-k">PRETO</span>
-                        <div class="printer-controls">
-                            <input type="number" id="out-cartaz-black" class="printer-counter-input" value="0">
-                            <button class="btn-output" onclick="saidaCartazDireta('black', 'out-cartaz-black')">DIRECIONAR</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <nav class="bottom-nav">
-                <button class="nav-btn" onclick="openScreen('screen-home')"><i class="fa-solid fa-house"></i></button>
-                <button class="nav-btn" onclick="openScreen('screen-impressora')"><i class="fa-solid fa-rotate-left"></i></button>
-            </nav>
-        </div>
+      <div class="card-desc">
+        Controle de estoque e direcionamento
+      </div>
 
     </div>
-    <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
-    <!-- CONFIGURAÇÃO DO FIREBASE CLOUD FIRESTORE -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { initializeFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    <div class="arrow">›</div>
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyA3odYvjY7mcWsCTvGcDKxoccz1qYSg_NE",
-            authDomain: "estoque-84295.firebaseapp.com",
-            projectId: "estoque-84295",
-            storageBucket: "estoque-84295.firebasestorage.app",
-            messagingSenderId: "704104486696",
-            appId: "1:704104486696:web:2be634dfc63baef31c221d",
-            measurementId: "G-D31RQ19END"
-        };
+  </a>
 
-        const app = initializeApp(firebaseConfig);
-        // Usa Long Polling para maior compatibilidade com redes, proxies e
-        // dispositivos que apresentam falha no WebChannel/HTTP2.
-        const db = initializeFirestore(app, {
-            experimentalForceLongPolling: true,
-            useFetchStreams: false
-        });
 
-        let toastTimer;
-        function mostrarToast(mensagem, erro = false) {
-            const toast = document.getElementById('toast');
-            if (!toast) return;
-            toast.textContent = mensagem;
-            toast.classList.toggle('error', erro);
-            toast.classList.add('show');
-            clearTimeout(toastTimer);
-            toastTimer = setTimeout(() => toast.classList.remove('show'), 2600);
-        }
+  <a class="card" href="toner-fotocondutor.html">
 
-        let estoqueLocal = {
-            papel_oficio: { saldo: 0, ultimaEntrada: "-" },
-            etq_gondola: { saldo: 0, ultimaEntrada: "-" },
-            ribbon: { saldo: 0, ultimaEntrada: "-" },
-            etq_amarela: { saldo: 0, ultimaEntrada: "-" },
-            etq_laranja: { saldo: 0, ultimaEntrada: "-" },
-            papel_timbrado: { saldo: 0, ultimaEntrada: "-" },
-            etq_ponto: { saldo: 0, ultimaEntrada: "-" },
-            etq_frios: { saldo: 0, ultimaEntrada: "-" },
-            etq_hf: { saldo: 0, ultimaEntrada: "-" },
-            lamb_lamb: { saldo: 0, ultimaEntrada: "-" },
-            lamb_lamb_laranja: { saldo: 0, ultimaEntrada: "-" },
-            cartaz: { yellow: 0, magenta: 0, cyan: 0, black: 0, data_yellow: "-", data_magenta: "-", data_cyan: "-", data_black: "-" }
-        };
+    <div class="icon">▣</div>
 
-        function atualizarElementoRealtime(id, valor, tipo = 'input') {
-            const el = document.getElementById(id);
-            if (el) {
-                if (tipo === 'input') el.value = valor;
-                else el.innerText = valor;
-            }
-        }
+    <div class="card-info">
 
-        function iniciarEscutaEstoque() {
-            onSnapshot(
-                doc(db, "controle", "geral"),
-                (snapshot) => {
-                if (snapshot.exists()) {
-                    const dados = snapshot.data();
-                    
-                    const chavesSimples = [
-                        { k: 'papel_oficio', id: 'oficio' },
-                        { k: 'etq_gondola', id: 'gondola' },
-                        { k: 'ribbon', id: 'ribbon' },
-                        { k: 'etq_amarela', id: 'amarela' },
-                        { k: 'etq_laranja', id: 'laranja' },
-                        { k: 'papel_timbrado', id: 'timbrado' },
-                        { k: 'etq_ponto', id: 'ponto' },
-                        { k: 'etq_frios', id: 'frios' },
-                        { k: 'etq_hf', id: 'hf' },
-                        { k: 'lamb_lamb', id: 'lamb' },
-                        { k: 'lamb_lamb_laranja', id: 'lamblaranja' }
-                    ];
+      <div class="card-title">
+        Toners
+      </div>
 
-                    chavesSimples.forEach(item => {
-                        if (dados[item.k]) {
-                            estoqueLocal[item.k] = dados[item.k];
-                            atualizarElementoRealtime(`input-${item.id}-saldo`, dados[item.k].saldo || 0, 'input');
-                            atualizarElementoRealtime(`date-${item.id}-saldo`, dados[item.k].ultimaEntrada || "-", 'text');
-                        }
-                    });
+      <div class="card-desc">
+        Toners e fotocondutores
+      </div>
 
-                    if (dados.cartaz) {
-                        estoqueLocal.cartaz = dados.cartaz;
-                        const cores = ['yellow', 'magenta', 'cyan', 'black'];
-                        cores.forEach(c => {
-                            atualizarElementoRealtime(`saldo-cartaz-${c}`, dados.cartaz[c] || 0, 'text');
-                            atualizarElementoRealtime(`date-cartaz-${c}`, dados.cartaz[`data_${c}`] || "-", 'text');
-                        });
-                    }
-                }
-                },
-                (erro) => {
-                    console.error("Erro na sincronização do Firestore:", erro);
-                    mostrarToast("Falha na conexão com o banco. Verifique a internet.", true);
-                }
-            );
-        }
+    </div>
 
-        function obterDataFormatada() {
-            const agora = new Date();
-            const dia = String(agora.getDate()).padStart(2, '0');
-            const mes = String(agora.getMonth() + 1).padStart(2, '0');
-            const ano = agora.getFullYear();
-            const horas = String(agora.getHours()).padStart(2, '0');
-            const minutos = String(agora.getMinutes()).padStart(2, '0');
-            return `${dia}/${mes}/${ano} ${horas}:${minutos}`;
-        }
+    <div class="arrow">›</div>
 
-        async function adicionarEstoque(itemKey, inputId) {
-            const inputField = document.getElementById(inputId);
-            const qtdAdicionar = parseInt(inputField.value);
+  </a>
 
-            if (!qtdAdicionar || qtdAdicionar <= 0) {
-                mostrarToast("Digite uma quantidade válida.", true);
-                return;
-            }
+</nav>
 
-            if (!estoqueLocal[itemKey]) estoqueLocal[itemKey] = { saldo: 0, ultimaEntrada: "-" };
 
-            const dataAtual = obterDataFormatada();
-            estoqueLocal[itemKey].saldo = (estoqueLocal[itemKey].saldo || 0) + qtdAdicionar;
-            estoqueLocal[itemKey].ultimaEntrada = dataAtual;
+<!-- =========================
+     CONTROLE
+========================== -->
 
-            try {
-                await setDoc(doc(db, "controle", "geral"), estoqueLocal, { merge: true });
-                inputField.value = "";
-                mostrarToast(`✓ ${qtdAdicionar} un. adicionadas ao estoque`);
-            } catch (erro) {
-                console.error("Erro ao salvar dados no Firebase:", erro);
-                mostrarToast(`Erro ao salvar: ${erro.code || erro.message}`, true);
-            }
-        }
+<div class="section-title">
+  Controle
+</div>
 
-        async function removerEstoque(itemKey, inputId, destinoNome) {
-            const inputField = document.getElementById(inputId);
-            const qtdRemover = parseInt(inputField.value);
+<nav class="menu">
 
-            if (!qtdRemover || qtdRemover <= 0) {
-                mostrarToast("Digite uma quantidade válida.", true);
-                return;
-            }
+  <a class="card" href="movimentacoes.html">
 
-            if (!estoqueLocal[itemKey] || qtdRemover > (estoqueLocal[itemKey].saldo || 0)) {
-                mostrarToast(`Saldo insuficiente. Estoque atual: ${estoqueLocal[itemKey]?.saldo || 0}`, true);
-                return;
-            }
+    <div class="icon">↕</div>
 
-            estoqueLocal[itemKey].saldo -= qtdRemover;
+    <div class="card-info">
 
-            try {
-                await setDoc(doc(db, "controle", "geral"), estoqueLocal, { merge: true });
-                inputField.value = "0"; 
-                mostrarToast(`✓ ${qtdRemover} un. direcionadas para ${destinoNome}`);
-            } catch (erro) {
-                console.error("Erro ao abater estoque:", erro);
-                mostrarToast(`Erro ao salvar: ${erro.code || erro.message}`, true);
-            }
-        }
+      <div class="card-title">
+        Movimentações
+      </div>
 
-        /* FUNÇÕES ADAPTADAS PARA O NOVO FORMATO DE TONER (IMAGE_D8A8D0.PNG) */
-        
-        // 1. ADICIONAR: Soma ao estoque central da cor selecionada no <select>
-async function entradaCartazUnica() {
-    const corSelect = document.getElementById("select-cartaz-cor").value; // 'yellow', 'magenta', 'cyan', 'black'
-    const inputQtd = document.getElementById("input-cartaz-qtd");
-    const qtd = parseInt(inputQtd.value);
+      <div class="card-desc">
+        Entradas, saídas e histórico
+      </div>
 
-    // Validação de entrada
-    if (!qtd || qtd <= 0) {
-        mostrarToast("Digite uma quantidade válida para a entrada.", true);
-        return;
-    }
+    </div>
 
-    // Inicializa o objeto cartaz caso ele não exista no banco ainda
-    if (!estoqueLocal.cartaz) {
-        estoqueLocal.cartaz = { 
-            yellow: 0, magenta: 0, cyan: 0, black: 0, 
-            data_yellow: "-", data_magenta: "-", data_cyan: "-", data_black: "-" 
-        };
-    }
+    <div class="arrow">›</div>
 
-    const dataAtual = obterDataFormatada();
-    
-    // SOMA ao estoque existente
-    estoqueLocal.cartaz[corSelect] = (estoqueLocal.cartaz[corSelect] || 0) + qtd;
-    estoqueLocal.cartaz[`data_${corSelect}`] = dataAtual;
+  </a>
 
-    try {
-        // Envia para o Firestore mantendo o merge ativo
-        await setDoc(doc(db, "controle", "geral"), estoqueLocal, { merge: true });
-        inputQtd.value = "";
-        mostrarToast(`✓ ${qtd} un. de Toner ${corSelect.toUpperCase()} adicionadas`);
-    } catch (erro) {
-        console.error("Erro ao dar entrada no Toner:", erro);
-        mostrarToast("Erro ao salvar no banco de dados.", true);
-    }
-}
 
-// 2. DIRECIONAR: Diminui do estoque atual da cor correspondente à linha
-async function saidaCartazDireta(cor, inputId) {
-    const inputField = document.getElementById(inputId);
-    const qtd = parseInt(inputField.value);
+  <a class="card" href="relatorios.html">
 
-    // Validação de entrada
-    if (!qtd || qtd <= 0) {
-        mostrarToast("Digite uma quantidade válida para direcionar.", true);
-        return;
-    }
+    <div class="icon">▥</div>
 
-    // Verifica se há saldo suficiente para abater
-    const saldoAtual = estoqueLocal.cartaz ? (estoqueLocal.cartaz[cor] || 0) : 0;
-    if (qtd > saldoAtual) {
-        mostrarToast(`Saldo insuficiente para ${cor.toUpperCase()}. Estoque atual: ${saldoAtual}`, true);
-        return;
-    }
+    <div class="card-info">
 
-    // SUBTRAI (diminui) do estoque atual
-    estoqueLocal.cartaz[cor] = saldoAtual - qtd;
+      <div class="card-title">
+        Relatórios
+      </div>
 
-    try {
-        // Salva a alteração decrementada no Firestore
-        await setDoc(doc(db, "controle", "geral"), estoqueLocal, { merge: true });
-        
-        // Retorna o valor do input da linha para 0 após o sucesso
-        inputField.value = "0"; 
-        
-        // Alerta opcional de confirmação para o operador do scanner
-        mostrarToast(`✓ ${qtd} un. de Toner ${cor.toUpperCase()} direcionadas`);
-    } catch (erro) {
-        console.error("Erro ao abater Toner:", erro);
-        mostrarToast("Erro ao processar a saída no banco de dados.", true);
-    }
-}
+      <div class="card-desc">
+        Consultas e informações do estoque
+      </div>
 
-// Vincula as funções ao escopo global (window) para os botões do HTML continuarem funcionando
-window.entradaCartazUnica = entradaCartazUnica;
-window.saidaCartazDireta = saidaCartazDireta;
-    </script>
+    </div>
 
-    <!-- NAVEGAÇÃO SPA -->
-    <script>
-        function openScreen(screenId) {
-            document.querySelectorAll('.screen').forEach(screen => {
-                screen.classList.remove('active');
-            });
-            const targetScreen = document.getElementById(screenId);
-            if (targetScreen) {
-                targetScreen.classList.add('active');
-                targetScreen.scrollTop = 0;
-            } else {
-                console.error("Tela não encontrada: " + screenId);
-            }
-        }
-    </script>
+    <div class="arrow">›</div>
+
+  </a>
+
+</nav>
+
+
+<!-- =========================
+     STATUS
+========================== -->
+
+<div class="status">
+
+  <span>
+    CPD851 • MATERIAL CONTROL
+  </span>
+
+  <span class="status-online">
+    ● ONLINE
+  </span>
+
+</div>
+
+
+<!-- =========================
+     FOOTER
+========================== -->
+
+<footer>
+  CPD851 • NEOS SYSTEM • TI
+</footer>
+
+
+  </main>
+
+  <!-- =========================
+       HOME
+  ========================== -->
+
+<a
+class="home"
+href="index.html"
+aria-label="Início"
+
+>
+
+
+⌂
+
+
+  </a>
+
 </body>
 </html>

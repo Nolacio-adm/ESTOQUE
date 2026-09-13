@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0b1117">
+<title>Estoque Toner - Fotocondutor | CPD851</title>
+
+<style>
+:root{
+  --bg:#090e13;
+  --panel:#10171e;
+  --blue:#073b66;
+  --blue2:#0b4677;
+  --line:#153b46;
+  --text:#f1f5f9;
+  --muted:#8ea3b7;
+  --stock:#59616a;
+  --green:#00ff7f;
+  --red:#ff315f;
+  --cyan:#00f0ff;
+}
+
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  min-height:100vh;
+  background:
+    radial-gradient(circle at 50% -10%, rgba(0,240,255,.10), transparent 38%),
+    var(--bg);
+  color:var(--text);
+  font-family:Arial,Helvetica,sans-serif;
+  padding:8px 6px 70px;
+}
+
+.page{
+  width:100%;
+  max-width:340px;
+  margin:0 auto;
+}
+
+header{
+  background:rgba(16,23,30,.86);
+  text-align:center;
+  padding:10px 6px 12px;
+  margin-bottom:7px;
+  border:1px solid #153b46;
+  border-radius:10px;
+  box-shadow:0 0 18px rgba(0,240,255,.08);
+}
+
+h1{
+  margin:0;
+  font-size:17px;
+  line-height:1.35;
+  letter-spacing:1px;
+  font-weight:800;
+  text-transform:uppercase;
+  color:var(--cyan);
+  text-shadow:0 0 12px rgba(0,240,255,.25);
+}
+
+.model{
+  margin-top:0;
+  background:linear-gradient(90deg,#073b66,#0b4677);
+  color:#fff;
+  min-height:42px;
+  box-shadow:inset 0 -1px 0 rgba(0,240,255,.15), 0 0 12px rgba(0,240,255,.05);
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:5px 10px;
+  font-size:15px;
+  font-weight:800;
+  border-bottom:1px solid #000;
+}
+
+.printer{
+  width:32px;
+  height:32px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:25px;
+  filter:grayscale(1);
+  flex:none;
+}
+
+.model-text{
+  line-height:1.1;
+  text-transform:uppercase;
+}
+
+.item{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 65px;
+  min-height:32px;
+  border-bottom:1px solid #000;
+  background:#10171e;
+  cursor:pointer;
+  user-select:none;
+}
+
+.item:last-of-type{
+  border-bottom:3px solid #111;
+}
+
+.item-name{
+  background:#073b66;
+  color:#fff;
+  border-right:1px solid #153b46;
+  padding:6px 7px;
+  font-size:9px;
+  line-height:1.25;
+  font-weight:700;
+  text-transform:uppercase;
+  display:flex;
+  align-items:center;
+}
+
+.item-stock{
+  background:#59616a;
+  color:#fff;
+  border-left:1px solid #153b46;
+
+  text-shadow:0 0 6px rgba(255,255,255,.18);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:13px;
+  font-weight:700;
+}
+
+.group{
+  background:rgba(16,23,30,.86);
+  margin-bottom:9px;
+  border:0;
+  box-shadow:0 1px 2px rgba(0,0,0,.08);
+}
+
+.details{
+  display:none;
+  background:#0c1319;
+  padding:7px;
+  border-bottom:1px solid #153b46;
+  box-shadow:inset 0 0 12px rgba(0,240,255,.03);
+}
+
+.item.open + .details{
+  display:block;
+}
+
+.detail-line{
+  font-size:9px;
+  color:var(--muted);
+  margin-bottom:4px;
+}
+
+.detail-line:last-child{margin-bottom:0}
+
+.actions{
+  display:flex;
+  gap:4px;
+  margin-top:6px;
+  flex-wrap:wrap;
+}
+
+button{
+  border:1px solid;
+  border-radius:4px;
+  min-height:38px;
+  padding:6px 8px;
+  font-size:9px;
+  font-weight:800;
+  cursor:pointer;
+  background:transparent;
+  color:#fff;
+}
+
+.btn-add{border-color:var(--green);color:var(--green)}
+.btn-undo{border-color:#7a2741;color:#b44a68}
+.btn-zero{border-color:#673043;color:var(--red)}
+.btn-add:hover{background:rgba(0,255,127,.08)}
+.btn-undo:hover,.btn-zero:hover{background:rgba(255,49,95,.08)}
+
+.destination{
+  margin-top:5px;
+  border-top:1px solid #ccc;
+  padding-top:5px;
+}
+
+.destination-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:5px;
+}
+
+.destination-name{
+  font-size:9px;
+  font-weight:800;
+}
+
+.destination-info{
+  font-size:8px;
+  color:#555;
+  margin-top:2px;
+}
+
+.destination-actions{
+  display:flex;
+  align-items:center;
+  gap:4px;
+}
+
+.used-number{
+  min-width:34px;
+  min-height:34px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:#59616a;
+  color:#fff;
+  text-shadow:0 0 6px rgba(255,255,255,.18);
+  font-size:10px;
+  font-weight:800;
+}
+
+.btn-direct{
+  background:#0b3f6b;
+}
+
+.status{
+  position:fixed;
+  left:50%;
+  bottom:55px;
+  transform:translateX(-50%);
+  z-index:20;
+  max-width:calc(100% - 20px);
+  padding:7px 11px;
+  border-radius:3px;
+  background:#0e151c;
+  color:var(--muted);
+  border:1px solid #153b46;
+  box-shadow:0 0 14px rgba(0,240,255,.08);
+  font-size:9px;
+  text-align:center;
+  opacity:0;
+  pointer-events:none;
+  transition:.2s;
+}
+
+.status.show{opacity:1}
+.status.error{background:#8b2020}
+
+.home{
+  position:fixed;
+  bottom:10px;
+  left:50%;
+  transform:translateX(-50%);
+  width:52px;
+  height:34px;
+  border:0;
+  border-radius:4px;
+  background:#073b66;
+  color:#fff;
+  border-right:1px solid #153b46;
+  font-size:18px;
+  z-index:10;
+}
+
+@media(min-width:600px){
+  .page{max-width:430px}
+  h1{font-size:19px}
+  .model{font-size:16px}
+}
+</style>
+</head>
+
+<body>
+<div class="page">
+
+<header>
+  <h1>ESTOQUE<br>TONER - FOTOCONDUTOR</h1>
+</header>
+
+<!-- MX611dhe -->
+<section class="group">
+  <div class="model">
+    <div class="printer">🖨️</div>
+    <div class="model-text">MX611dhe (GER / RH)</div>
+  </div>
+
+  <div class="item" data-code="50FBU0E" onclick="toggleItem(this)">
+    <div class="item-name">TONER - 50FBU0E</div>
+    <div class="item-stock" id="stock-box-50FBU0E">0</div>
+  </div>
+  <div class="details" id="details-50FBU0E">
+    <div class="detail-line">Estoque compartilhado: <strong><span id="stock-50FBU0E">0</span> unidade(s)</strong></div>
+    <div class="detail-line">Última entrada: <span id="entry-50FBU0E">-</span></div>
+    <div class="actions">
+      <button class="btn-add" onclick="event.stopPropagation();addStock('50FBU0E')">+1 ADICIONAR</button>
+      <button class="btn-undo" id="undo-add-50FBU0E" onclick="event.stopPropagation();undoAdd('50FBU0E')" disabled>DESFAZER</button>
+      <button class="btn-zero" onclick="event.stopPropagation();zeroStock('50FBU0E')">ZERAR</button>
+    </div>
+    <div id="destinations-50FBU0E"></div>
+  </div>
+
+  <div class="item" data-code="50F0Z00" onclick="toggleItem(this)">
+    <div class="item-name">FOTOCONDUTOR - 50F0Z00</div>
+    <div class="item-stock" id="stock-box-50F0Z00">0</div>
+  </div>
+  <div class="details" id="details-50F0Z00">
+    <div class="detail-line">Estoque compartilhado: <strong><span id="stock-50F0Z00">0</span> unidade(s)</strong></div>
+    <div class="detail-line">Última entrada: <span id="entry-50F0Z00">-</span></div>
+    <div class="actions">
+      <button class="btn-add" onclick="event.stopPropagation();addStock('50F0Z00')">+1 ADICIONAR</button>
+      <button class="btn-undo" id="undo-add-50F0Z00" onclick="event.stopPropagation();undoAdd('50F0Z00')" disabled>DESFAZER</button>
+      <button class="btn-zero" onclick="event.stopPropagation();zeroStock('50F0Z00')">ZERAR</button>
+    </div>
+    <div id="destinations-50F0Z00"></div>
+  </div>
+</section>
+
+<!-- MS812 -->
+<section class="group">
+  <div class="model">
+    <div class="printer">🖨️</div>
+    <div class="model-text">MS812 (CPD / RM / NFE)</div>
+  </div>
+
+  <div class="item" data-code="52DBX0E" onclick="toggleItem(this)">
+    <div class="item-name">TONER - 52DBX0E</div>
+    <div class="item-stock" id="stock-box-52DBX0E">0</div>
+  </div>
+  <div class="details" id="details-52DBX0E">
+    <div class="detail-line">Estoque compartilhado: <strong><span id="stock-52DBX0E">0</span> unidade(s)</strong></div>
+    <div class="detail-line">Última entrada: <span id="entry-52DBX0E">-</span></div>
+    <div class="actions">
+      <button class="btn-add" onclick="event.stopPropagation();addStock('52DBX0E')">+1 ADICIONAR</button>
+      <button class="btn-undo" id="undo-add-52DBX0E" onclick="event.stopPropagation();undoAdd('52DBX0E')" disabled>DESFAZER</button>
+      <button class="btn-zero" onclick="event.stopPropagation();zeroStock('52DBX0E')">ZERAR</button>
+    </div>
+    <div id="destinations-52DBX0E"></div>
+  </div>
+
+  <div class="item" data-code="52D0Z00" onclick="toggleItem(this)">
+    <div class="item-name">FOTOCONDUTOR - 52D0Z00</div>
+    <div class="item-stock" id="stock-box-52D0Z00">0</div>
+  </div>
+  <div class="details" id="details-52D0Z00">
+    <div class="detail-line">Estoque compartilhado: <strong><span id="stock-52D0Z00">0</span> unidade(s)</strong></div>
+    <div class="detail-line">Última entrada: <span id="entry-52D0Z00">-</span></div>
+    <div class="actions">
+      <button class="btn-add" onclick="event.stopPropagation();addStock('52D0Z00')">+1 ADICIONAR</button>
+      <button class="btn-undo" id="undo-add-52D0Z00" onclick="event.stopPropagation();undoAdd('52D0Z00')" disabled>DESFAZER</button>
+      <button class="btn-zero" onclick="event.stopPropagation();zeroStock('52D0Z00')">ZERAR</button>
+    </div>
+    <div id="destinations-52D0Z00"></div>
+  </div>
+</section>
+
+</div>
+
+<div id="status" class="status"></div>
+<button class="home" onclick="window.location.href='index.html'" title="Página inicial">⌂</button>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+import {
+  initializeFirestore,
+  doc,
+  getDoc,
+  setDoc,
+  onSnapshot,
+  runTransaction
+} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+const materials = {
+  "50FBU0E": {tipo:"TONER", modelo:"MX611dhe", locais:["GER","RH"]},
+  "50F0Z00": {tipo:"FOTOCONDUTOR", modelo:"MX611dhe", locais:["GER","RH"]},
+  "52DBX0E": {tipo:"TONER", modelo:"MS812", locais:["CPD","RM","NFE"]},
+  "52D0Z00": {tipo:"FOTOCONDUTOR", modelo:"MS812", locais:["CPD","RM","NFE"]}
+};
+
+const STORAGE_KEY = "cpd851_toner_fotocondutor_v2";
+
+/* Mesmo projeto Firebase usado pelos demais portais */
+const firebaseConfig = {
+  apiKey: "AIzaSyA3odYvjY7mcWsCTvGcDKxoccz1qYSg_NE",
+  authDomain: "estoque-84295.firebaseapp.com",
+  projectId: "estoque-84295",
+  storageBucket: "estoque-84295.firebasestorage.app",
+  messagingSenderId: "704104486696",
+  appId: "1:704104486696:web:2be634dfc63baef31c221d",
+  measurementId: "G-D31RQ19END"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = initializeFirestore(app, {
+  experimentalForceLongPolling: true,
+  useFetchStreams: false
+});
+const controleRef = doc(db, "controle", "geral");
+const FIELD = "toner_fotocondutor";
+
+function defaultState(){
+  const state = {};
+  Object.keys(materials).forEach(code=>{
+    state[code]={
+      stock:0,
+      lastEntry:null,
+      lastAdd:null,
+      destinations:{}
+    };
+    materials[code].locais.forEach(local=>{
+      state[code].destinations[local]={used:0,last:null};
+    });
+  });
+  return state;
+}
+
+let state = defaultState();
+let cloudReady = false;
+let writeQueue = Promise.resolve();
+
+function nowString(){
+  return new Date().toLocaleString("pt-BR",{
+    dateStyle:"short",
+    timeStyle:"short"
+  });
+}
+
+function showStatus(message,type="ok"){
+  const el=document.getElementById("status");
+  el.textContent=message;
+  el.className="status show "+type;
+  clearTimeout(showStatus.timer);
+  showStatus.timer=setTimeout(()=>el.className="status",2500);
+}
+
+function saveLocal(){
+  try{
+    localStorage.setItem(STORAGE_KEY,JSON.stringify(state));
+  }catch(e){
+    console.warn("Não foi possível salvar localmente",e);
+  }
+}
+
+function loadLocal(){
+  try{
+    const saved=localStorage.getItem(STORAGE_KEY);
+    if(!saved)return false;
+    const parsed=JSON.parse(saved);
+    Object.keys(materials).forEach(code=>{
+      if(!parsed[code])return;
+      state[code].stock=Number(parsed[code].stock)||0;
+      state[code].lastEntry=parsed[code].lastEntry||null;
+      state[code].lastAdd=parsed[code].lastAdd||null;
+      materials[code].locais.forEach(local=>{
+        const d=parsed[code].destinations?.[local];
+        if(d){
+          state[code].destinations[local].used=Number(d.used)||0;
+          state[code].destinations[local].last=d.last||null;
+        }
+      });
+    });
+    return true;
+  }catch(e){
+    console.error("Erro ao carregar dados locais:",e);
+    return false;
+  }
+}
+
+function normalizeCloudData(data){
+  const next=defaultState();
+  const cloud=data?.[FIELD];
+  if(!cloud || typeof cloud!=="object")return next;
+
+  Object.keys(materials).forEach(code=>{
+    const item=cloud[code];
+    if(!item)return;
+    next[code].stock=Number(item.stock)||0;
+    next[code].lastEntry=item.lastEntry||null;
+    next[code].lastAdd=item.lastAdd||null;
+    materials[code].locais.forEach(local=>{
+      const d=item.destinations?.[local];
+      if(d){
+        next[code].destinations[local].used=Number(d.used)||0;
+        next[code].destinations[local].last=d.last||null;
+      }
+    });
+  });
+  return next;
+}
+
+function renderMaterial(code){
+  const item=state[code];
+  const stock=document.getElementById("stock-"+code);
+  const box=document.getElementById("stock-box-"+code);
+  const entry=document.getElementById("entry-"+code);
+  const undoButton=document.getElementById("undo-add-"+code);
+  const container=document.getElementById("destinations-"+code);
+
+  if(stock)stock.textContent=item.stock;
+  if(box)box.textContent=item.stock;
+  if(entry)entry.textContent=item.lastEntry||"-";
+  if(undoButton)undoButton.disabled=!item.lastAdd;
+  if(!container)return;
+
+  container.innerHTML="";
+  materials[code].locais.forEach(local=>{
+    const destination=item.destinations[local];
+    const div=document.createElement("div");
+    div.className="destination";
+    div.innerHTML=`
+      <div class="destination-head">
+        <div>
+          <div class="destination-name">${local}</div>
+          <div class="destination-info">
+            Utilizado: <strong>${destination.used}</strong> unidade(s) |
+            Último: ${destination.last||"-"}
+          </div>
+        </div>
+        <div class="destination-actions">
+          <div class="used-number">${destination.used}</div>
+          <button class="btn-direct" ${item.stock<=0?"disabled":""}
+            onclick="directOne('${code}','${local}');event.stopPropagation()">
+            DIRECIONAR
+          </button>
+          <button class="btn-undo" ${destination.used<=0?"disabled":""}
+            onclick="undoDirection('${code}','${local}');event.stopPropagation()">
+            DESFAZER
+          </button>
+        </div>
+      </div>`;
+    container.appendChild(div);
+  });
+}
+
+function renderAll(){Object.keys(materials).forEach(renderMaterial);}
+
+function toggleItem(el){
+  document.querySelectorAll(".item.open").forEach(other=>{
+    if(other!==el)other.classList.remove("open");
+  });
+  el.classList.toggle("open");
+}
+
+/*
+ * Todas as alterações importantes passam por transação.
+ * Isso evita perder uma movimentação quando dois celulares
+ * alteram o mesmo item praticamente ao mesmo tempo.
+ */
+function queueCloudOperation(operation){
+  writeQueue=writeQueue.then(operation).catch(error=>{
+    console.error("Erro no Firebase:",error);
+    saveLocal();
+    showStatus("Falha ao salvar no Firebase — dados locais preservados","error");
+  });
+  return writeQueue;
+}
+
+function applyCloudAndRender(snapshot){
+  state=normalizeCloudData(snapshot.exists()?snapshot.data():null);
+  saveLocal();
+  cloudReady=true;
+  renderAll();
+}
+
+async function ensureCloudDocument(){
+  const snap=await getDoc(controleRef);
+  if(!snap.exists()){
+    await setDoc(controleRef,{[FIELD]:defaultState()},{merge:true});
+  }else if(!snap.data()?.[FIELD]){
+    await setDoc(controleRef,{[FIELD]:defaultState()},{merge:true});
+  }
+}
+
+async function mutateCloud(mutator){
+  await runTransaction(db,async transaction=>{
+    const snap=await transaction.get(controleRef);
+    const current=normalizeCloudData(snap.exists()?snap.data():null);
+    mutator(current);
+    transaction.set(controleRef,{[FIELD]:current},{merge:true});
+  });
+}
+
+function addStock(code){
+  return queueCloudOperation(async()=>{
+    const stamp=nowString();
+    await mutateCloud(current=>{
+      current[code].stock+=1;
+      current[code].lastEntry=stamp;
+      current[code].lastAdd={date:stamp};
+    });
+    showStatus("1 unidade adicionada");
+  });
+}
+
+function undoAdd(code){
+  return queueCloudOperation(async()=>{
+    await mutateCloud(current=>{
+      if(!current[code].lastAdd || current[code].stock<=0)throw new Error("Não há adição válida para desfazer.");
+      current[code].stock-=1;
+      current[code].lastAdd=null;
+    });
+    showStatus("Última adição desfeita");
+  });
+}
+
+function zeroStock(code){
+  if(state[code].stock===0){showStatus("Estoque já está zerado");return;}
+  if(!confirm("Tem certeza que deseja ZERAR o estoque de "+code+"?\n\nAs saídas por local não serão apagadas."))return;
+  queueCloudOperation(async()=>{
+    await mutateCloud(current=>{
+      current[code].stock=0;
+      current[code].lastAdd=null;
+    });
+    showStatus("Estoque zerado");
+  });
+}
+
+function directOne(code,local){
+  if(state[code].stock<=0){showStatus("Estoque insuficiente","error");return;}
+  queueCloudOperation(async()=>{
+    const stamp=nowString();
+    await mutateCloud(current=>{
+      if(current[code].stock<=0)throw new Error("Estoque insuficiente.");
+      current[code].stock-=1;
+      current[code].destinations[local].used+=1;
+      current[code].destinations[local].last=stamp;
+    });
+    showStatus("1 unidade direcionada para "+local);
+  });
+}
+
+function undoDirection(code,local){
+  if(state[code].destinations[local].used<=0){showStatus("Não há saída para desfazer","error");return;}
+  queueCloudOperation(async()=>{
+    await mutateCloud(current=>{
+      const destination=current[code].destinations[local];
+      if(destination.used<=0)throw new Error("Não há saída para desfazer.");
+      destination.used-=1;
+      destination.last=destination.used>0?destination.last:null;
+      current[code].stock+=1;
+    });
+    showStatus("Saída desfeita — 1 unidade voltou ao estoque");
+  });
+}
+
+window.toggleItem=toggleItem;
+window.addStock=addStock;
+window.undoAdd=undoAdd;
+window.zeroStock=zeroStock;
+window.directOne=directOne;
+window.undoDirection=undoDirection;
+
+loadLocal();
+renderAll();
+
+ensureCloudDocument().catch(error=>{
+  console.error("Falha na inicialização do Firebase:",error);
+  showStatus("Firebase indisponível — modo local temporário","error");
+});
+
+onSnapshot(
+  controleRef,
+  snapshot=>applyCloudAndRender(snapshot),
+  error=>{
+    console.error("Erro na sincronização Firebase:",error);
+    showStatus("Falha na conexão com o Firebase","error");
+  }
+);
+</script>
+</body>
+</html>

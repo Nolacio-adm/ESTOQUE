@@ -1,0 +1,2798 @@
+<!DOCTYPE html>
+
+<html lang="pt-BR">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+>
+
+<title>CPD851 - Toner Cartaz</title>
+
+<link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+>
+
+<style>
+
+    :root {
+
+        --bg-color: #0b0e14;
+        --surface-color: rgba(20,25,34,0.7);
+        --text-main: #ffffff;
+        --text-muted: #8b9bb4;
+
+        --glow-cyan: #00f3ff;
+        --glow-green: #00ff66;
+        --glow-orange: #ff9900;
+        --glow-red: #ff3366;
+
+        --yellow: #ffff00;
+        --magenta: #ff0088;
+        --cyan: #00cfff;
+
+        --black: #ffffff;
+
+    }
+
+
+    * {
+
+        margin: 0;
+        padding: 0;
+
+        box-sizing: border-box;
+
+        font-family:
+            'Segoe UI',
+            Roboto,
+            Helvetica,
+            Arial,
+            sans-serif;
+
+    }
+
+
+    body {
+
+        background-color: var(--bg-color);
+
+        color: var(--text-main);
+
+        display: flex;
+
+        justify-content: center;
+
+        align-items: stretch;
+
+        min-height: 100vh;
+        min-height: 100dvh;
+
+        background:
+            radial-gradient(
+                circle at 50% 0%,
+                #1a2332 0%,
+                #0b0e14 70%
+            );
+
+        overflow-x: hidden;
+
+    }
+
+
+    .app-container {
+
+        width: 100%;
+
+        max-width: 760px;
+
+        min-height: 100vh;
+        min-height: 100dvh;
+
+        padding: 1.25rem 1.2rem;
+
+        display: flex;
+
+        flex-direction: column;
+
+        position: relative;
+
+        border:
+            1px solid rgba(0,243,255,0.1);
+
+        background:
+            rgba(11,14,20,0.95);
+
+    }
+
+
+    header {
+
+        text-align: center;
+
+        position: relative;
+
+        padding-bottom: 0.8rem;
+
+        margin-bottom: 1.5rem;
+
+        flex-shrink: 0;
+
+    }
+
+
+    h1 {
+
+        font-size: 1.35rem;
+
+        font-weight: 700;
+
+        letter-spacing: 2px;
+
+        text-transform: uppercase;
+
+        text-shadow:
+            0 0 10px rgba(0,243,255,0.3);
+
+    }
+
+
+    header::after {
+
+        content: '';
+
+        position: absolute;
+
+        bottom: 0;
+
+        left: 50%;
+
+        transform: translateX(-50%);
+
+        width: 55%;
+
+        height: 2px;
+
+        background: var(--glow-cyan);
+
+        box-shadow:
+            0 0 15px var(--glow-cyan);
+
+        border-radius: 50%;
+
+    }
+
+
+    .sub-panel {
+
+        background:
+            rgba(20,25,34,0.6);
+
+        border:
+            1px solid rgba(0,243,255,0.1);
+
+        border-radius: 16px;
+
+        padding: 1rem;
+
+        margin-bottom: 1rem;
+
+    }
+
+
+    .sub-panel h3 {
+
+        font-size: 0.85rem;
+
+        color: var(--glow-cyan);
+
+        letter-spacing: 1px;
+
+        margin-bottom: 0.8rem;
+
+        text-transform: uppercase;
+
+    }
+
+
+    .color-list {
+
+        display: flex;
+
+        flex-direction: column;
+
+        gap: 0.5rem;
+
+    }
+
+
+    .color-row {
+
+        display: flex;
+
+        justify-content: space-between;
+
+        align-items: center;
+
+        background:
+            rgba(255,255,255,0.035);
+
+        padding: 0.6rem 0.75rem;
+
+        border-radius: 8px;
+
+        border-left: 3px solid var(--glow-cyan);
+
+        gap: 10px;
+
+    }
+
+
+    .color-info {
+
+        display: flex;
+
+        flex-direction: column;
+
+        gap: 3px;
+
+        min-width: 0;
+
+    }
+
+
+    .color-name {
+
+        font-weight: bold;
+
+        font-size: 0.8rem;
+
+        letter-spacing: 0.5px;
+
+    }
+
+
+    .color-usage {
+
+        font-size: 0.68rem;
+
+        color: var(--text-muted);
+
+    }
+
+
+    .color-date {
+
+        font-size: 0.62rem;
+
+        color: var(--text-muted);
+
+        white-space: nowrap;
+
+    }
+
+
+    .color-controls {
+
+        display: flex;
+
+        align-items: center;
+
+        gap: 0.45rem;
+
+        flex-shrink: 0;
+
+    }
+
+
+    .color-counter {
+
+        min-width: 42px;
+
+        padding: 0.35rem 0.45rem;
+
+        text-align: center;
+
+        border-radius: 6px;
+
+        background:
+            rgba(20,25,34,0.9);
+
+        border:
+            1px solid rgba(255,153,0,0.35);
+
+        color: var(--glow-orange);
+
+        font-size: 0.85rem;
+
+        font-weight: bold;
+
+    }
+
+
+    /* ==========================
+       BOTÃO ADICIONAR +1
+       ========================== */
+
+    .btn-add-one {
+
+        background: transparent;
+
+        border:
+            1px solid var(--glow-green);
+
+        color: var(--glow-green);
+
+        border-radius: 6px;
+
+        padding: 0.35rem 0.65rem;
+
+        font-size: 0.7rem;
+
+        font-weight: bold;
+
+        cursor: pointer;
+
+        transition: 0.2s;
+
+        white-space: nowrap;
+
+    }
+
+
+    .btn-add-one:hover {
+
+        background: var(--glow-green);
+
+        color: #000;
+
+        box-shadow:
+            0 0 8px rgba(0,255,102,0.3);
+
+    }
+
+
+    /* ==========================
+       BOTÃO DIRECIONAR
+       ========================== */
+
+    .btn-output {
+
+        background: transparent;
+
+        border:
+            1px solid var(--glow-orange);
+
+        color: var(--glow-orange);
+
+        border-radius: 6px;
+
+        padding: 0.35rem 0.65rem;
+
+        font-size: 0.7rem;
+
+        font-weight: bold;
+
+        cursor: pointer;
+
+        transition: 0.2s;
+
+        white-space: nowrap;
+
+    }
+
+
+    .btn-output:hover:not(:disabled) {
+
+        background: var(--glow-orange);
+
+        color: #000;
+
+        box-shadow:
+            0 0 8px rgba(255,153,0,0.3);
+
+    }
+
+
+    .btn-output:disabled {
+
+        opacity: 0.25;
+
+        cursor: not-allowed;
+
+    }
+
+
+    /* ==========================
+       BOTÃO DESFAZER
+       ========================== */
+
+    .btn-undo {
+
+        background: transparent;
+
+        border:
+            1px solid var(--glow-red);
+
+        color: var(--glow-red);
+
+        border-radius: 6px;
+
+        padding: 0.35rem 0.6rem;
+
+        font-size: 0.68rem;
+
+        font-weight: bold;
+
+        cursor: pointer;
+
+        transition: 0.2s;
+
+        white-space: nowrap;
+
+    }
+
+
+    .btn-undo:hover:not(:disabled) {
+
+        background: var(--glow-red);
+
+        color: #000;
+
+        box-shadow:
+            0 0 8px rgba(255,51,102,0.3);
+
+    }
+
+
+    .btn-undo:disabled {
+
+        opacity: 0.25;
+
+        cursor: not-allowed;
+
+    }
+
+
+    /* ==========================
+       BOTÃO ZERAR ESTOQUE
+       ========================== */
+
+    .btn-zero {
+
+        background: transparent;
+
+        border:
+            1px solid #ff4444;
+
+        color: #ff4444;
+
+        border-radius: 6px;
+
+        padding: 0.35rem 0.6rem;
+
+        font-size: 0.68rem;
+
+        font-weight: bold;
+
+        cursor: pointer;
+
+        transition: 0.2s;
+
+        white-space: nowrap;
+
+    }
+
+
+    .btn-zero:hover:not(:disabled) {
+
+        background: #ff4444;
+
+        color: #000;
+
+        box-shadow:
+            0 0 8px rgba(255,68,68,0.35);
+
+    }
+
+
+    .btn-zero:disabled {
+
+        opacity: 0.25;
+
+        cursor: not-allowed;
+
+    }
+
+
+    /* ==========================
+       CORES DOS NOMES
+       ========================== */
+
+    .nome-amarelo {
+
+        color: var(--yellow);
+
+    }
+
+
+    .nome-magenta {
+
+        color: var(--magenta);
+
+    }
+
+
+    .nome-cyano {
+
+        color: var(--cyan);
+
+    }
+
+
+    .nome-preto {
+
+        color: #ffffff;
+
+    }
+
+
+    /* ==========================
+       NAVEGAÇÃO
+       ========================== */
+
+    .bottom-nav {
+
+        position: sticky;
+
+        bottom:
+            calc(
+                0.6rem +
+                env(safe-area-inset-bottom)
+            );
+
+        align-self: center;
+
+        margin-top: auto;
+
+        display: flex;
+
+        gap: 2rem;
+
+        background:
+            rgba(10,14,20,0.97);
+
+        padding: 0.55rem 1.8rem;
+
+        border-radius: 30px;
+
+        border:
+            1px solid rgba(0,243,255,0.2);
+
+        backdrop-filter: blur(10px);
+
+        z-index: 10;
+
+        width: max-content;
+
+        box-shadow:
+            0 8px 24px rgba(0,0,0,0.35);
+
+    }
+
+
+    .nav-btn {
+
+        background: none;
+
+        border: none;
+
+        color: var(--text-main);
+
+        font-size: 1.2rem;
+
+        cursor: pointer;
+
+        transition: 0.2s;
+
+    }
+
+
+    .nav-btn:hover {
+
+        color: var(--glow-cyan);
+
+        transform: scale(1.05);
+
+    }
+
+
+    /* ==========================
+       TOAST
+       ========================== */
+
+    .toast {
+
+        position: fixed;
+
+        left: 50%;
+
+        bottom:
+            calc(
+                1rem +
+                env(safe-area-inset-bottom)
+            );
+
+        transform:
+            translate(-50%,150%);
+
+        width: min(92vw,430px);
+
+        padding: 0.9rem 1rem;
+
+        border-radius: 12px;
+
+        background:
+            rgba(20,25,34,0.98);
+
+        border:
+            1px solid var(--glow-cyan);
+
+        color: #fff;
+
+        text-align: center;
+
+        font-weight: 700;
+
+        z-index: 9999;
+
+        transition:
+            transform .25s ease;
+
+        box-shadow:
+            0 0 18px rgba(0,243,255,.18);
+
+    }
+
+
+    .toast.show {
+
+        transform:
+            translate(-50%,0);
+
+    }
+
+
+    .toast.error {
+
+        border-color:
+            var(--glow-red);
+
+    }
+
+
+    /* ==========================
+       MOBILE
+       ========================== */
+
+    @media (max-width: 560px) {
+
+        .color-row {
+
+            align-items: stretch;
+
+            flex-direction: column;
+
+            gap: 0.55rem;
+
+        }
+
+
+        .color-controls {
+
+            width: 100%;
+
+            justify-content: space-between;
+
+            flex-wrap: wrap;
+
+        }
+
+
+        .color-counter {
+
+            min-width: 50px;
+
+        }
+
+
+        .btn-add-one,
+        .btn-output,
+        .btn-undo,
+        .btn-zero {
+
+            flex: 1;
+
+            min-height: 40px;
+
+        }
+
+    }
+
+
+    @media (max-width: 480px) {
+
+        .app-container {
+
+            max-width: 100%;
+
+            border: none;
+
+            border-radius: 0;
+
+            padding:
+                1rem 0.8rem;
+
+            min-height: 100dvh;
+
+        }
+
+
+        h1 {
+
+            font-size: 1.2rem;
+
+        }
+
+
+        .color-row {
+
+            padding:
+                0.55rem 0.6rem;
+
+        }
+
+    }
+
+
+    /* ==========================
+       CELULARES MUITO PEQUENOS
+       Mantém os controles compactos
+       ========================== */
+
+    @media (max-width: 380px) {
+
+        .color-controls {
+
+            gap: 0.3rem;
+
+        }
+
+
+        .btn-add-one,
+        .btn-output,
+        .btn-undo,
+        .btn-zero {
+
+            padding:
+                0.3rem 0.35rem;
+
+            font-size:
+                0.62rem;
+
+        }
+
+
+        .color-counter {
+
+            min-width: 42px;
+
+        }
+
+    }
+
+</style>
+
+</head>
+
+<body>
+
+<div class="app-container">
+
+
+<main style="
+    display:flex;
+    flex-direction:column;
+    flex:1;
+">
+
+
+    <header>
+
+        <h1>
+            Toner Cartaz
+        </h1>
+
+    </header>
+
+
+    <!-- ============================== -->
+    <!-- ESTOQUE -->
+    <!-- ============================== -->
+
+    <div class="sub-panel">
+
+        <h3>
+            Estoque
+        </h3>
+
+
+        <div class="color-list">
+
+
+            <!-- ====================== -->
+            <!-- AMARELO -->
+            <!-- ====================== -->
+
+            <div class="color-row">
+
+                <div class="color-info">
+
+                    <span class="color-name nome-amarelo">
+                        AMARELO
+                    </span>
+
+                    <span class="color-usage">
+
+                        Saldo:
+                        <strong id="saldo-toner-amarelo">
+                            0
+                        </strong>
+                        unidades
+
+                    </span>
+
+                    <span
+                        class="color-date"
+                        id="entrada-toner-amarelo"
+                    >
+                        Última entrada: -
+
+                    </span>
+
+                </div>
+
+
+                <div class="color-controls">
+
+                    <span
+                        class="color-counter"
+                        id="contador-estoque-amarelo"
+                    >
+                        0
+                    </span>
+
+
+                    <button
+                        class="btn-add-one"
+                        onclick="adicionarToner('amarelo')"
+                    >
+                        +1 ADICIONAR
+                    </button>
+
+
+                    <button
+                        class="btn-undo"
+                        id="btn-desfazer-entrada-amarelo"
+                        onclick="desfazerEntradaToner('amarelo')"
+                        disabled
+                    >
+                        DESFAZER
+                    </button>
+
+
+                    <button
+                        class="btn-zero"
+                        id="btn-zerar-amarelo"
+                        onclick="zerarEstoqueToner('amarelo')"
+                        disabled
+                    >
+                        ZERAR
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <!-- ====================== -->
+            <!-- MAGENTA -->
+            <!-- ====================== -->
+
+            <div class="color-row">
+
+                <div class="color-info">
+
+                    <span class="color-name nome-magenta">
+                        MAGENTA
+                    </span>
+
+                    <span class="color-usage">
+
+                        Saldo:
+                        <strong id="saldo-toner-magenta">
+                            0
+                        </strong>
+                        unidades
+
+                    </span>
+
+                    <span
+                        class="color-date"
+                        id="entrada-toner-magenta"
+                    >
+                        Última entrada: -
+
+                    </span>
+
+                </div>
+
+
+                <div class="color-controls">
+
+                    <span
+                        class="color-counter"
+                        id="contador-estoque-magenta"
+                    >
+                        0
+                    </span>
+
+
+                    <button
+                        class="btn-add-one"
+                        onclick="adicionarToner('magenta')"
+                    >
+                        +1 ADICIONAR
+                    </button>
+
+
+                    <button
+                        class="btn-undo"
+                        id="btn-desfazer-entrada-magenta"
+                        onclick="desfazerEntradaToner('magenta')"
+                        disabled
+                    >
+                        DESFAZER
+                    </button>
+
+
+                    <button
+                        class="btn-zero"
+                        id="btn-zerar-magenta"
+                        onclick="zerarEstoqueToner('magenta')"
+                        disabled
+                    >
+                        ZERAR
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <!-- ====================== -->
+            <!-- CYANO -->
+            <!-- ====================== -->
+
+            <div class="color-row">
+
+                <div class="color-info">
+
+                    <span class="color-name nome-cyano">
+                        CYANO
+                    </span>
+
+                    <span class="color-usage">
+
+                        Saldo:
+                        <strong id="saldo-toner-cyano">
+                            0
+                        </strong>
+                        unidades
+
+                    </span>
+
+                    <span
+                        class="color-date"
+                        id="entrada-toner-cyano"
+                    >
+                        Última entrada: -
+
+                    </span>
+
+                </div>
+
+
+                <div class="color-controls">
+
+                    <span
+                        class="color-counter"
+                        id="contador-estoque-cyano"
+                    >
+                        0
+                    </span>
+
+
+                    <button
+                        class="btn-add-one"
+                        onclick="adicionarToner('cyano')"
+                    >
+                        +1 ADICIONAR
+                    </button>
+
+
+                    <button
+                        class="btn-undo"
+                        id="btn-desfazer-entrada-cyano"
+                        onclick="desfazerEntradaToner('cyano')"
+                        disabled
+                    >
+                        DESFAZER
+                    </button>
+
+
+                    <button
+                        class="btn-zero"
+                        id="btn-zerar-cyano"
+                        onclick="zerarEstoqueToner('cyano')"
+                        disabled
+                    >
+                        ZERAR
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <!-- ====================== -->
+            <!-- PRETO -->
+            <!-- ====================== -->
+
+            <div class="color-row">
+
+                <div class="color-info">
+
+                    <span class="color-name nome-preto">
+                        PRETO
+                    </span>
+
+                    <span class="color-usage">
+
+                        Saldo:
+                        <strong id="saldo-toner-preto">
+                            0
+                        </strong>
+                        unidades
+
+                    </span>
+
+                    <span
+                        class="color-date"
+                        id="entrada-toner-preto"
+                    >
+                        Última entrada: -
+
+                    </span>
+
+                </div>
+
+
+                <div class="color-controls">
+
+                    <span
+                        class="color-counter"
+                        id="contador-estoque-preto"
+                    >
+                        0
+                    </span>
+
+
+                    <button
+                        class="btn-add-one"
+                        onclick="adicionarToner('preto')"
+                    >
+                        +1 ADICIONAR
+                    </button>
+
+
+                    <button
+                        class="btn-undo"
+                        id="btn-desfazer-entrada-preto"
+                        onclick="desfazerEntradaToner('preto')"
+                        disabled
+                    >
+                        DESFAZER
+                    </button>
+
+
+                    <button
+                        class="btn-zero"
+                        id="btn-zerar-preto"
+                        onclick="zerarEstoqueToner('preto')"
+                        disabled
+                    >
+                        ZERAR
+                    </button>
+
+                </div>
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+
+    <!-- ============================== -->
+    <!-- SAÍDA -->
+    <!-- ============================== -->
+
+    <div class="sub-panel">
+
+        <h3>
+            Saída
+        </h3>
+
+
+        <div class="color-list">
+
+
+            <!-- ====================== -->
+            <!-- AMARELO -->
+            <!-- ====================== -->
+
+            <div class="color-row">
+
+                <div class="color-info">
+
+                    <span class="color-name nome-amarelo">
+                        AMARELO
+                    </span>
+
+                    <span class="color-usage">
+
+                        Utilizado:
+                        <strong id="uso-toner-amarelo">
+                            0
+                        </strong>
+                        unidades
+
+                    </span>
+
+                    <span
+                        class="color-date"
+                        id="data-toner-amarelo"
+                    >
+                        Último: -
+
+                    </span>
+
+                </div>
+
+
+                <div class="color-controls">
+
+                    <span
+                        class="color-counter"
+                        id="contador-saida-amarelo"
+                    >
+                        0
+                    </span>
+
+
+                    <button
+                        class="btn-output"
+                        id="btn-direcionar-amarelo"
+                        onclick="direcionarToner('amarelo')"
+                    >
+                        DIRECIONAR
+                    </button>
+
+
+                    <button
+                        class="btn-undo"
+                        id="btn-desfazer-amarelo"
+                        onclick="desfazerToner('amarelo')"
+                        disabled
+                    >
+                        DESFAZER
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <!-- ====================== -->
+            <!-- MAGENTA -->
+            <!-- ====================== -->
+
+            <div class="color-row">
+
+                <div class="color-info">
+
+                    <span class="color-name nome-magenta">
+                        MAGENTA
+                    </span>
+
+                    <span class="color-usage">
+
+                        Utilizado:
+                        <strong id="uso-toner-magenta">
+                            0
+                        </strong>
+                        unidades
+
+                    </span>
+
+                    <span
+                        class="color-date"
+                        id="data-toner-magenta"
+                    >
+                        Último: -
+
+                    </span>
+
+                </div>
+
+
+                <div class="color-controls">
+
+                    <span
+                        class="color-counter"
+                        id="contador-saida-magenta"
+                    >
+                        0
+                    </span>
+
+
+                    <button
+                        class="btn-output"
+                        id="btn-direcionar-magenta"
+                        onclick="direcionarToner('magenta')"
+                    >
+                        DIRECIONAR
+                    </button>
+
+
+                    <button
+                        class="btn-undo"
+                        id="btn-desfazer-magenta"
+                        onclick="desfazerToner('magenta')"
+                        disabled
+                    >
+                        DESFAZER
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <!-- ====================== -->
+            <!-- CYANO -->
+            <!-- ====================== -->
+
+            <div class="color-row">
+
+                <div class="color-info">
+
+                    <span class="color-name nome-cyano">
+                        CYANO
+                    </span>
+
+                    <span class="color-usage">
+
+                        Utilizado:
+                        <strong id="uso-toner-cyano">
+                            0
+                        </strong>
+                        unidades
+
+                    </span>
+
+                    <span
+                        class="color-date"
+                        id="data-toner-cyano"
+                    >
+                        Último: -
+
+                    </span>
+
+                </div>
+
+
+                <div class="color-controls">
+
+                    <span
+                        class="color-counter"
+                        id="contador-saida-cyano"
+                    >
+                        0
+                    </span>
+
+
+                    <button
+                        class="btn-output"
+                        id="btn-direcionar-cyano"
+                        onclick="direcionarToner('cyano')"
+                    >
+                        DIRECIONAR
+                    </button>
+
+
+                    <button
+                        class="btn-undo"
+                        id="btn-desfazer-cyano"
+                        onclick="desfazerToner('cyano')"
+                        disabled
+                    >
+                        DESFAZER
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <!-- ====================== -->
+            <!-- PRETO -->
+            <!-- ====================== -->
+
+            <div class="color-row">
+
+                <div class="color-info">
+
+                    <span class="color-name nome-preto">
+                        PRETO
+                    </span>
+
+                    <span class="color-usage">
+
+                        Utilizado:
+                        <strong id="uso-toner-preto">
+                            0
+                        </strong>
+                        unidades
+
+                    </span>
+
+                    <span
+                        class="color-date"
+                        id="data-toner-preto"
+                    >
+                        Último: -
+
+                    </span>
+
+                </div>
+
+
+                <div class="color-controls">
+
+                    <span
+                        class="color-counter"
+                        id="contador-saida-preto"
+                    >
+                        0
+                    </span>
+
+
+                    <button
+                        class="btn-output"
+                        id="btn-direcionar-preto"
+                        onclick="direcionarToner('preto')"
+                    >
+                        DIRECIONAR
+                    </button>
+
+
+                    <button
+                        class="btn-undo"
+                        id="btn-desfazer-preto"
+                        onclick="desfazerToner('preto')"
+                        disabled
+                    >
+                        DESFAZER
+                    </button>
+
+                </div>
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+
+    <!-- ============================== -->
+    <!-- NAVEGAÇÃO -->
+    <!-- ============================== -->
+
+    <nav class="bottom-nav">
+
+        <button
+            class="nav-btn"
+            onclick="window.location.href='index.html'"
+            title="Voltar ao CPD851"
+        >
+
+            <i class="fa-solid fa-house"></i>
+
+        </button>
+
+    </nav>
+
+
+</main>
+
+</div>
+
+
+<!-- ============================== -->
+<!-- TOAST -->
+<!-- ============================== -->
+
+<div
+    id="toast"
+    class="toast"
+    role="status"
+    aria-live="polite"
+></div>
+
+
+<!-- ============================== -->
+<!-- FIREBASE -->
+<!-- ============================== -->
+
+<script type="module">
+
+    import {
+        initializeApp
+    }
+    from
+    "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+
+
+    import {
+        initializeFirestore,
+        doc,
+        setDoc,
+        onSnapshot
+    }
+    from
+    "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+
+    const firebaseConfig = {
+
+        apiKey:
+            "AIzaSyA3odYvjY7mcWsCTvGcDKxoccz1qYSg_NE",
+
+        authDomain:
+            "estoque-84295.firebaseapp.com",
+
+        projectId:
+            "estoque-84295",
+
+        storageBucket:
+            "estoque-84295.firebasestorage.app",
+
+        messagingSenderId:
+            "704104486696",
+
+        appId:
+            "1:704104486696:web:2be634dfc63baef31c221d",
+
+        measurementId:
+            "G-D31RQ19END"
+
+    };
+
+
+    const app =
+        initializeApp(firebaseConfig);
+
+
+    const db =
+        initializeFirestore(app, {
+
+            experimentalForceLongPolling: true,
+
+            useFetchStreams: false
+
+        });
+
+
+    /*
+     * =========================================
+     * REFERÊNCIA DO FIRESTORE
+     * =========================================
+     */
+
+    const controleRef =
+        doc(
+            db,
+            "controle",
+            "geral"
+        );
+
+
+    /*
+     * =========================================
+     * ESTADO LOCAL
+     * =========================================
+     */
+
+    let estoqueToner = {
+
+        amarelo: {
+
+            saldo: 0,
+
+            ultimaEntrada: "-",
+
+            total: 0,
+
+            ultimaData: "-",
+
+            historico: [],
+
+            historicoEntradas: []
+
+        },
+
+
+        magenta: {
+
+            saldo: 0,
+
+            ultimaEntrada: "-",
+
+            total: 0,
+
+            ultimaData: "-",
+
+            historico: [],
+
+            historicoEntradas: []
+
+        },
+
+
+        cyano: {
+
+            saldo: 0,
+
+            ultimaEntrada: "-",
+
+            total: 0,
+
+            ultimaData: "-",
+
+            historico: [],
+
+            historicoEntradas: []
+
+        },
+
+
+        preto: {
+
+            saldo: 0,
+
+            ultimaEntrada: "-",
+
+            total: 0,
+
+            ultimaData: "-",
+
+            historico: [],
+
+            historicoEntradas: []
+
+        }
+
+    };
+
+
+    let toastTimer;
+
+
+    /*
+     * =========================================
+     * TOAST
+     * =========================================
+     */
+
+    function mostrarToast(
+        mensagem,
+        erro = false
+    ) {
+
+        const toast =
+            document.getElementById("toast");
+
+
+        if (!toast) return;
+
+
+        toast.textContent =
+            mensagem;
+
+
+        toast.classList.toggle(
+            "error",
+            erro
+        );
+
+
+        toast.classList.add(
+            "show"
+        );
+
+
+        clearTimeout(
+            toastTimer
+        );
+
+
+        toastTimer =
+            setTimeout(() => {
+
+                toast.classList.remove(
+                    "show"
+                );
+
+            }, 2600);
+
+    }
+
+
+    /*
+     * =========================================
+     * DATA / HORA
+     * =========================================
+     */
+
+    function obterDataFormatada() {
+
+        const agora =
+            new Date();
+
+
+        const dia =
+            String(
+                agora.getDate()
+            ).padStart(2, "0");
+
+
+        const mes =
+            String(
+                agora.getMonth() + 1
+            ).padStart(2, "0");
+
+
+        const ano =
+            agora.getFullYear();
+
+
+        const horas =
+            String(
+                agora.getHours()
+            ).padStart(2, "0");
+
+
+        const minutos =
+            String(
+                agora.getMinutes()
+            ).padStart(2, "0");
+
+
+        return `${dia}/${mes}/${ano} ${horas}:${minutos}`;
+
+    }
+
+
+    /*
+     * =========================================
+     * ATUALIZAR TELA
+     * =========================================
+     */
+
+    function atualizarTela() {
+
+        const cores = [
+            "amarelo",
+            "magenta",
+            "cyano",
+            "preto"
+        ];
+
+
+        cores.forEach(
+            (cor) => {
+
+                const dados =
+                    estoqueToner[cor];
+
+
+                const saldo =
+                    Number(
+                        dados.saldo || 0
+                    );
+
+
+                const total =
+                    Number(
+                        dados.total || 0
+                    );
+
+
+                /*
+                 * SALDO
+                 */
+
+                const saldoTexto =
+                    document.getElementById(
+                        `saldo-toner-${cor}`
+                    );
+
+
+                if (saldoTexto) {
+
+                    saldoTexto.innerText =
+                        saldo;
+
+                }
+
+
+                const contadorEstoque =
+                    document.getElementById(
+                        `contador-estoque-${cor}`
+                    );
+
+
+                if (contadorEstoque) {
+
+                    contadorEstoque.innerText =
+                        saldo;
+
+                }
+
+
+                /*
+                 * ÚLTIMA ENTRADA
+                 */
+
+                const entrada =
+                    document.getElementById(
+                        `entrada-toner-${cor}`
+                    );
+
+
+                if (entrada) {
+
+                    entrada.innerText =
+                        `Última entrada: ${
+                            dados.ultimaEntrada || "-"
+                        }`;
+
+                }
+
+
+                /*
+                 * TOTAL UTILIZADO
+                 */
+
+                const uso =
+                    document.getElementById(
+                        `uso-toner-${cor}`
+                    );
+
+
+                if (uso) {
+
+                    uso.innerText =
+                        total;
+
+                }
+
+
+                const contadorSaida =
+                    document.getElementById(
+                        `contador-saida-${cor}`
+                    );
+
+
+                if (contadorSaida) {
+
+                    contadorSaida.innerText =
+                        total;
+
+                }
+
+
+                /*
+                 * ÚLTIMA SAÍDA
+                 */
+
+                const data =
+                    document.getElementById(
+                        `data-toner-${cor}`
+                    );
+
+
+                if (data) {
+
+                    data.innerText =
+                        `Último: ${
+                            dados.ultimaData || "-"
+                        }`;
+
+                }
+
+
+                /*
+                 * BOTÃO DIRECIONAR
+                 */
+
+                const botaoDirecionar =
+                    document.getElementById(
+                        `btn-direcionar-${cor}`
+                    );
+
+
+                if (botaoDirecionar) {
+
+                    botaoDirecionar.disabled =
+                        saldo <= 0;
+
+                }
+
+
+                /*
+                 * BOTÃO DESFAZER SAÍDA
+                 */
+
+                const botaoDesfazer =
+                    document.getElementById(
+                        `btn-desfazer-${cor}`
+                    );
+
+
+                if (botaoDesfazer) {
+
+                    botaoDesfazer.disabled =
+                        total <= 0;
+
+                }
+
+
+                /*
+                 * BOTÃO DESFAZER ENTRADA
+                 */
+
+                const botaoDesfazerEntrada =
+                    document.getElementById(
+                        `btn-desfazer-entrada-${cor}`
+                    );
+
+
+                if (botaoDesfazerEntrada) {
+
+                    const entradas =
+                        Array.isArray(
+                            dados.historicoEntradas
+                        )
+                            ? dados.historicoEntradas
+                            : [];
+
+
+                    botaoDesfazerEntrada.disabled =
+                        entradas.length <= 0 ||
+                        saldo <= 0;
+
+                }
+
+
+                /*
+                 * BOTÃO ZERAR ESTOQUE
+                 */
+
+                const botaoZerar =
+                    document.getElementById(
+                        `btn-zerar-${cor}`
+                    );
+
+
+                if (botaoZerar) {
+
+                    botaoZerar.disabled =
+                        saldo <= 0;
+
+                }
+
+            }
+        );
+
+    }
+
+
+    /*
+     * =========================================
+     * FIRESTORE - SINCRONIZAÇÃO
+     * =========================================
+     */
+
+    onSnapshot(
+
+        controleRef,
+
+        (snapshot) => {
+
+            if (!snapshot.exists()) {
+
+                atualizarTela();
+
+                return;
+
+            }
+
+
+            const dados =
+                snapshot.data();
+
+
+            const toner =
+                dados.toner_cartaz || {};
+
+
+            const cores = [
+                "amarelo",
+                "magenta",
+                "cyano",
+                "preto"
+            ];
+
+
+            cores.forEach(
+                (cor) => {
+
+                    const atual =
+                        toner[cor] || {};
+
+
+                    estoqueToner[cor] = {
+
+                        saldo:
+                            Number(
+                                atual.saldo || 0
+                            ),
+
+
+                        ultimaEntrada:
+                            atual.ultimaEntrada || "-",
+
+
+                        total:
+                            Number(
+                                atual.total || 0
+                            ),
+
+
+                        ultimaData:
+                            atual.ultimaData || "-",
+
+
+                        /*
+                         * Histórico de SAÍDAS
+                         */
+
+                        historico:
+                            Array.isArray(
+                                atual.historico
+                            )
+                                ? [
+                                    ...atual.historico
+                                ]
+                                : [],
+
+
+                        /*
+                         * Histórico de ENTRADAS
+                         */
+
+                        historicoEntradas:
+                            Array.isArray(
+                                atual.historicoEntradas
+                            )
+                                ? [
+                                    ...atual.historicoEntradas
+                                ]
+                                : []
+
+                    };
+
+                }
+            );
+
+
+            atualizarTela();
+
+        },
+
+
+        (erro) => {
+
+            console.error(
+                "Erro na sincronização:",
+                erro
+            );
+
+
+            mostrarToast(
+                "Falha na conexão com o banco.",
+                true
+            );
+
+        }
+
+    );
+
+
+    /*
+     * =========================================
+     * ADICIONAR 1 UNIDADE
+     * =========================================
+     */
+
+    window.adicionarToner =
+        async function(cor) {
+
+            const dados =
+                estoqueToner[cor];
+
+
+            const novoSaldo =
+                Number(
+                    dados.saldo || 0
+                ) + 1;
+
+
+            const dataAtual =
+                obterDataFormatada();
+
+
+            const historicoEntradas =
+                Array.isArray(
+                    dados.historicoEntradas
+                )
+                    ? [
+                        ...dados.historicoEntradas,
+                        dataAtual
+                    ]
+                    : [
+                        dataAtual
+                    ];
+
+
+            try {
+
+                await setDoc(
+
+                    controleRef,
+
+                    {
+
+                        toner_cartaz: {
+
+                            [cor]: {
+
+                                saldo:
+                                    novoSaldo,
+
+
+                                ultimaEntrada:
+                                    dataAtual,
+
+
+                                total:
+                                    Number(
+                                        dados.total || 0
+                                    ),
+
+
+                                ultimaData:
+                                    dados.ultimaData || "-",
+
+
+                                historico:
+                                    Array.isArray(
+                                        dados.historico
+                                    )
+                                        ? dados.historico
+                                        : [],
+
+
+                                historicoEntradas:
+                                    historicoEntradas
+
+                            }
+
+                        }
+
+                    },
+
+                    {
+                        merge: true
+                    }
+
+                );
+
+
+                mostrarToast(
+                    `✓ +1 toner ${cor.toUpperCase()} adicionado`
+                );
+
+            }
+
+            catch (erro) {
+
+                console.error(
+                    "Erro ao adicionar toner:",
+                    erro
+                );
+
+
+                mostrarToast(
+                    `Erro ao salvar: ${
+                        erro.code ||
+                        erro.message
+                    }`,
+                    true
+                );
+
+            }
+
+        };
+
+
+    /*
+     * =========================================
+     * DESFAZER ENTRADA
+     * =========================================
+     */
+
+    window.desfazerEntradaToner =
+        async function(cor) {
+
+            const dados =
+                estoqueToner[cor];
+
+
+            const saldoAtual =
+                Number(
+                    dados.saldo || 0
+                );
+
+
+            const historicoEntradas =
+                Array.isArray(
+                    dados.historicoEntradas
+                )
+                    ? [
+                        ...dados.historicoEntradas
+                    ]
+                    : [];
+
+
+            if (
+                historicoEntradas.length <= 0
+            ) {
+
+                mostrarToast(
+                    `Nenhuma entrada de ${cor.toUpperCase()} para desfazer.`,
+                    true
+                );
+
+                return;
+
+            }
+
+
+            if (
+                saldoAtual <= 0
+            ) {
+
+                mostrarToast(
+                    `Não é possível desfazer: ${cor.toUpperCase()} já foi utilizado.`,
+                    true
+                );
+
+                return;
+
+            }
+
+
+            historicoEntradas.pop();
+
+
+            const novoSaldo =
+                saldoAtual - 1;
+
+
+            const novaUltimaEntrada =
+                historicoEntradas.length > 0
+                    ? historicoEntradas[
+                        historicoEntradas.length - 1
+                    ]
+                    : "-";
+
+
+            try {
+
+                await setDoc(
+
+                    controleRef,
+
+                    {
+
+                        toner_cartaz: {
+
+                            [cor]: {
+
+                                saldo:
+                                    novoSaldo,
+
+
+                                ultimaEntrada:
+                                    novaUltimaEntrada,
+
+
+                                total:
+                                    Number(
+                                        dados.total || 0
+                                    ),
+
+
+                                ultimaData:
+                                    dados.ultimaData || "-",
+
+
+                                historico:
+                                    Array.isArray(
+                                        dados.historico
+                                    )
+                                        ? dados.historico
+                                        : [],
+
+
+                                historicoEntradas:
+                                    historicoEntradas
+
+                            }
+
+                        }
+
+                    },
+
+                    {
+                        merge: true
+                    }
+
+                );
+
+
+                mostrarToast(
+                    `↩ Última entrada de ${cor.toUpperCase()} desfeita`
+                );
+
+            }
+
+            catch (erro) {
+
+                console.error(
+                    "Erro ao desfazer entrada:",
+                    erro
+                );
+
+
+                mostrarToast(
+                    `Erro ao desfazer: ${
+                        erro.code ||
+                        erro.message
+                    }`,
+                    true
+                );
+
+            }
+
+        };
+
+
+    /*
+     * =========================================
+     * DIRECIONAR 1 UNIDADE
+     * =========================================
+     */
+
+    window.direcionarToner =
+        async function(cor) {
+
+            const dados =
+                estoqueToner[cor];
+
+
+            const saldoAtual =
+                Number(
+                    dados.saldo || 0
+                );
+
+
+            if (
+                saldoAtual <= 0
+            ) {
+
+                mostrarToast(
+                    `Estoque ${cor.toUpperCase()} zerado.`,
+                    true
+                );
+
+                return;
+
+            }
+
+
+            const novoSaldo =
+                saldoAtual - 1;
+
+
+            const novoTotal =
+                Number(
+                    dados.total || 0
+                ) + 1;
+
+
+            const dataAtual =
+                obterDataFormatada();
+
+
+            const historico =
+                Array.isArray(
+                    dados.historico
+                )
+                    ? [
+                        ...dados.historico,
+                        dataAtual
+                    ]
+                    : [
+                        dataAtual
+                    ];
+
+
+            try {
+
+                await setDoc(
+
+                    controleRef,
+
+                    {
+
+                        toner_cartaz: {
+
+                            [cor]: {
+
+                                saldo:
+                                    novoSaldo,
+
+
+                                ultimaEntrada:
+                                    dados.ultimaEntrada || "-",
+
+
+                                total:
+                                    novoTotal,
+
+
+                                ultimaData:
+                                    dataAtual,
+
+
+                                historico:
+                                    historico,
+
+
+                                historicoEntradas:
+                                    Array.isArray(
+                                        dados.historicoEntradas
+                                    )
+                                        ? dados.historicoEntradas
+                                        : []
+
+                            }
+
+                        }
+
+                    },
+
+                    {
+                        merge: true
+                    }
+
+                );
+
+
+                mostrarToast(
+                    `✓ 1 ${cor.toUpperCase()} direcionado`
+                );
+
+            }
+
+            catch (erro) {
+
+                console.error(
+                    "Erro ao direcionar toner:",
+                    erro
+                );
+
+
+                mostrarToast(
+                    `Erro ao salvar: ${
+                        erro.code ||
+                        erro.message
+                    }`,
+                    true
+                );
+
+            }
+
+        };
+
+
+    /*
+     * =========================================
+     * DESFAZER 1 SAÍDA
+     * =========================================
+     */
+
+    window.desfazerToner =
+        async function(cor) {
+
+            const dados =
+                estoqueToner[cor];
+
+
+            const totalAtual =
+                Number(
+                    dados.total || 0
+                );
+
+
+            if (
+                totalAtual <= 0
+            ) {
+
+                mostrarToast(
+                    `Nenhuma saída de ${cor.toUpperCase()} para desfazer.`,
+                    true
+                );
+
+                return;
+
+            }
+
+
+            let historico =
+                Array.isArray(
+                    dados.historico
+                )
+                    ? [
+                        ...dados.historico
+                    ]
+                    : [];
+
+
+            if (
+                historico.length > 0
+            ) {
+
+                historico.pop();
+
+            }
+
+
+            const novoTotal =
+                totalAtual - 1;
+
+
+            const novaUltimaData =
+                historico.length > 0
+                    ? historico[
+                        historico.length - 1
+                    ]
+                    : "-";
+
+
+            const novoSaldo =
+                Number(
+                    dados.saldo || 0
+                ) + 1;
+
+
+            try {
+
+                await setDoc(
+
+                    controleRef,
+
+                    {
+
+                        toner_cartaz: {
+
+                            [cor]: {
+
+                                saldo:
+                                    novoSaldo,
+
+
+                                ultimaEntrada:
+                                    dados.ultimaEntrada || "-",
+
+
+                                total:
+                                    novoTotal,
+
+
+                                ultimaData:
+                                    novaUltimaData,
+
+
+                                historico:
+                                    historico,
+
+
+                                historicoEntradas:
+                                    Array.isArray(
+                                        dados.historicoEntradas
+                                    )
+                                        ? dados.historicoEntradas
+                                        : []
+
+                            }
+
+                        }
+
+                    },
+
+                    {
+                        merge: true
+                    }
+
+                );
+
+
+                mostrarToast(
+                    `↩ 1 ${cor.toUpperCase()} devolvido ao estoque`
+                );
+
+            }
+
+            catch (erro) {
+
+                console.error(
+                    "Erro ao desfazer saída:",
+                    erro
+                );
+
+
+                mostrarToast(
+                    `Erro ao desfazer: ${
+                        erro.code ||
+                        erro.message
+                    }`,
+                    true
+                );
+
+            }
+
+        };
+
+
+    /*
+     * =========================================
+     * ZERAR ESTOQUE
+     * =========================================
+     */
+
+    window.zerarEstoqueToner =
+        async function(cor) {
+
+            const dados =
+                estoqueToner[cor];
+
+
+            const saldoAtual =
+                Number(
+                    dados.saldo || 0
+                );
+
+
+            /*
+             * Já está zerado
+             */
+
+            if (
+                saldoAtual <= 0
+            ) {
+
+                mostrarToast(
+                    `Estoque ${cor.toUpperCase()} já está zerado.`,
+                    true
+                );
+
+                return;
+
+            }
+
+
+            /*
+             * Confirmação
+             */
+
+            const confirmar =
+                confirm(
+
+                    `ZERAR ESTOQUE - ${cor.toUpperCase()}\n\n` +
+
+                    `Saldo atual: ${saldoAtual} unidade(s).\n\n` +
+
+                    `O estoque será alterado para ZERO.\n` +
+
+                    `O total de unidades já utilizadas será mantido.\n\n` +
+
+                    `Esta ação não poderá ser desfeita.\n\n` +
+
+                    `Deseja continuar?`
+
+                );
+
+
+            if (!confirmar) {
+
+                return;
+
+            }
+
+
+            try {
+
+                await setDoc(
+
+                    controleRef,
+
+                    {
+
+                        toner_cartaz: {
+
+                            [cor]: {
+
+                                /*
+                                 * ZERA SOMENTE
+                                 * O ESTOQUE
+                                 */
+
+                                saldo: 0,
+
+
+                                /*
+                                 * Limpa última
+                                 * entrada
+                                 */
+
+                                ultimaEntrada:
+                                    "-",
+
+
+                                /*
+                                 * Mantém total
+                                 * utilizado
+                                 */
+
+                                total:
+                                    Number(
+                                        dados.total || 0
+                                    ),
+
+
+                                /*
+                                 * Mantém última saída
+                                 */
+
+                                ultimaData:
+                                    dados.ultimaData || "-",
+
+
+                                /*
+                                 * Mantém histórico
+                                 * das saídas
+                                 */
+
+                                historico:
+                                    Array.isArray(
+                                        dados.historico
+                                    )
+                                        ? dados.historico
+                                        : [],
+
+
+                                /*
+                                 * Limpa histórico
+                                 * das entradas
+                                 */
+
+                                historicoEntradas:
+                                    []
+
+                            }
+
+                        }
+
+                    },
+
+                    {
+                        merge: true
+                    }
+
+                );
+
+
+                mostrarToast(
+                    `✓ Estoque ${cor.toUpperCase()} zerado`
+                );
+
+            }
+
+            catch (erro) {
+
+                console.error(
+                    "Erro ao zerar estoque:",
+                    erro
+                );
+
+
+                mostrarToast(
+                    `Erro ao zerar: ${
+                        erro.code ||
+                        erro.message
+                    }`,
+                    true
+                );
+
+            }
+
+        };
+
+</script>
+
+</body>
+
+</html>

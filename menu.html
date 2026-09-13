@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0b1117">
+
+  <title>Impressoras | CPD851</title>
+
+  <style>
+    :root {
+      --bg: #0b1117;
+      --panel: #101820;
+      --panel2: #0d151d;
+
+      --cyan: #00eaff;
+      --green: #00ff9c;
+      --orange: #ffb300;
+      --red: #ff4567;
+      --purple: #b56cff;
+
+      --text: #e7f7ff;
+      --muted: #71808d;
+
+      --border: rgba(0, 234, 255, .22);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      min-height: 100%;
+      background: #05090d;
+    }
+
+    body {
+      min-height: 100vh;
+
+      background:
+        radial-gradient(
+          circle at 50% -10%,
+          rgba(0,234,255,.08),
+          transparent 35%
+        ),
+        #05090d;
+
+      color: var(--text);
+
+      font-family: Arial, Helvetica, sans-serif;
+
+      display: flex;
+      justify-content: center;
+    }
+
+    /* =========================
+       APLICATIVO
+    ========================== */
+
+    .app {
+      width: 100%;
+      max-width: 430px;
+      min-height: 100vh;
+
+      padding: 14px 12px 78px;
+
+      background:
+        radial-gradient(
+          circle at 50% 0%,
+          rgba(0,234,255,.035),
+          transparent 30%
+        ),
+        var(--bg);
+
+      box-shadow:
+        0 0 45px rgba(0,0,0,.55),
+        0 0 25px rgba(0,234,255,.04);
+    }
+
+    /* =========================
+       HEADER
+    ========================== */
+
+    header {
+      position: relative;
+
+      padding: 16px;
+
+      margin-bottom: 15px;
+
+      background:
+        linear-gradient(
+          145deg,
+          rgba(0,234,255,.06),
+          rgba(0,255,156,.025)
+        ),
+        var(--panel);
+
+      border:
+        1px solid var(--border);
+
+      border-radius: 13px;
+
+      overflow: hidden;
+
+      box-shadow:
+        0 0 25px rgba(0,234,255,.07);
+    }
+
+    header::before {
+      content: "";
+
+      position: absolute;
+
+      top: 0;
+      left: 0;
+
+      width: 100%;
+      height: 2px;
+
+      background:
+        linear-gradient(
+          90deg,
+          transparent,
+          var(--cyan),
+          var(--green),
+          transparent
+        );
+    }
+
+    .system {
+      display: flex;
+      align-items: center;
+
+      gap: 7px;
+
+      margin-bottom: 7px;
+
+      color: var(--green);
+
+      font-size: 9px;
+      font-weight: bold;
+
+      letter-spacing: 2px;
+    }
+
+    .system-dot {
+      width: 6px;
+      height: 6px;
+
+      border-radius: 50%;
+
+      background: var(--green);
+
+      box-shadow:
+        0 0 10px var(--green);
+    }
+
+    h1 {
+      color: var(--cyan);
+
+      font-size: 25px;
+
+      letter-spacing: 3px;
+
+      text-shadow:
+        0 0 12px rgba(0,234,255,.25);
+    }
+
+    .subtitle {
+      margin-top: 5px;
+
+      color: #91a4b1;
+
+      font-size: 8px;
+
+      letter-spacing: 1.3px;
+
+      text-transform: uppercase;
+    }
+
+    /* =========================
+       TITULO DOS PORTAIS
+    ========================== */
+
+    .section-title {
+      display: flex;
+      align-items: center;
+
+      gap: 7px;
+
+      margin: 0 3px 8px;
+
+      color: var(--muted);
+
+      font-size: 9px;
+      font-weight: bold;
+
+      letter-spacing: 2px;
+
+      text-transform: uppercase;
+    }
+
+    .section-title::after {
+      content: "";
+
+      flex: 1;
+
+      height: 1px;
+
+      background:
+        rgba(255,255,255,.07);
+    }
+
+    /* =========================
+       GRID DOS PORTAIS
+    ========================== */
+
+    .portals {
+      display: grid;
+
+      grid-template-columns:
+        repeat(2, 1fr);
+
+      gap: 8px;
+    }
+
+    /* =========================
+       BOTÃO PORTAL
+    ========================== */
+
+    .portal {
+      position: relative;
+
+      min-height: 88px;
+
+      display: flex;
+
+      flex-direction: column;
+
+      justify-content: center;
+
+      align-items: center;
+
+      text-align: center;
+
+      padding: 10px;
+
+      background:
+        linear-gradient(
+          145deg,
+          rgba(255,255,255,.025),
+          rgba(255,255,255,.008)
+        ),
+        var(--panel2);
+
+      border:
+        1px solid rgba(0,234,255,.16);
+
+      border-radius: 11px;
+
+      color: var(--text);
+
+      text-decoration: none;
+
+      overflow: hidden;
+
+      transition:
+        transform .18s ease,
+        border-color .18s ease,
+        box-shadow .18s ease,
+        background .18s ease;
+    }
+
+    /* linha neon lateral */
+
+    .portal::before {
+      content: "";
+
+      position: absolute;
+
+      left: 0;
+      top: 0;
+      bottom: 0;
+
+      width: 2px;
+
+      background: var(--cyan);
+
+      box-shadow:
+        0 0 8px var(--cyan);
+
+      opacity: .8;
+    }
+
+    /* brilho superior */
+
+    .portal::after {
+      content: "";
+
+      position: absolute;
+
+      top: 0;
+      left: 15%;
+
+      width: 70%;
+      height: 1px;
+
+      background:
+        linear-gradient(
+          90deg,
+          transparent,
+          var(--cyan),
+          transparent
+        );
+
+      opacity: .5;
+    }
+
+    .portal:hover {
+      transform: translateY(-2px);
+
+      border-color:
+        rgba(0,234,255,.5);
+
+      background:
+        linear-gradient(
+          145deg,
+          rgba(0,234,255,.08),
+          rgba(0,255,156,.025)
+        ),
+        var(--panel2);
+
+      box-shadow:
+        0 0 18px rgba(0,234,255,.12);
+    }
+
+    .portal:active {
+      transform: scale(.97);
+    }
+
+    /* =========================
+       ICONE
+    ========================== */
+
+    .portal-icon {
+      width: 32px;
+      height: 32px;
+
+      display: flex;
+
+      align-items: center;
+      justify-content: center;
+
+      margin-bottom: 7px;
+
+      border:
+        1px solid rgba(0,234,255,.22);
+
+      border-radius: 8px;
+
+      background:
+        rgba(0,234,255,.035);
+
+      color: var(--cyan);
+
+      font-size: 16px;
+
+      box-shadow:
+        inset 0 0 12px rgba(0,234,255,.025);
+    }
+
+    /* =========================
+       TEXTO
+    ========================== */
+
+    .portal-name {
+      font-size: 10px;
+
+      font-weight: bold;
+
+      letter-spacing: .8px;
+
+      text-transform: uppercase;
+    }
+
+    .portal-desc {
+      margin-top: 3px;
+
+      color: var(--muted);
+
+      font-size: 7px;
+
+      letter-spacing: .2px;
+    }
+
+    .portal-number {
+      position: absolute;
+
+      right: 7px;
+      top: 6px;
+
+      color:
+        rgba(0,234,255,.25);
+
+      font-size: 7px;
+
+      letter-spacing: 1px;
+    }
+
+    /* =========================
+       STATUS
+    ========================== */
+
+    .status {
+      margin-top: 10px;
+
+      display: flex;
+
+      justify-content: space-between;
+
+      align-items: center;
+
+      padding: 8px 10px;
+
+      border:
+        1px solid rgba(0,255,156,.13);
+
+      border-radius: 8px;
+
+      background:
+        rgba(0,255,156,.025);
+
+      color: var(--muted);
+
+      font-size: 7.5px;
+
+      letter-spacing: .7px;
+    }
+
+    .online {
+      color: var(--green);
+
+      font-weight: bold;
+    }
+
+    /* =========================
+       HOME
+    ========================== */
+
+    .home {
+      position: fixed;
+
+      z-index: 10;
+
+      left: 50%;
+      bottom: 12px;
+
+      transform:
+        translateX(-50%);
+
+      width: 48px;
+      height: 32px;
+
+      display: flex;
+
+      align-items: center;
+      justify-content: center;
+
+      border:
+        1px solid rgba(0,234,255,.3);
+
+      border-radius: 9px;
+
+      background:
+        rgba(11,17,23,.94);
+
+      color: var(--cyan);
+
+      text-decoration: none;
+
+      font-size: 15px;
+
+      box-shadow:
+        0 0 18px rgba(0,234,255,.08);
+
+      backdrop-filter:
+        blur(8px);
+    }
+
+    .home:hover {
+      border-color: var(--cyan);
+
+      box-shadow:
+        0 0 20px rgba(0,234,255,.18);
+    }
+
+    /* =========================
+       CELULAR
+    ========================== */
+
+    @media (max-width: 430px) {
+
+      body {
+        background: var(--bg);
+      }
+
+      .app {
+        max-width: 100%;
+
+        box-shadow: none;
+
+        padding:
+          12px
+          10px
+          75px;
+      }
+    }
+
+    /* =========================
+       CELULARES PEQUENOS
+    ========================== */
+
+    @media (max-width: 330px) {
+
+      .portal {
+        min-height: 82px;
+      }
+
+      .portal-name {
+        font-size: 9px;
+      }
+
+      .portal-desc {
+        font-size: 6.5px;
+      }
+
+    }
+
+  </style>
+
+</head>
+
+<body>
+
+  <main class="app">
+
+<!-- =========================
+     HEADER
+========================== -->
+
+<header>
+
+  <div class="system">
+    <span class="system-dot"></span>
+    SYSTEM ONLINE
+  </div>
+
+  <h1>IMPRESSORAS</h1>
+
+  <div class="subtitle">
+    Central de Impressão • CPD851
+  </div>
+
+</header>
+
+
+<!-- =========================
+     PORTAIS
+========================== -->
+
+<div class="section-title">
+  Portais de Impressão
+</div>
+
+
+<nav class="portals">
+
+
+  <!-- PORTAL 01 -->
+
+  <a class="portal" href="etiqueta-gondola.html">
+
+    <span class="portal-number">
+      01
+    </span>
+
+    <div class="portal-icon">
+      ▣
+    </div>
+
+    <div class="portal-name">
+      etiqueta-gondola
+    </div>
+
+    <div class="portal-desc">
+      Impressoras
+    </div>
+
+  </a>
+
+
+  <!-- PORTAL 02 -->
+
+  <a class="portal" href="etiqueta-ponto.html">
+
+    <span class="portal-number">
+      02
+    </span>
+
+    <div class="portal-icon">
+      ▣
+    </div>
+
+    <div class="portal-name">
+      etiqueta-ponto
+    </div>
+
+    <div class="portal-desc">
+      Impressoras
+    </div>
+
+  </a>
+
+
+  <!-- PORTAL 03 -->
+
+  <a class="portal" href="papel-oficio.html">
+
+    <span class="portal-number">
+      03
+    </span>
+
+    <div class="portal-icon">
+      ▣
+    </div>
+
+    <div class="portal-name">
+      papel-oficio
+    </div>
+
+    <div class="portal-desc">
+      Impressoras
+    </div>
+
+  </a>
+
+
+  <!-- PORTAL 04 -->
+
+  <a class="portal" href="ribbon.html">
+
+    <span class="portal-number">
+      04
+    </span>
+
+    <div class="portal-icon">
+      ▣
+    </div>
+
+    <div class="portal-name">
+      Ribbon
+    </div>
+
+    <div class="portal-desc">
+      Impressoras
+    </div>
+
+  </a>
+
+
+  <!-- PORTAL 05 -->
+
+  <a class="portal" href="toner-cartaz.html">
+
+    <span class="portal-number">
+      05
+    </span>
+
+    <div class="portal-icon">
+      ▣
+    </div>
+
+    <div class="portal-name">
+      Toner-cartaz
+    </div>
+
+    <div class="portal-desc">
+      Impressoras
+    </div>
+
+  </a>
+
+
+  <!-- PORTAL 06 -->
+
+  <a class="portal" href="toner-fotocondutor.html">
+
+    <span class="portal-number">
+      06
+    </span>
+
+    <div class="portal-icon">
+      ▣
+    </div>
+
+    <div class="portal-name">
+      Toner-fotocondutor
+    </div>
+
+    <div class="portal-desc">
+      Impressoras
+    </div>
+
+  </a>
+
+
+</nav>
+
+
+<!-- =========================
+     STATUS
+========================== -->
+
+<div class="status">
+
+  <span>
+    CPD851 • PRINTER CONTROL
+  </span>
+
+  <span class="online">
+    ● ONLINE
+  </span>
+
+</div>
+
+  </main>
+
+  <!-- =========================
+       HOME
+  ========================== -->
+
+<a
+class="home"
+href="index.html"
+aria-label="Início"
+
+>
+
+⌂
+
+  </a>
+
+</body>
+</html>

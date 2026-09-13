@@ -1,0 +1,2179 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    <title>CPD851 - ETQ Gôndola</title>
+
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --bg-color: #0b0e14;
+            --surface-color: rgba(20, 25, 34, 0.7);
+            --text-main: #ffffff;
+            --text-muted: #8b9bb4;
+
+            --glow-cyan: #00f3ff;
+            --glow-green: #00ff66;
+            --glow-orange: #ff9900;
+            --glow-red: #ff3366;
+
+            --white-label: #ffffff;
+            --yellow-label: #ffff00;
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            min-height: 100%;
+            background: var(--bg-color);
+            color: var(--text-main);
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        body {
+            min-height: 100dvh;
+            overflow-x: hidden;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 760px;
+            min-height: 100dvh;
+            margin: 0 auto;
+            padding: 1.25rem 1.2rem;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* =========================
+           CABEÇALHO
+        ========================= */
+
+        header {
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 1.35rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            color: var(--text-main);
+        }
+
+        header h1 i {
+            color: var(--glow-cyan);
+            margin-right: 7px;
+        }
+
+        .header-line {
+            width: 80px;
+            height: 2px;
+            margin: 8px auto 0;
+            background: var(--glow-cyan);
+            box-shadow: 0 0 10px var(--glow-cyan);
+        }
+
+        /* =========================
+           PAINÉIS
+        ========================= */
+
+        .sub-panel {
+            background: var(--surface-color);
+            border: 1px solid rgba(0, 243, 255, 0.16);
+            border-radius: 12px;
+            padding: 0.85rem;
+            margin-bottom: 0.75rem;
+            box-shadow:
+                0 0 15px rgba(0, 243, 255, 0.04),
+                inset 0 0 20px rgba(0, 243, 255, 0.02);
+        }
+
+        .panel-title {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: var(--glow-cyan);
+            letter-spacing: 0.8px;
+            margin-bottom: 0.7rem;
+        }
+
+        .panel-title i {
+            font-size: 0.9rem;
+        }
+
+        /* =========================
+           ESTOQUE CENTRAL
+        ========================= */
+
+        .estoque-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.55rem;
+        }
+
+        .estoque-central {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 0.75rem;
+            border-radius: 10px;
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .estoque-info {
+            min-width: 0;
+            flex: 1;
+        }
+
+        .estoque-label {
+            font-size: 0.88rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .estoque-saldo {
+            margin-top: 4px;
+            font-size: 0.78rem;
+            color: var(--text-muted);
+        }
+
+        .estoque-saldo strong {
+            color: var(--glow-green);
+            font-size: 1.15rem;
+        }
+
+        .ultima-entrada {
+            margin-top: 3px;
+            font-size: 0.68rem;
+            color: var(--text-muted);
+        }
+
+        .ultima-entrada strong {
+            color: var(--text-main);
+        }
+
+        /* =========================
+           CORES DAS ETIQUETAS
+        ========================= */
+
+        .nome-branca {
+            color: var(--white-label);
+        }
+
+        .nome-amarela {
+            color: var(--yellow-label);
+            text-shadow: 0 0 6px rgba(255, 255, 0, 0.25);
+        }
+
+        .nome-lamb {
+            color: var(--glow-cyan);
+        }
+
+        /* =========================
+           CONTROLES
+        ========================= */
+
+        .estoque-controls {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            flex-shrink: 0;
+        }
+
+        .color-counter {
+            min-width: 48px;
+            height: 38px;
+            padding: 0 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 7px;
+            background: rgba(0, 0, 0, 0.35);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: var(--text-main);
+            font-weight: 700;
+            font-size: 0.8rem;
+        }
+
+        button {
+            border: none;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+            transition: 0.15s ease;
+            touch-action: manipulation;
+        }
+
+        button:active {
+            transform: scale(0.96);
+        }
+
+        button:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-add-one {
+            min-height: 38px;
+            padding: 0 10px;
+            border-radius: 7px;
+            background: rgba(0, 255, 102, 0.12);
+            border: 1px solid var(--glow-green);
+            color: var(--glow-green);
+            font-size: 0.68rem;
+            box-shadow: 0 0 8px rgba(0, 255, 102, 0.08);
+        }
+
+        .btn-add-one:hover:not(:disabled) {
+            background: rgba(0, 255, 102, 0.2);
+        }
+
+        .btn-output {
+            min-height: 38px;
+            padding: 0 10px;
+            border-radius: 7px;
+            background: rgba(255, 153, 0, 0.12);
+            border: 1px solid var(--glow-orange);
+            color: var(--glow-orange);
+            font-size: 0.68rem;
+            box-shadow: 0 0 8px rgba(255, 153, 0, 0.08);
+        }
+
+        .btn-output:hover:not(:disabled) {
+            background: rgba(255, 153, 0, 0.2);
+        }
+
+        .btn-undo {
+            min-height: 38px;
+            padding: 0 9px;
+            border-radius: 7px;
+            background: rgba(255, 51, 102, 0.12);
+            border: 1px solid var(--glow-red);
+            color: var(--glow-red);
+            font-size: 0.65rem;
+        }
+
+        .btn-undo:hover:not(:disabled) {
+            background: rgba(255, 51, 102, 0.2);
+        }
+
+        .btn-zero {
+            min-height: 38px;
+            padding: 0 9px;
+            border-radius: 7px;
+            background: rgba(255, 68, 68, 0.12);
+            border: 1px solid #ff4444;
+            color: #ff4444;
+            font-size: 0.65rem;
+        }
+
+        .btn-zero:hover:not(:disabled) {
+            background: rgba(255, 68, 68, 0.2);
+        }
+
+        /* =========================
+           DESTINOS
+        ========================= */
+
+        .destino-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.55rem;
+        }
+
+        .destino-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 0.75rem;
+            border-radius: 9px;
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .destino-info {
+            min-width: 0;
+            flex: 1;
+        }
+
+        .destino-nome {
+            font-size: 0.83rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .destino-uso {
+            margin-top: 4px;
+            font-size: 0.7rem;
+            color: var(--text-muted);
+        }
+
+        .destino-uso strong {
+            color: var(--glow-orange);
+            font-size: 0.9rem;
+        }
+
+        .destino-data {
+            margin-top: 3px;
+            font-size: 0.65rem;
+            color: var(--text-muted);
+        }
+
+        .destino-controls {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            flex-shrink: 0;
+        }
+
+        /* =========================
+           NAVEGAÇÃO
+        ========================= */
+
+        .bottom-nav {
+            margin-top: auto;
+            padding-top: 0.8rem;
+            display: flex;
+            justify-content: center;
+        }
+
+        .bottom-nav a {
+            width: 45px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            text-decoration: none;
+            color: var(--glow-cyan);
+            background: rgba(0, 243, 255, 0.08);
+            border: 1px solid rgba(0, 243, 255, 0.4);
+            box-shadow: 0 0 10px rgba(0, 243, 255, 0.08);
+        }
+
+        .bottom-nav a:active {
+            transform: scale(0.94);
+        }
+
+        /* =========================
+           TOAST
+        ========================= */
+
+        #toast {
+            position: fixed;
+            left: 50%;
+            bottom: 72px;
+            transform: translateX(-50%);
+            z-index: 9999;
+
+            max-width: calc(100vw - 30px);
+            padding: 10px 15px;
+
+            border-radius: 8px;
+            background: rgba(15, 20, 28, 0.96);
+            border: 1px solid var(--glow-green);
+            color: var(--glow-green);
+
+            font-size: 0.76rem;
+            font-weight: 700;
+            text-align: center;
+
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease;
+        }
+
+        #toast.show {
+            opacity: 1;
+        }
+
+        #toast.error {
+            color: var(--glow-red);
+            border-color: var(--glow-red);
+        }
+
+        /* =========================
+           CELULAR
+        ========================= */
+
+        @media (max-width: 560px) {
+
+            .app-container {
+                padding: 1rem 0.8rem;
+            }
+
+            .estoque-central {
+                align-items: stretch;
+            }
+
+            .estoque-info {
+                flex: 1;
+            }
+
+            .estoque-controls {
+                flex-wrap: wrap;
+                justify-content: flex-end;
+            }
+
+            .destino-row {
+                align-items: stretch;
+            }
+
+            .destino-info {
+                flex: 1;
+            }
+
+            .destino-controls {
+                flex-wrap: wrap;
+                justify-content: flex-end;
+            }
+
+            .btn-add-one,
+            .btn-output,
+            .btn-undo,
+            .btn-zero {
+                flex: 1;
+                min-height: 40px;
+            }
+
+            .color-counter {
+                min-width: 50px;
+            }
+        }
+
+        @media (max-width: 480px) {
+
+            .app-container {
+                max-width: 100%;
+                padding: 1rem 0.8rem;
+            }
+
+            header h1 {
+                font-size: 1.2rem;
+            }
+
+            .sub-panel {
+                padding: 0.75rem;
+            }
+
+            .estoque-central,
+            .destino-row {
+                padding: 0.7rem;
+            }
+
+            .estoque-controls,
+            .destino-controls {
+                width: 100%;
+            }
+
+            .estoque-central,
+            .destino-row {
+                flex-direction: column;
+            }
+
+            .estoque-info,
+            .destino-info {
+                width: 100%;
+            }
+
+            .estoque-controls,
+            .destino-controls {
+                display: grid;
+                grid-template-columns: 50px 1fr 1fr;
+                gap: 5px;
+            }
+
+            .btn-zero {
+                grid-column: span 2;
+            }
+
+            .destino-controls {
+                grid-template-columns: 50px 1fr 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="app-container">
+
+    <!-- =========================
+         CABEÇALHO
+    ========================== -->
+
+    <header>
+        <h1>
+            <i class="fa-solid fa-tags"></i>
+            ETQ GÔNDOLA
+        </h1>
+
+        <div class="header-line"></div>
+    </header>
+
+
+    <!-- =========================
+         ESTOQUE CENTRAL
+    ========================== -->
+
+    <section class="sub-panel">
+
+        <div class="panel-title">
+            <i class="fa-solid fa-boxes-stacked"></i>
+            ESTOQUE CENTRAL
+        </div>
+
+        <div class="estoque-list">
+
+            <!-- =====================
+                 ETIQUETA BRANCA
+            ====================== -->
+
+            <div class="estoque-central">
+
+                <div class="estoque-info">
+
+                    <div class="estoque-label nome-branca">
+                        ETIQUETA BRANCA
+                    </div>
+
+                    <div class="estoque-saldo">
+                        Saldo:
+                        <strong id="saldo-etq-branca">0</strong>
+                        unidades
+                    </div>
+
+                    <div class="ultima-entrada">
+                        Última entrada:
+                        <strong id="entrada-etq-branca">-</strong>
+                    </div>
+
+                </div>
+
+                <div class="estoque-controls">
+
+                    <div class="color-counter"
+                         id="contador-estoque-branca">
+                        0
+                    </div>
+
+                    <button
+                        class="btn-add-one"
+                        onclick="adicionarEstoque('branca')">
+                        <i class="fa-solid fa-plus"></i>
+                        ADICIONAR
+                    </button>
+
+                    <button
+                        class="btn-undo"
+                        id="btn-desfazer-entrada-branca"
+                        onclick="desfazerEntrada('branca')"
+                        disabled>
+                        <i class="fa-solid fa-rotate-left"></i>
+                        DESFAZER
+                    </button>
+
+                    <button
+                        class="btn-zero"
+                        id="btn-zerar-branca"
+                        onclick="zerarEstoque('branca')"
+                        disabled>
+                        <i class="fa-solid fa-trash"></i>
+                        ZERAR ESTOQUE
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <!-- =====================
+                 ETIQUETA AMARELA
+            ====================== -->
+
+            <div class="estoque-central">
+
+                <div class="estoque-info">
+
+                    <div class="estoque-label nome-amarela">
+                        ETIQUETA AMARELA
+                    </div>
+
+                    <div class="estoque-saldo">
+                        Saldo:
+                        <strong id="saldo-etq-amarela">0</strong>
+                        unidades
+                    </div>
+
+                    <div class="ultima-entrada">
+                        Última entrada:
+                        <strong id="entrada-etq-amarela">-</strong>
+                    </div>
+
+                </div>
+
+                <div class="estoque-controls">
+
+                    <div class="color-counter"
+                         id="contador-estoque-amarela">
+                        0
+                    </div>
+
+                    <button
+                        class="btn-add-one"
+                        onclick="adicionarEstoque('amarela')">
+                        <i class="fa-solid fa-plus"></i>
+                        ADICIONAR
+                    </button>
+
+                    <button
+                        class="btn-undo"
+                        id="btn-desfazer-entrada-amarela"
+                        onclick="desfazerEntrada('amarela')"
+                        disabled>
+                        <i class="fa-solid fa-rotate-left"></i>
+                        DESFAZER
+                    </button>
+
+                    <button
+                        class="btn-zero"
+                        id="btn-zerar-amarela"
+                        onclick="zerarEstoque('amarela')"
+                        disabled>
+                        <i class="fa-solid fa-trash"></i>
+                        ZERAR ESTOQUE
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <!-- =====================
+                 LAMB LAMB
+            ====================== -->
+
+            <div class="estoque-central">
+
+                <div class="estoque-info">
+
+                    <div class="estoque-label nome-lamb">
+                        LAMB LAMB
+                    </div>
+
+                    <div class="estoque-saldo">
+                        Saldo:
+                        <strong id="saldo-etq-lamb-lamb">0</strong>
+                        unidades
+                    </div>
+
+                    <div class="ultima-entrada">
+                        Última entrada:
+                        <strong id="entrada-etq-lamb-lamb">-</strong>
+                    </div>
+
+                </div>
+
+                <div class="estoque-controls">
+
+                    <div class="color-counter"
+                         id="contador-estoque-lamb-lamb">
+                        0
+                    </div>
+
+                    <button
+                        class="btn-add-one"
+                        onclick="adicionarEstoque('lambLamb')">
+                        <i class="fa-solid fa-plus"></i>
+                        ADICIONAR
+                    </button>
+
+                    <button
+                        class="btn-undo"
+                        id="btn-desfazer-entrada-lamb-lamb"
+                        onclick="desfazerEntrada('lambLamb')"
+                        disabled>
+                        <i class="fa-solid fa-rotate-left"></i>
+                        DESFAZER
+                    </button>
+
+                    <button
+                        class="btn-zero"
+                        id="btn-zerar-lamb-lamb"
+                        onclick="zerarEstoque('lambLamb')"
+                        disabled>
+                        <i class="fa-solid fa-trash"></i>
+                        ZERAR ESTOQUE
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =========================
+         DESTINAR INSUMO
+    ========================== -->
+
+    <section class="sub-panel">
+
+        <div class="panel-title">
+            <i class="fa-solid fa-share-from-square"></i>
+            DESTINAR INSUMO
+        </div>
+
+        <div class="destino-list">
+
+
+            <!-- =====================
+                 IMPRESSORA PREÇO
+                 ETIQUETA BRANCA
+            ====================== -->
+
+            <div class="destino-row">
+
+                <div class="destino-info">
+
+                    <div class="destino-nome">
+                        IMPRESSORA PREÇO — BRANCA
+                    </div>
+
+                    <div class="destino-uso">
+                        Utilizado:
+                        <strong id="uso-impressora-branca">0</strong>
+                        unidades
+                    </div>
+
+                    <div class="destino-data">
+                        Último:
+                        <span id="data-impressora-branca">-</span>
+                    </div>
+
+                </div>
+
+                <div class="destino-controls">
+
+                    <div class="color-counter"
+                         id="contador-impressora-branca">
+                        0
+                    </div>
+
+                    <button
+                        class="btn-output"
+                        id="btn-direcionar-impressora-branca"
+                        onclick="direcionar('impressoraBranca')">
+                        <i class="fa-solid fa-arrow-right"></i>
+                        DIRECIONAR
+                    </button>
+
+                    <button
+                        class="btn-undo"
+                        id="btn-desfazer-impressora-branca"
+                        onclick="desfazer('impressoraBranca')"
+                        disabled>
+                        <i class="fa-solid fa-rotate-left"></i>
+                        DESFAZER
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <!-- =====================
+                 IMPRESSORA PREÇO
+                 ETIQUETA AMARELA
+            ====================== -->
+
+            <div class="destino-row">
+
+                <div class="destino-info">
+
+                    <div class="destino-nome">
+                        IMPRESSORA PREÇO — AMARELA
+                    </div>
+
+                    <div class="destino-uso">
+                        Utilizado:
+                        <strong id="uso-impressora-amarela">0</strong>
+                        unidades
+                    </div>
+
+                    <div class="destino-data">
+                        Último:
+                        <span id="data-impressora-amarela">-</span>
+                    </div>
+
+                </div>
+
+                <div class="destino-controls">
+
+                    <div class="color-counter"
+                         id="contador-impressora-amarela">
+                        0
+                    </div>
+
+                    <button
+                        class="btn-output"
+                        id="btn-direcionar-impressora-amarela"
+                        onclick="direcionar('impressoraAmarela')">
+                        <i class="fa-solid fa-arrow-right"></i>
+                        DIRECIONAR
+                    </button>
+
+                    <button
+                        class="btn-undo"
+                        id="btn-desfazer-impressora-amarela"
+                        onclick="desfazer('impressoraAmarela')"
+                        disabled>
+                        <i class="fa-solid fa-rotate-left"></i>
+                        DESFAZER
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <!-- =====================
+                 LAMB LAMB
+            ====================== -->
+
+            <div class="destino-row">
+
+                <div class="destino-info">
+
+                    <div class="destino-nome">
+                        LAMB LAMB
+                    </div>
+
+                    <div class="destino-uso">
+                        Utilizado:
+                        <strong id="uso-lamb-lamb">0</strong>
+                        unidades
+                    </div>
+
+                    <div class="destino-data">
+                        Último:
+                        <span id="data-lamb-lamb">-</span>
+                    </div>
+
+                </div>
+
+                <div class="destino-controls">
+
+                    <div class="color-counter"
+                         id="contador-lamb-lamb">
+                        0
+                    </div>
+
+                    <button
+                        class="btn-output"
+                        id="btn-direcionar-lamb-lamb"
+                        onclick="direcionar('lambLamb')">
+                        <i class="fa-solid fa-arrow-right"></i>
+                        DIRECIONAR
+                    </button>
+
+                    <button
+                        class="btn-undo"
+                        id="btn-desfazer-lamb-lamb"
+                        onclick="desfazer('lambLamb')"
+                        disabled>
+                        <i class="fa-solid fa-rotate-left"></i>
+                        DESFAZER
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =========================
+         NAVEGAÇÃO
+    ========================== -->
+
+    <nav class="bottom-nav">
+
+        <a href="index.html" title="Início">
+            <i class="fa-solid fa-house"></i>
+        </a>
+
+    </nav>
+
+</div>
+
+
+<div id="toast"></div>
+
+
+<!-- =========================
+     FIREBASE
+========================== -->
+
+<script type="module">
+
+    import { initializeApp }
+        from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+
+    import {
+        initializeFirestore,
+        doc,
+        setDoc,
+        onSnapshot
+    }
+        from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+
+    /* =========================
+       CONFIGURAÇÃO FIREBASE
+    ========================== */
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyA3odYvjY7mcWsCTvGcDKxoccz1qYSg_NE",
+        authDomain: "estoque-84295.firebaseapp.com",
+        projectId: "estoque-84295",
+        storageBucket: "estoque-84295.firebasestorage.app",
+        messagingSenderId: "704104486696",
+        appId: "1:704104486696:web:2be634dfc63baef31c221d",
+        measurementId: "G-D31RQ19END"
+    };
+
+
+    const app = initializeApp(firebaseConfig);
+
+    const db = initializeFirestore(app, {
+        experimentalForceLongPolling: true,
+        useFetchStreams: false
+    });
+
+
+    /* =========================
+       ESTADO
+    ========================== */
+
+    let estoqueGondola = {
+
+        branca: {
+            saldo: 0,
+            ultimaEntrada: "-",
+            historicoEntradas: []
+        },
+
+        amarela: {
+            saldo: 0,
+            ultimaEntrada: "-",
+            historicoEntradas: []
+        },
+
+        lambLamb: {
+            saldo: 0,
+            ultimaEntrada: "-",
+            historicoEntradas: []
+        },
+
+        destinos: {
+
+            impressoraBranca: {
+                total: 0,
+                ultimaData: "-",
+                historico: []
+            },
+
+            impressoraAmarela: {
+                total: 0,
+                ultimaData: "-",
+                historico: []
+            },
+
+            lambLamb: {
+                total: 0,
+                ultimaData: "-",
+                historico: []
+            }
+
+        }
+    };
+
+
+    /* =========================
+       TOAST
+    ========================== */
+
+    let toastTimer;
+
+    function mostrarToast(mensagem, erro = false) {
+
+        const toast =
+            document.getElementById("toast");
+
+        toast.textContent = mensagem;
+
+        toast.classList.toggle(
+            "error",
+            erro
+        );
+
+        toast.classList.add("show");
+
+        clearTimeout(toastTimer);
+
+        toastTimer = setTimeout(() => {
+
+            toast.classList.remove("show");
+
+        }, 2600);
+    }
+
+
+    /* =========================
+       DATA
+    ========================== */
+
+    function obterDataFormatada() {
+
+        const agora = new Date();
+
+        const dia =
+            String(agora.getDate()).padStart(2, "0");
+
+        const mes =
+            String(agora.getMonth() + 1).padStart(2, "0");
+
+        const ano =
+            agora.getFullYear();
+
+        const hora =
+            String(agora.getHours()).padStart(2, "0");
+
+        const minuto =
+            String(agora.getMinutes()).padStart(2, "0");
+
+        return `${dia}/${mes}/${ano} ${hora}:${minuto}`;
+    }
+
+
+    /* =========================
+       ATUALIZAR TELA
+    ========================== */
+
+    function atualizarTela() {
+
+
+        /* =====================
+           ESTOQUES
+        ====================== */
+
+        const estoques = [
+
+            {
+                chave: "branca",
+                saldo: "saldo-etq-branca",
+                contador: "contador-estoque-branca",
+                entrada: "entrada-etq-branca",
+                desfazer: "btn-desfazer-entrada-branca",
+                zerar: "btn-zerar-branca"
+            },
+
+            {
+                chave: "amarela",
+                saldo: "saldo-etq-amarela",
+                contador: "contador-estoque-amarela",
+                entrada: "entrada-etq-amarela",
+                desfazer: "btn-desfazer-entrada-amarela",
+                zerar: "btn-zerar-amarela"
+            },
+
+            {
+                chave: "lambLamb",
+                saldo: "saldo-etq-lamb-lamb",
+                contador: "contador-estoque-lamb-lamb",
+                entrada: "entrada-etq-lamb-lamb",
+                desfazer: "btn-desfazer-entrada-lamb-lamb",
+                zerar: "btn-zerar-lamb-lamb"
+            }
+
+        ];
+
+
+        estoques.forEach(item => {
+
+            const dados =
+                estoqueGondola[item.chave];
+
+            const saldo =
+                Number(dados?.saldo || 0);
+
+
+            document.getElementById(
+                item.saldo
+            ).textContent = saldo;
+
+
+            document.getElementById(
+                item.contador
+            ).textContent = saldo;
+
+
+            document.getElementById(
+                item.entrada
+            ).textContent =
+                dados?.ultimaEntrada || "-";
+
+
+            document.getElementById(
+                item.desfazer
+            ).disabled =
+                !Array.isArray(
+                    dados?.historicoEntradas
+                ) ||
+                dados.historicoEntradas.length === 0 ||
+                saldo <= 0;
+
+
+            document.getElementById(
+                item.zerar
+            ).disabled =
+                saldo <= 0;
+
+        });
+
+
+        /* =====================
+           DESTINOS
+        ====================== */
+
+        const destinos = [
+
+            {
+                chave: "impressoraBranca",
+                uso: "uso-impressora-branca",
+                contador: "contador-impressora-branca",
+                data: "data-impressora-branca",
+                direcionar: "btn-direcionar-impressora-branca",
+                desfazer: "btn-desfazer-impressora-branca",
+                estoque: "branca"
+            },
+
+            {
+                chave: "impressoraAmarela",
+                uso: "uso-impressora-amarela",
+                contador: "contador-impressora-amarela",
+                data: "data-impressora-amarela",
+                direcionar: "btn-direcionar-impressora-amarela",
+                desfazer: "btn-desfazer-impressora-amarela",
+                estoque: "amarela"
+            },
+
+            {
+                chave: "lambLamb",
+                uso: "uso-lamb-lamb",
+                contador: "contador-lamb-lamb",
+                data: "data-lamb-lamb",
+                direcionar: "btn-direcionar-lamb-lamb",
+                desfazer: "btn-desfazer-lamb-lamb",
+                estoque: "lambLamb"
+            }
+
+        ];
+
+
+        destinos.forEach(item => {
+
+            const dadosDestino =
+                estoqueGondola.destinos[item.chave];
+
+            const dadosEstoque =
+                estoqueGondola[item.estoque];
+
+
+            const total =
+                Number(
+                    dadosDestino?.total || 0
+                );
+
+
+            const saldo =
+                Number(
+                    dadosEstoque?.saldo || 0
+                );
+
+
+            document.getElementById(
+                item.uso
+            ).textContent = total;
+
+
+            document.getElementById(
+                item.contador
+            ).textContent = total;
+
+
+            document.getElementById(
+                item.data
+            ).textContent =
+                dadosDestino?.ultimaData || "-";
+
+
+            /*
+             * O botão só pode direcionar
+             * se existir saldo daquele
+             * tipo específico.
+             */
+
+            document.getElementById(
+                item.direcionar
+            ).disabled =
+                saldo <= 0;
+
+
+            document.getElementById(
+                item.desfazer
+            ).disabled =
+                total <= 0;
+
+        });
+
+    }
+
+
+    /* =========================
+       FIRESTORE
+    ========================== */
+
+    onSnapshot(
+
+        doc(db, "controle", "geral"),
+
+        snapshot => {
+
+            if (!snapshot.exists()) {
+
+                atualizarTela();
+
+                return;
+            }
+
+
+            const dados =
+                snapshot.data();
+
+
+            const salvo =
+                dados?.etq_gondola;
+
+
+            if (!salvo) {
+
+                atualizarTela();
+
+                return;
+            }
+
+
+            /* =====================
+               ETIQUETA BRANCA
+            ====================== */
+
+            /*
+             * Compatibilidade com o
+             * estoque antigo.
+             *
+             * O antigo:
+             *
+             * saldo
+             * ultimaEntrada
+             * historicoEntradas
+             *
+             * passa a representar
+             * ETIQUETA BRANCA.
+             */
+
+            const brancaExiste =
+                salvo.branca &&
+                typeof salvo.branca === "object";
+
+
+            estoqueGondola.branca = {
+
+                saldo: Number(
+                    brancaExiste
+                        ? salvo.branca.saldo || 0
+                        : salvo.saldo || 0
+                ),
+
+                ultimaEntrada:
+                    brancaExiste
+                        ? salvo.branca.ultimaEntrada || "-"
+                        : salvo.ultimaEntrada || "-",
+
+                historicoEntradas:
+                    Array.isArray(
+                        brancaExiste
+                            ? salvo.branca.historicoEntradas
+                            : salvo.historicoEntradas
+                    )
+                        ? [
+                            ...(brancaExiste
+                                ? salvo.branca.historicoEntradas
+                                : salvo.historicoEntradas)
+                        ]
+                        : []
+            };
+
+
+            /* =====================
+               ETIQUETA AMARELA
+            ====================== */
+
+            estoqueGondola.amarela = {
+
+                saldo:
+                    Number(
+                        salvo?.amarela?.saldo || 0
+                    ),
+
+                ultimaEntrada:
+                    salvo?.amarela?.ultimaEntrada || "-",
+
+                historicoEntradas:
+                    Array.isArray(
+                        salvo?.amarela?.historicoEntradas
+                    )
+                        ? [
+                            ...salvo.amarela.historicoEntradas
+                        ]
+                        : []
+            };
+
+
+            /* =====================
+               LAMB LAMB
+            ====================== */
+
+            estoqueGondola.lambLamb = {
+
+                saldo:
+                    Number(
+                        salvo?.lambLamb?.saldo || 0
+                    ),
+
+                ultimaEntrada:
+                    salvo?.lambLamb?.ultimaEntrada || "-",
+
+                historicoEntradas:
+                    Array.isArray(
+                        salvo?.lambLamb?.historicoEntradas
+                    )
+                        ? [
+                            ...salvo.lambLamb.historicoEntradas
+                        ]
+                        : []
+            };
+
+
+            /* =====================
+               DESTINOS
+            ====================== */
+
+            estoqueGondola.destinos = {
+
+                impressoraBranca: {
+
+                    total:
+                        Number(
+                            salvo?.destinos?.impressoraBranca?.total || 0
+                        ),
+
+                    ultimaData:
+                        salvo?.destinos?.impressoraBranca?.ultimaData || "-",
+
+                    historico:
+                        Array.isArray(
+                            salvo?.destinos?.impressoraBranca?.historico
+                        )
+                            ? [
+                                ...salvo.destinos.impressoraBranca.historico
+                            ]
+                            : []
+                },
+
+
+                impressoraAmarela: {
+
+                    total:
+                        Number(
+                            salvo?.destinos?.impressoraAmarela?.total || 0
+                        ),
+
+                    ultimaData:
+                        salvo?.destinos?.impressoraAmarela?.ultimaData || "-",
+
+                    historico:
+                        Array.isArray(
+                            salvo?.destinos?.impressoraAmarela?.historico
+                        )
+                            ? [
+                                ...salvo.destinos.impressoraAmarela.historico
+                            ]
+                            : []
+                },
+
+
+                lambLamb: {
+
+                    total:
+                        Number(
+                            salvo?.destinos?.lambLamb?.total || 0
+                        ),
+
+                    ultimaData:
+                        salvo?.destinos?.lambLamb?.ultimaData || "-",
+
+                    historico:
+                        Array.isArray(
+                            salvo?.destinos?.lambLamb?.historico
+                        )
+                            ? [
+                                ...salvo.destinos.lambLamb.historico
+                            ]
+                            : []
+                }
+
+            };
+
+
+            atualizarTela();
+
+        },
+
+        erro => {
+
+            console.error(
+                "Erro ao carregar estoque:",
+                erro
+            );
+
+            mostrarToast(
+                "Erro ao carregar estoque.",
+                true
+            );
+
+        }
+
+    );
+
+
+    /* =========================
+       ADICIONAR ESTOQUE
+       +1
+    ========================== */
+
+    window.adicionarEstoque =
+        async function(tipo) {
+
+
+        const dados =
+            estoqueGondola[tipo];
+
+
+        if (!dados) {
+            return;
+        }
+
+
+        const data =
+            obterDataFormatada();
+
+
+        const historico =
+            Array.isArray(
+                dados.historicoEntradas
+            )
+                ? [...dados.historicoEntradas]
+                : [];
+
+
+        historico.push(data);
+
+
+        const novoSaldo =
+            Number(dados.saldo || 0) + 1;
+
+
+        try {
+
+            await setDoc(
+
+                doc(
+                    db,
+                    "controle",
+                    "geral"
+                ),
+
+                {
+                    etq_gondola: {
+
+                        [tipo]: {
+
+                            saldo: novoSaldo,
+
+                            ultimaEntrada: data,
+
+                            historicoEntradas:
+                                historico
+
+                        }
+
+                    }
+
+                },
+
+                {
+                    merge: true
+                }
+
+            );
+
+
+            mostrarToast(
+                `✓ 1 unidade adicionada: ${nomeTipo(tipo)}`
+            );
+
+
+        } catch (erro) {
+
+            console.error(
+                "Erro ao adicionar:",
+                erro
+            );
+
+            mostrarToast(
+                `Erro ao adicionar: ${erro.code || erro.message}`,
+                true
+            );
+        }
+
+    };
+
+
+    /* =========================
+       DESFAZER ENTRADA
+    ========================== */
+
+    window.desfazerEntrada =
+        async function(tipo) {
+
+
+        const dados =
+            estoqueGondola[tipo];
+
+
+        if (!dados) {
+            return;
+        }
+
+
+        const saldo =
+            Number(dados.saldo || 0);
+
+
+        const historico =
+            Array.isArray(
+                dados.historicoEntradas
+            )
+                ? [...dados.historicoEntradas]
+                : [];
+
+
+        if (
+            historico.length === 0 ||
+            saldo <= 0
+        ) {
+
+            mostrarToast(
+                "Não há entrada disponível para desfazer.",
+                true
+            );
+
+            return;
+        }
+
+
+        historico.pop();
+
+
+        const novoSaldo =
+            Math.max(
+                0,
+                saldo - 1
+            );
+
+
+        const ultimaEntrada =
+            historico.length > 0
+                ? historico[
+                    historico.length - 1
+                ]
+                : "-";
+
+
+        try {
+
+            await setDoc(
+
+                doc(
+                    db,
+                    "controle",
+                    "geral"
+                ),
+
+                {
+                    etq_gondola: {
+
+                        [tipo]: {
+
+                            saldo: novoSaldo,
+
+                            ultimaEntrada,
+
+                            historicoEntradas:
+                                historico
+
+                        }
+
+                    }
+
+                },
+
+                {
+                    merge: true
+                }
+
+            );
+
+
+            mostrarToast(
+                `↩ Entrada desfeita: ${nomeTipo(tipo)}`
+            );
+
+
+        } catch (erro) {
+
+            console.error(
+                "Erro ao desfazer entrada:",
+                erro
+            );
+
+            mostrarToast(
+                `Erro ao desfazer: ${erro.code || erro.message}`,
+                true
+            );
+        }
+
+    };
+
+
+    /* =========================
+       ZERAR ESTOQUE
+    ========================== */
+
+    window.zerarEstoque =
+        async function(tipo) {
+
+
+        const dados =
+            estoqueGondola[tipo];
+
+
+        if (!dados) {
+            return;
+        }
+
+
+        const saldoAtual =
+            Number(dados.saldo || 0);
+
+
+        if (saldoAtual <= 0) {
+
+            mostrarToast(
+                `${nomeTipo(tipo)} já está zerado.`,
+                true
+            );
+
+            return;
+        }
+
+
+        const confirmar = confirm(
+
+            `Deseja realmente ZERAR o estoque de ${nomeTipo(tipo)}?\n\n` +
+
+            `Saldo atual: ${saldoAtual} unidade(s).\n\n` +
+
+            "Essa ação não poderá ser desfeita."
+
+        );
+
+
+        if (!confirmar) {
+            return;
+        }
+
+
+        try {
+
+            await setDoc(
+
+                doc(
+                    db,
+                    "controle",
+                    "geral"
+                ),
+
+                {
+                    etq_gondola: {
+
+                        [tipo]: {
+
+                            saldo: 0,
+
+                            ultimaEntrada: "-",
+
+                            historicoEntradas: []
+
+                        }
+
+                    }
+
+                },
+
+                {
+                    merge: true
+                }
+
+            );
+
+
+            mostrarToast(
+                `✓ Estoque ${nomeTipo(tipo)} zerado`
+            );
+
+
+        } catch (erro) {
+
+            console.error(
+                "Erro ao zerar:",
+                erro
+            );
+
+            mostrarToast(
+                `Erro ao zerar: ${erro.code || erro.message}`,
+                true
+            );
+        }
+
+    };
+
+
+    /* =========================
+       DIRECIONAR
+    ========================== */
+
+    window.direcionar =
+        async function(destino) {
+
+
+        const configuracao = {
+
+            impressoraBranca: {
+                estoque: "branca",
+                nome: "Etiqueta Branca",
+                destinoNome: "Impressora Preço"
+            },
+
+            impressoraAmarela: {
+                estoque: "amarela",
+                nome: "Etiqueta Amarela",
+                destinoNome: "Impressora Preço"
+            },
+
+            lambLamb: {
+                estoque: "lambLamb",
+                nome: "Lamb Lamb",
+                destinoNome: "Lamb Lamb"
+            }
+
+        };
+
+
+        const config =
+            configuracao[destino];
+
+
+        if (!config) {
+            return;
+        }
+
+
+        const dadosEstoque =
+            estoqueGondola[
+                config.estoque
+            ];
+
+
+        const dadosDestino =
+            estoqueGondola.destinos[
+                destino
+            ];
+
+
+        if (!dadosEstoque) {
+            return;
+        }
+
+
+        const saldo =
+            Number(
+                dadosEstoque.saldo || 0
+            );
+
+
+        if (saldo <= 0) {
+
+            mostrarToast(
+                `Estoque ${config.nome} zerado.`,
+                true
+            );
+
+            return;
+        }
+
+
+        const data =
+            obterDataFormatada();
+
+
+        const historico =
+            Array.isArray(
+                dadosDestino?.historico
+            )
+                ? [...dadosDestino.historico]
+                : [];
+
+
+        historico.push(data);
+
+
+        const novoSaldo =
+            saldo - 1;
+
+
+        const novoTotal =
+            Number(
+                dadosDestino?.total || 0
+            ) + 1;
+
+
+        try {
+
+            await setDoc(
+
+                doc(
+                    db,
+                    "controle",
+                    "geral"
+                ),
+
+                {
+                    etq_gondola: {
+
+                        [config.estoque]: {
+
+                            saldo: novoSaldo,
+
+                            ultimaEntrada:
+                                dadosEstoque.ultimaEntrada,
+
+                            historicoEntradas:
+                                dadosEstoque.historicoEntradas
+
+                        },
+
+                        destinos: {
+
+                            [destino]: {
+
+                                total:
+                                    novoTotal,
+
+                                ultimaData:
+                                    data,
+
+                                historico
+
+                            }
+
+                        }
+
+                    }
+
+                },
+
+                {
+                    merge: true
+                }
+
+            );
+
+
+            mostrarToast(
+                `✓ 1 ${config.nome} direcionada`
+            );
+
+
+        } catch (erro) {
+
+            console.error(
+                "Erro ao direcionar:",
+                erro
+            );
+
+            mostrarToast(
+                `Erro ao direcionar: ${erro.code || erro.message}`,
+                true
+            );
+        }
+
+    };
+
+
+    /* =========================
+       DESFAZER DIRECIONAMENTO
+    ========================== */
+
+    window.desfazer =
+        async function(destino) {
+
+
+        const configuracao = {
+
+            impressoraBranca: {
+                estoque: "branca",
+                nome: "Etiqueta Branca"
+            },
+
+            impressoraAmarela: {
+                estoque: "amarela",
+                nome: "Etiqueta Amarela"
+            },
+
+            lambLamb: {
+                estoque: "lambLamb",
+                nome: "Lamb Lamb"
+            }
+
+        };
+
+
+        const config =
+            configuracao[destino];
+
+
+        if (!config) {
+            return;
+        }
+
+
+        const dadosDestino =
+            estoqueGondola.destinos[
+                destino
+            ];
+
+
+        const dadosEstoque =
+            estoqueGondola[
+                config.estoque
+            ];
+
+
+        const total =
+            Number(
+                dadosDestino?.total || 0
+            );
+
+
+        if (total <= 0) {
+
+            mostrarToast(
+                "Não há direcionamento para desfazer.",
+                true
+            );
+
+            return;
+        }
+
+
+        const historico =
+            Array.isArray(
+                dadosDestino?.historico
+            )
+                ? [...dadosDestino.historico]
+                : [];
+
+
+        if (historico.length > 0) {
+            historico.pop();
+        }
+
+
+        const novoTotal =
+            Math.max(
+                0,
+                total - 1
+            );
+
+
+        const ultimaData =
+            historico.length > 0
+                ? historico[
+                    historico.length - 1
+                ]
+                : "-";
+
+
+        const novoSaldo =
+            Number(
+                dadosEstoque.saldo || 0
+            ) + 1;
+
+
+        try {
+
+            await setDoc(
+
+                doc(
+                    db,
+                    "controle",
+                    "geral"
+                ),
+
+                {
+                    etq_gondola: {
+
+                        [config.estoque]: {
+
+                            saldo:
+                                novoSaldo,
+
+                            ultimaEntrada:
+                                dadosEstoque.ultimaEntrada,
+
+                            historicoEntradas:
+                                dadosEstoque.historicoEntradas
+
+                        },
+
+                        destinos: {
+
+                            [destino]: {
+
+                                total:
+                                    novoTotal,
+
+                                ultimaData,
+
+                                historico
+
+                            }
+
+                        }
+
+                    }
+
+                },
+
+                {
+                    merge: true
+                }
+
+            );
+
+
+            mostrarToast(
+                `↩ ${config.nome}: direcionamento desfeito`
+            );
+
+
+        } catch (erro) {
+
+            console.error(
+                "Erro ao desfazer direcionamento:",
+                erro
+            );
+
+            mostrarToast(
+                `Erro ao desfazer: ${erro.code || erro.message}`,
+                true
+            );
+        }
+
+    };
+
+
+    /* =========================
+       NOME DO TIPO
+    ========================== */
+
+    function nomeTipo(tipo) {
+
+        const nomes = {
+
+            branca:
+                "ETIQUETA BRANCA",
+
+            amarela:
+                "ETIQUETA AMARELA",
+
+            lambLamb:
+                "LAMB LAMB"
+
+        };
+
+
+        return nomes[tipo] || tipo;
+    }
+
+</script>
+
+</body>
+</html>
