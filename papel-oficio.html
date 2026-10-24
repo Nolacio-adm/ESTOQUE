@@ -1057,6 +1057,47 @@
                     </div>
 
 
+                    <!-- CARTAZISTA -->
+                    <div class="printer-row">
+
+                        <div class="printer-info">
+                            <span class="printer-name">CARTAZISTA</span>
+                            <span class="printer-usage">
+                                Usado:
+                                <strong id="uso-oficio-cartazista">0</strong>
+                                unidades
+                            </span>
+                            <span class="printer-date" id="data-oficio-cartazista">
+                                Último: -
+                            </span>
+                        </div>
+
+                        <div class="printer-controls">
+                            <span
+                                id="contador-papel_oficio-CARTAZISTA"
+                                class="printer-counter"
+                            >0</span>
+
+                            <button
+                                class="btn-output"
+                                onclick="direcionarUmaUnidade('CARTAZISTA')"
+                            >
+                                DIRECIONAR
+                            </button>
+
+                            <button
+                                id="desfazer-papel_oficio-CARTAZISTA"
+                                class="btn-undo"
+                                onclick="desfazerDirecionamento('CARTAZISTA')"
+                                disabled
+                            >
+                                DESFAZER
+                            </button>
+                        </div>
+
+                    </div>
+
+
                     <!-- RH -->
                     <div class="printer-row">
 
@@ -1365,7 +1406,8 @@
                 "RME",
                 "GER",
                 "CPD",
-                "RH"
+                "RH",
+                "CARTAZISTA"
             ];
 
 
